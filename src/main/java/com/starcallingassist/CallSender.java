@@ -66,8 +66,7 @@ public class CallSender
     public boolean sendCall(String username, String world, String tier, String location) throws IOException
     {
 	List<CallData> data = new ArrayList<>();
-	data.add(new CallData(username, "star miners", world + " " + tier + " " + location));
-	data.add(new CallData(username, "group stars", world + " " + tier + " " + location));
+	data.add(new CallData(username, "plugin", world + " " + tier + " " + location));
 	Request request = new Request.Builder()
 		.url(endpoint)
 		.addHeader("Authorization", "none")
