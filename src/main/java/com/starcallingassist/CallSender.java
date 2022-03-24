@@ -73,7 +73,7 @@ public class CallSender
 		.post(RequestBody.create(MediaType.parse("application/json"), GSON.toJson(data)))
 		.build();
 
-	return true;//okHttpClient.newCall(request).execute().isSuccessful();
+	return okHttpClient.newCall(request).execute().isSuccessful();
     }
 
 }
