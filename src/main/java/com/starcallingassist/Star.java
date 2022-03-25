@@ -48,14 +48,14 @@ public class Star
 	    put(new Point(2940, 3280), "Crafting guild");
 	    put(new Point(2906, 3355), "West falador mine");
 	    put(new Point(3030, 3348), "East falador bank");
-	    put(new Point(3018, 3443), "Dwarven mine");
+	    put(new Point(3018, 3443), "North Dwarven Mine Entrance");
 	    put(new Point(2882, 3474), "Taverley house portal");
 	    /*
 	    CRANDOR/KARAMJA
 	     */
-	    put(new Point(2736, 3221), "Brimhaven horseshoe mine");
-	    put(new Point(2742, 3143), "Brimhaven dungeon entrance");
-	    put(new Point(2845, 3037), "Karamja nature altar mine");
+	    put(new Point(2736, 3221), "Brimhaven north horseshoe mine");
+	    put(new Point(2742, 3143), "Brimhaven south dungeon entrance");
+	    put(new Point(2845, 3037), "Nature altar mine north of shilo");
 	    put(new Point(2827, 2999), "Shilo village gem mine");
 	    put(new Point(2835, 3296), "North crandor");
 	    put(new Point(2822, 3238), "South crandor");
@@ -66,50 +66,50 @@ public class Star
 	    put(new Point(3276, 3164), "Al kharid bank");
 	    put(new Point(3341, 3267), "Duel arena");
 	    put(new Point(3424, 3160), "Northwest of uzer");
-	    put(new Point(3434, 2889), "Nardah");
-	    put(new Point(3316, 2867), "Northwest of agility pyramid");
-	    put(new Point(3171, 2910), "Desert sandstone mine");
+	    put(new Point(3434, 2889), "Nardah bank");
+	    put(new Point(3316, 2867), "Agility pyramid mine");
+	    put(new Point(3171, 2910), "Desert quarry mine");
 	    /*
 	    FELDIP HILLS/ISLE OF SOULS
 	     */
-	    put(new Point(2567, 2858), "Corsair cove");
+	    put(new Point(2567, 2858), "Corsair cove bank");
 	    put(new Point(2483, 2886), "Corsair resource area");
 	    put(new Point(2468, 2842), "Myths guild");
 	    put(new Point(2571, 2964), "Feldip hills aks fairy ring");
 	    put(new Point(2630, 2993), "Rantz cave");
-	    put(new Point(2200, 2792), "Isle of souls mine");
+	    put(new Point(2200, 2792), "Soul wars south mine");
 	    /*
 	    FOSSIL ISLAND/MOS LE HARMLESS
 	     */
-	    put(new Point(3818, 3801), "Volcanic mine");
-	    put(new Point(3774, 3814), "West of fossil island volcano");
+	    put(new Point(3818, 3801), "Fossil Island Volcanic Mine Entrance");
+	    put(new Point(3774, 3814), "Fossil Island rune rocks");
 	    put(new Point(3686, 2969), "Mos le harmless");
 	    /*
 	    FREMENNIK/LUNAR ISLE
 	     */
 	    put(new Point(2727, 3683), "Keldagrim entrance mine");
 	    put(new Point(2683, 3699), "Rellekka mine");
-	    put(new Point(2393, 3814), "Jatizso");
-	    put(new Point(2375, 3832), "Neitiznot runite rocks");
-	    put(new Point(2528, 3887), "Miscellania coal mine");
+	    put(new Point(2393, 3814), "Jatizso Mine Entrance");
+	    put(new Point(2375, 3832), "Neitiznot Island South of Rune Rocks");
+	    put(new Point(2528, 3887), "Miscellania Mine (cip fairy ring)");
 	    put(new Point(2139, 3938), "Lunar isle mine entrance");
 	    /*
 	    KANDARIN
 	     */
 	    put(new Point(2602, 3086), "Yanille bank");
-	    put(new Point(2624, 3141), "Khazard mine");
+	    put(new Point(2624, 3141), "Port Khazard mine");
 	    put(new Point(2608, 3233), "Ardougne monestary");
 	    put(new Point(2705, 3333), "South of legends guild");
 	    put(new Point(2804, 3434), "Catherby bank");
-	    put(new Point(2589, 3478), "Coal trucks");
+	    put(new Point(2589, 3478), "Coal Trucks West of Seers");
 	    /*
 	    KOUREND
 	     */
-	    put(new Point(1778, 3493), "Tithe farm");
-	    put(new Point(1769, 3709), "Port piscarilius mine");
-	    put(new Point(1597, 3648), "Mine south of kourend castle");
-	    put(new Point(1534, 3747), "Southeast lovakengj bank");
-	    put(new Point(1437, 3840), "Northwest lovakengj bank");
+	    put(new Point(1778, 3493), "Hosidius mine");
+	    put(new Point(1769, 3709), "Port Piscarilius Mine in Kourend");
+	    put(new Point(1597, 3648), "Shayzien Mine south of kourend castle");
+	    put(new Point(1534, 3747), "South lovakengj bank");
+	    put(new Point(1437, 3840), "Lovakite mine");
 	    put(new Point(1760, 3853), "Arceuus dense essence mine");
 	    /*
 	    KEBOS LOWLANDS
@@ -125,16 +125,16 @@ public class Star
 	    put(new Point(3290, 3353), "Southeast varrock mine");
 	    put(new Point(3175, 3362), "Champions guild mine");
 	    put(new Point(3094, 3235), "Draynor village");
-	    put(new Point(3153, 3150), "Southwest lumbridge swamp");
-	    put(new Point(3230, 3155), "Southeast lumbridge swamp");
+	    put(new Point(3153, 3150), "Southwest lumbridge swamp mine");
+	    put(new Point(3230, 3155), "Southeast lumbridge swamp mine");
 	    /*
 	    MORYTANIA
 	     */
-	    put(new Point(3635, 3340), "Darkmeyer");
+	    put(new Point(3635, 3340), "Darkmeyer ess. mine entrance");
 	    put(new Point(3650, 3214), "Theatre of blood bank");
 	    put(new Point(3505, 3485), "Canifis bank");
 	    put(new Point(3500, 3219), "Burgh de rott bank");
-	    put(new Point(3451, 3233), "Abandoned mine");
+	    put(new Point(3451, 3233), "Abandoned mine west of burgh de rott");
 	    /*
 	    PISCATORIS/GNOME STRONGHOLD
 	     */
@@ -146,7 +146,7 @@ public class Star
 	     */
 	    put(new Point(2329, 3163), "Lletya");
 	    put(new Point(2269, 3158), "Isafdar runite rocks");
-	    put(new Point(3274, 6055), "Priffdnas");
+	    put(new Point(3274, 6055), "Priffdinas zalcano entrance");
 	    put(new Point(2318, 3269), "Arandar mine");
 	    put(new Point(2173, 3409), "Mynydd");
 	    /*

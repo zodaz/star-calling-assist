@@ -5,7 +5,6 @@ import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
-import okio.Buffer;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -49,7 +48,6 @@ public class CallSender
 	    .connectTimeout(5, TimeUnit.SECONDS)
 	    .writeTimeout(3, TimeUnit.SECONDS)
 	    .readTimeout(2, TimeUnit.SECONDS)
-	    .cache(null)
 	    .build();
 
     private String endpoint;
