@@ -24,11 +24,6 @@ public class Star
 	this.world = world;
     }
 
-    public String getTierString()
-    {
-	return "T" + tier;
-    }
-
     public static Star GET_STAR(){ return CURRENT_STAR; }
 
     public static void REMOVE_STAR() { CURRENT_STAR = null; }
@@ -75,7 +70,7 @@ public class Star
 	    put(new Point(2567, 2858), "Corsair cove bank");
 	    put(new Point(2483, 2886), "Corsair resource area");
 	    put(new Point(2468, 2842), "Myths guild");
-	    put(new Point(2571, 2964), "Feldip hills aks fairy ring");
+	    put(new Point(2571, 2964), "Feldip hills (aks fairy ring)");
 	    put(new Point(2630, 2993), "Rantz cave");
 	    put(new Point(2200, 2792), "Soul wars south mine");
 	    /*
@@ -90,7 +85,7 @@ public class Star
 	    put(new Point(2727, 3683), "Keldagrim entrance mine");
 	    put(new Point(2683, 3699), "Rellekka mine");
 	    put(new Point(2393, 3814), "Jatizso Mine Entrance");
-	    put(new Point(2375, 3832), "Neitiznot Island South of Rune Rocks");
+	    put(new Point(2375, 3832), "Neitiznot Islands South of Rune Rocks");
 	    put(new Point(2528, 3887), "Miscellania Mine (cip fairy ring)");
 	    put(new Point(2139, 3938), "Lunar isle mine entrance");
 	    /*
@@ -140,7 +135,7 @@ public class Star
 	     */
 	    put(new Point(2444, 3490), "West of grand tree");
 	    put(new Point(2448, 3436), "Gnome stronghold spirit tree");
-	    put(new Point(2341, 3635), "Piscatoris akq fairy ring");
+	    put(new Point(2341, 3635), "Piscatoris (akq fairy ring)");
 	    /*
 	    TIRANNWN
 	     */

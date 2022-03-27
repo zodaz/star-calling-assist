@@ -27,7 +27,6 @@ import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
-
 import javax.inject.Inject;
 import java.awt.*;
 import java.io.IOException;
@@ -39,7 +38,6 @@ import java.io.IOException;
 )
 public class StarCallingAssistPlugin extends Plugin
 {
-
     private static final int[] TIER_IDS = new int[]{41229,41228,41227,41226,41225,41224,41223,41021,41020};
     private static final Point BUTTON_RESIZEABLE_LOCATION = new Point(130, 150);
     private static final Point BUTTON_FIXED_LOCATION = new Point(208, 55);
@@ -68,6 +66,7 @@ public class StarCallingAssistPlugin extends Plugin
     protected void startUp() throws Exception
     {
 	sender.updateConfig();
+
 	autoCall = starConfig.autoCall();
 	chatLogging = starConfig.chatMessages();
 	updateStar = starConfig.updateStar();
@@ -190,7 +189,7 @@ public class StarCallingAssistPlugin extends Plugin
 	if (parent == null || callButton == null)
 	    return;
 	Widget[] children = parent.getChildren();
-	if (children.length <= callButton.getIndex() || children[callButton.getIndex()] != callButton)
+	if (children.length <= callButton.getIndex() || !children[callButton.getIndex()].equals(callButton))
 	    return;
 	children[callButton.getIndex()] = null;
 	callButton = null;
@@ -224,12 +223,12 @@ public class StarCallingAssistPlugin extends Plugin
 	}
 
 	String username = client.getLocalPlayer().getName();
-	String world = "W" + Integer.toString(client.getWorld());
-	String tier = Star.GET_STAR().getTierString();
+	int world = client.getWorld();
+	int tier = Star.GET_STAR().tier;
 	String location = getLocationName(Star.GET_STAR().location.getX(), Star.GET_STAR().location.getY());
 	if (location.equals("unknown"))
 	{
-	    logToChat("Star location name is unknown, manual call required.");
+	    logToChat("Star location is unknown, manual call required.");
 	    return;
 	}
 	new Thread(() -> {
@@ -239,7 +238,7 @@ public class StarCallingAssistPlugin extends Plugin
 		{
 		    lastCalledStar = Star.GET_STAR();
 		    clientThread.invokeLater(() -> {
-			logHighlightedToChat("Successfully called: ", world + " " + tier + " " + location);
+			logHighlightedToChat("Successfully called: ", "W" + world + " T" + tier + " " + location);
 		    });
 		}
 		else

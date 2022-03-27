@@ -17,8 +17,8 @@ public interface StarCallingAssistConfig extends Config
 
     @ConfigItem(
 	    keyName = "autoCall",
-	    name = "Automatic star calling",
-	    description = "Automatically call stars that appear",
+	    name = "Auto calling stars",
+	    description = "Automatically call stars as they appear",
 	    position = 1
     )
     default boolean autoCall() {return false;}
@@ -26,7 +26,7 @@ public interface StarCallingAssistConfig extends Config
     @ConfigItem(
 	    keyName = "updateStar",
 	    name = "Auto update stars",
-	    description = "Allows for a new automatic call to be made when the tier of a star changes (if automatic star calling enabled)",
+	    description = "Posts a new call when the tier of a star changes (auto calling must be enabled)",
 	    position = 2
     )
     default boolean updateStar() {return false;}
@@ -34,7 +34,7 @@ public interface StarCallingAssistConfig extends Config
     @ConfigItem(
 	    keyName = "chatMessages",
 	    name = "Display chat messages",
-	    description = "Displays chat messages on successful calls, unsuccessful calls and other errors",
+	    description = "Display chat messages on successful calls, unsuccessful calls and other errors",
 	    position = 3
     )
     default boolean chatMessages() {return true;}

@@ -1,47 +1,35 @@
 package com.starcallingassist;
 
-import lombok.ToString;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
-
 import javax.inject.Inject;
 import java.io.IOException;
-import java.time.Clock;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import static net.runelite.http.api.RuneLiteAPI.GSON;
 
 public class CallSender
 {
-
-    @ToString
-    private class CallData{
-	private final String timestamp;
-	private final long id;
-	private final String chatType;
-	private final String chatName;
+    private class CallData
+    {
+	private final int world;
+	private final int tier;
+	private final String location;
 	private final String sender;
-	private final String message;
 
-	public CallData(String sender, String chatName, String message)
+	public CallData(String sender, int world, int tier, String location)
 	{
-	    timestamp = ZonedDateTime.now(Clock.systemUTC()).toString();
-	    long t_id = new Random().nextLong();
-	    if (t_id < 0)
-		t_id *= -1;
-	    id = t_id;
-	    chatType = "FRIENDS";
-	    this.chatName = chatName;
 	    this.sender = sender;
-	    this.message = message;
+	    this.world = world;
+	    this.tier = tier;
+	    this.location = location;
 	}
     }
+
+    private String endpoint;
+
     private final StarCallingAssistConfig config;
 
     private final OkHttpClient okHttpClient = new OkHttpClient.Builder()
@@ -50,7 +38,6 @@ public class CallSender
 	    .readTimeout(2, TimeUnit.SECONDS)
 	    .build();
 
-    private String endpoint;
 
     public void updateConfig() {
 	endpoint = config.getEndpoint();
@@ -61,17 +48,13 @@ public class CallSender
 	this.config = config;
     }
 
-    public boolean sendCall(String username, String world, String tier, String location) throws IOException
+    public boolean sendCall(String username, int world, int tier, String location) throws IOException
     {
-	List<CallData> data = new ArrayList<>();
-	data.add(new CallData(username, "plugin", world + " " + tier + " " + location));
 	Request request = new Request.Builder()
 		.url(endpoint)
-		.addHeader("Authorization", "none")
-		.post(RequestBody.create(MediaType.parse("application/json"), GSON.toJson(data)))
+		.post(RequestBody.create(MediaType.parse("application/json"), GSON.toJson(new CallData(username, world, tier, location))))
 		.build();
 
 	return okHttpClient.newCall(request).execute().isSuccessful();
     }
-
 }
