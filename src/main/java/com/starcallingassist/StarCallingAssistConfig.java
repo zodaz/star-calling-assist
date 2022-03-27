@@ -12,7 +12,7 @@ public interface StarCallingAssistConfig extends Config
 	    keyName = "endpoint", position = 0, name = "Call endpoint", description = "Endpoint to post calls to.")
     default String getEndpoint()
     {
-	return "http://blablacxcer.com";//"http://server.groupstars.site/chat";
+	return "No endpoint set";
     }
 
     @ConfigItem(
