@@ -244,7 +244,7 @@ public class StarCallingAssistPlugin extends Plugin
 		else
 		    clientThread.invokeLater(() -> {logToChat("Unable to post call to " + starConfig.getEndpoint() + ".");});
 	    }
-	    catch (IOException ioe)
+	    catch (Exception ee)
 	    {
 		clientThread.invokeLater(() -> {logToChat("Unable to post call to " + starConfig.getEndpoint() + ".");});
 	    }

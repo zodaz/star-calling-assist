@@ -48,7 +48,7 @@ public class CallSender
 	this.config = config;
     }
 
-    public boolean sendCall(String username, int world, int tier, String location) throws IOException
+    public boolean sendCall(String username, int world, int tier, String location) throws IOException, IllegalArgumentException
     {
 	Request request = new Request.Builder()
 		.url(endpoint)
