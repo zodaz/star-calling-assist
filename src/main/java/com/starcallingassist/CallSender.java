@@ -6,7 +6,6 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import javax.inject.Inject;
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 import static net.runelite.http.api.RuneLiteAPI.GSON;
 
@@ -31,21 +30,16 @@ public class CallSender
     private String endpoint;
 
     private final StarCallingAssistConfig config;
-
-    private final OkHttpClient okHttpClient = new OkHttpClient.Builder()
-	    .connectTimeout(5, TimeUnit.SECONDS)
-	    .writeTimeout(3, TimeUnit.SECONDS)
-	    .readTimeout(2, TimeUnit.SECONDS)
-	    .build();
-
+    private final OkHttpClient okHttpClient;
 
     public void updateConfig() {
 	endpoint = config.getEndpoint();
     }
 
-    @Inject CallSender(StarCallingAssistConfig config)
+    @Inject CallSender(StarCallingAssistConfig config, OkHttpClient okHttpClient)
     {
 	this.config = config;
+	this.okHttpClient = okHttpClient;
     }
 
     public boolean sendCall(String username, int world, int tier, String location) throws IOException, IllegalArgumentException
