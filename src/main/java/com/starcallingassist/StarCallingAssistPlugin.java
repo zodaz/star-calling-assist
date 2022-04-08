@@ -4,6 +4,7 @@ import com.google.inject.Provides;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
+import net.runelite.api.ScriptEvent;
 import net.runelite.api.SpriteID;
 import net.runelite.api.events.GameObjectDespawned;
 import net.runelite.api.events.GameObjectSpawned;
@@ -29,7 +30,6 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
 import javax.inject.Inject;
 import java.awt.*;
-import java.io.IOException;
 
 @PluginDescriptor(
 	name = "Star Calling Assist",
@@ -38,7 +38,6 @@ import java.io.IOException;
 )
 public class StarCallingAssistPlugin extends Plugin
 {
-    private static final int[] TIER_IDS = new int[]{41229,41228,41227,41226,41225,41224,41223,41021,41020};
     private static final Point BUTTON_RESIZEABLE_LOCATION = new Point(130, 150);
     private static final Point BUTTON_FIXED_LOCATION = new Point(208, 55);
 
@@ -84,7 +83,7 @@ public class StarCallingAssistPlugin extends Plugin
     @Override
     protected void shutDown() throws Exception
     {
-	Star.REMOVE_STAR();
+	Star.removeStar();
 	lastCalledStar = null;
 	removeCallButton();
     }
@@ -92,10 +91,10 @@ public class StarCallingAssistPlugin extends Plugin
     @Subscribe
     public void onGameObjectSpawned(GameObjectSpawned event)
     {
-	int tier = getTier(event.getGameObject().getId());
+	int tier = Star.getTier(event.getGameObject().getId());
 	if (tier != -1)
 	{
-	    Star.SET_STAR(event.getGameObject(), tier, client.getWorld());
+	    Star.setStar(event.getGameObject(), tier, client.getWorld());
 	    if(autoCall)
 		attemptCall(false);
 	}
@@ -104,8 +103,8 @@ public class StarCallingAssistPlugin extends Plugin
     @Subscribe
     public void onGameObjectDespawned(GameObjectDespawned event)
     {
-	if (getTier(event.getGameObject().getId()) != -1)
-	    Star.REMOVE_STAR();
+	if (Star.getTier(event.getGameObject().getId()) != -1)
+	    Star.removeStar();
     }
 
     @Subscribe
@@ -113,7 +112,7 @@ public class StarCallingAssistPlugin extends Plugin
     {
 	if (state.getGameState() == GameState.HOPPING || state.getGameState() == GameState.LOGGING_IN)
 	{
-	    Star.REMOVE_STAR();
+	    Star.removeStar();
 	    removeCallButton();
 	}
     }
@@ -121,9 +120,9 @@ public class StarCallingAssistPlugin extends Plugin
     @Subscribe
     public void onGameTick(GameTick tick)
     {
-	if (Star.GET_STAR() != null)
-	    if (client.getLocalPlayer().getWorldLocation().distanceTo(Star.GET_STAR().location) > 32)
-		Star.REMOVE_STAR();
+	if (Star.getStar() != null)
+	    if (client.getLocalPlayer().getWorldLocation().distanceTo(Star.getStar().location) > 32)
+		Star.removeStar();
     }
 
     @Subscribe
@@ -178,10 +177,36 @@ public class StarCallingAssistPlugin extends Plugin
 	callButton.setOriginalHeight(23);
 	setCallButtonLocation();
 	callButton.setAction(4, "Call star");
+	callButton.setAction(5, "Call dead");
+	callButton.setAction(6, "Call private");
 	callButton.setHasListener(true);
 	callButton.setNoClickThrough(true);
-	callButton.setOnOpListener((JavaScriptCallback) ev -> attemptCall(true));
+	callButton.setOnOpListener((JavaScriptCallback) this::callButtonClicked);//ev -> attemptCall(true));
+
 	callButton.revalidate();
+    }
+
+    private void callButtonClicked(ScriptEvent event)
+    {
+	System.out.println(event.getOp());
+	switch (event.getOp())
+	{
+	    case 5://Call star
+	    {
+		attemptCall(true);
+		break;
+	    }
+	    case 6://Call dead
+	    {
+		logHighlightedToChat("Successfully called: ", "W" + client.getWorld() + " T0 dead");
+		break;
+	    }
+	    case 7://Call private
+	    {
+		logHighlightedToChat("Successfully called: ", "W" + client.getWorld() + " T0 pdead");
+		break;
+	    }
+	}
     }
 
     private void removeCallButton()
@@ -198,25 +223,25 @@ public class StarCallingAssistPlugin extends Plugin
 
     private void attemptCall(boolean manual)
     {
-	if (Star.GET_STAR() == null)
+	if (Star.getStar() == null)
 	{
 	    if(manual)
 	    	logToChat("Unable to find star.");
 	    return;
 	}
 	else if (lastCalledStar != null
-		 && lastCalledStar.world == Star.GET_STAR().world
-		 && lastCalledStar.tier == Star.GET_STAR().tier
-		 && lastCalledStar.location.equals(Star.GET_STAR().location))
+		 && lastCalledStar.world == Star.getStar().world
+		 && lastCalledStar.tier == Star.getStar().tier
+		 && lastCalledStar.location.equals(Star.getStar().location))
 	{
 	    if (manual)
 	    	logToChat("Star has already been called.");
 	    return;
 	}
 	//Won't automatically call star again if tier decreased and the updateStar option disabled
-	else if(lastCalledStar != null  && lastCalledStar.world == Star.GET_STAR().world
-					&& lastCalledStar.location.equals(Star.GET_STAR().location)
-					&& lastCalledStar.tier > Star.GET_STAR().tier
+	else if(lastCalledStar != null  && lastCalledStar.world == Star.getStar().world
+					&& lastCalledStar.location.equals(Star.getStar().location)
+					&& lastCalledStar.tier > Star.getStar().tier
 					&& !updateStar && !manual)
 	{
 	    return;
@@ -224,8 +249,8 @@ public class StarCallingAssistPlugin extends Plugin
 
 	String username = client.getLocalPlayer().getName();
 	int world = client.getWorld();
-	int tier = Star.GET_STAR().tier;
-	String location = getLocationName(Star.GET_STAR().location.getX(), Star.GET_STAR().location.getY());
+	int tier = Star.getStar().tier;
+	String location = getLocationName(Star.getStar().location.getX(), Star.getStar().location.getY());
 	if (location.equals("unknown"))
 	{
 	    logToChat("Star location is unknown, manual call required.");
@@ -236,7 +261,7 @@ public class StarCallingAssistPlugin extends Plugin
 	    {
 		if(sender.sendCall(username, world, tier, location))
 		{
-		    lastCalledStar = Star.GET_STAR();
+		    lastCalledStar = Star.getStar();
 		    clientThread.invokeLater(() -> {
 			logHighlightedToChat("Successfully called: ", "W" + world + " T" + tier + " " + location);
 		    });
@@ -280,14 +305,6 @@ public class StarCallingAssistPlugin extends Plugin
 	if (locationName != null)
 	    return locationName;
 	return "unknown";
-    }
-
-    private int getTier(int id)
-    {
-	for (int i = 0; i < TIER_IDS.length; i++)
-	    if(id == TIER_IDS[i])
-		return i + 1;
-	return -1;
     }
 
     private void setCallButtonLocation()
