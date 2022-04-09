@@ -42,7 +42,15 @@ public class Star
 	return -1;
     }
 
-    public static final Map<Point, String> LOCATION_NAMES = new HashMap<Point, String>()
+    public static String getLocationName(int x, int y)
+    {
+	String locationName = LOCATION_NAMES.get(new Point(x, y));
+	if (locationName != null)
+	    return locationName;
+	return "unknown";
+    }
+
+    private static final Map<Point, String> LOCATION_NAMES = new HashMap<Point, String>()
     {
 	{
 	    /*

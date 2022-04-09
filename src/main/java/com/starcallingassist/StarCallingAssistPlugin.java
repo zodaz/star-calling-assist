@@ -250,16 +250,13 @@ public class StarCallingAssistPlugin extends Plugin
 	    return;
 	}
 
-	String username = client.getLocalPlayer().getName();
-	int world = client.getWorld();
-	int tier = Star.getStar().tier;
-	String location = getLocationName(Star.getStar().location.getX(), Star.getStar().location.getY());
+	String location = Star.getLocationName(Star.getStar().location.getX(), Star.getStar().location.getY());
 	if (location.equals("unknown"))
 	{
 	    logToChat("Star location is unknown, manual call required.");
 	    return;
 	}
-	attemptCall(username, world, tier, location);
+	attemptCall(client.getLocalPlayer().getName(), client.getWorld(), Star.getStar().tier, location);
     }
 
     private void attemptCall(String username, int world, int tier, String location)
@@ -305,14 +302,6 @@ public class StarCallingAssistPlugin extends Plugin
     {
 	if (chatLogging)
 	    client.addChatMessage(ChatMessageType.CONSOLE, "", message, "");
-    }
-
-    private String getLocationName(int x, int y)
-    {
-	String locationName = Star.LOCATION_NAMES.get(new Point(x, y));
-	if (locationName != null)
-	    return locationName;
-	return "unknown";
     }
 
     private void setCallButtonLocation()
