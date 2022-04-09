@@ -40,6 +40,9 @@ public class StarCallingAssistPlugin extends Plugin
 {
     private static final Point BUTTON_RESIZEABLE_LOCATION = new Point(130, 150);
     private static final Point BUTTON_FIXED_LOCATION = new Point(208, 55);
+    private static final int CALL_STAR = 5;
+    private static final int CALL_DEAD = 6;
+    private static final int CALL_PRIVATE = 7;
 
     private Widget parent, callButton;
     private Star lastCalledStar;
@@ -96,7 +99,7 @@ public class StarCallingAssistPlugin extends Plugin
 	{
 	    Star.setStar(event.getGameObject(), tier, client.getWorld());
 	    if(autoCall)
-		attemptCall(false);
+		prepareCall(false);
 	}
     }
 
@@ -136,7 +139,7 @@ public class StarCallingAssistPlugin extends Plugin
 	else if (event.getKey().equals("autoCall")) {
 	    autoCall = starConfig.autoCall();
 	    if (autoCall)
-		clientThread.invokeLater(() -> {attemptCall(false);});
+		clientThread.invokeLater(() -> {prepareCall(false);});
 	}
 	else if (event.getKey().equals("chatMessages")) {
 	    chatLogging = starConfig.chatMessages();
@@ -144,7 +147,7 @@ public class StarCallingAssistPlugin extends Plugin
 	else if (event.getKey().equals("updateStar")) {
 	    updateStar = starConfig.updateStar();
 	    if (autoCall && updateStar)
-		clientThread.invokeLater(() -> {attemptCall(false);});
+		clientThread.invokeLater(() -> {prepareCall(false);});
 	}
     }
 
@@ -181,7 +184,7 @@ public class StarCallingAssistPlugin extends Plugin
 	callButton.setAction(6, "Call private");
 	callButton.setHasListener(true);
 	callButton.setNoClickThrough(true);
-	callButton.setOnOpListener((JavaScriptCallback) this::callButtonClicked);//ev -> attemptCall(true));
+	callButton.setOnOpListener((JavaScriptCallback) this::callButtonClicked);
 
 	callButton.revalidate();
     }
@@ -191,19 +194,19 @@ public class StarCallingAssistPlugin extends Plugin
 	System.out.println(event.getOp());
 	switch (event.getOp())
 	{
-	    case 5://Call star
+	    case CALL_STAR:
 	    {
-		attemptCall(true);
+		prepareCall(true);
 		break;
 	    }
-	    case 6://Call dead
+	    case CALL_DEAD:
 	    {
-		logHighlightedToChat("Successfully called: ", "W" + client.getWorld() + " T0 dead");
+		attemptCall(client.getLocalPlayer().getName(), client.getWorld(), 0 , "dead");
 		break;
 	    }
-	    case 7://Call private
+	    case CALL_PRIVATE:
 	    {
-		logHighlightedToChat("Successfully called: ", "W" + client.getWorld() + " T0 pdead");
+		attemptCall(client.getLocalPlayer().getName(), client.getWorld(), 0 , "pdead");
 		break;
 	    }
 	}
@@ -221,7 +224,7 @@ public class StarCallingAssistPlugin extends Plugin
 	parent = null;
     }
 
-    private void attemptCall(boolean manual)
+    private void prepareCall(boolean manual)
     {
 	if (Star.getStar() == null)
 	{
@@ -256,6 +259,11 @@ public class StarCallingAssistPlugin extends Plugin
 	    logToChat("Star location is unknown, manual call required.");
 	    return;
 	}
+	attemptCall(username, world, tier, location);
+    }
+
+    private void attemptCall(String username, int world, int tier, String location)
+    {
 	new Thread(() -> {
 	    try
 	    {
