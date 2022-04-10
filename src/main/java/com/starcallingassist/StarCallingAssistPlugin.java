@@ -185,7 +185,6 @@ public class StarCallingAssistPlugin extends Plugin
 	callButton.setHasListener(true);
 	callButton.setNoClickThrough(true);
 	callButton.setOnOpListener((JavaScriptCallback) this::callButtonClicked);
-
 	callButton.revalidate();
     }
 
@@ -249,7 +248,6 @@ public class StarCallingAssistPlugin extends Plugin
 	{
 	    return;
 	}
-
 	String location = Star.getLocationName(Star.getStar().location.getX(), Star.getStar().location.getY());
 	if (location.equals("unknown"))
 	{
@@ -266,7 +264,8 @@ public class StarCallingAssistPlugin extends Plugin
 	    {
 		if(sender.sendCall(username, world, tier, location))
 		{
-		    lastCalledStar = Star.getStar();
+		    if (tier > 0)
+		    	lastCalledStar = Star.getStar();
 		    clientThread.invokeLater(() -> {
 			logHighlightedToChat("Successfully called: ", "W" + world + " T" + tier + " " + location);
 		    });
