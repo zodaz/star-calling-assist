@@ -158,9 +158,9 @@ public class Star
 	     */
 	    put(new Point(2329, 3163), "Lletya");
 	    put(new Point(2269, 3158), "Isafdar runite rocks");
-	    put(new Point(3274, 6055), "Priffdinas Zalcano entrance");
+	    put(new Point(3274, 6055), "Prifddinas Zalcano entrance");
 	    put(new Point(2318, 3269), "Arandar mine north of Lleyta");
-	    put(new Point(2173, 3409), "Mynydd nw of Priffdinas");
+	    put(new Point(2173, 3409), "Mynydd nw of Prifddinas");
 	    /*
 	    WILDERNESS
 	     */
