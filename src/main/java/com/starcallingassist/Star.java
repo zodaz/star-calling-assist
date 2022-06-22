@@ -66,7 +66,7 @@ public class Star
 	    CRANDOR/KARAMJA
 	     */
 	    put(new Point(2736, 3221), "Brimhaven northwest gold mine");
-	    put(new Point(2742, 3143), "Brimhaven south dungeon entrance");
+	    put(new Point(2742, 3143), "Southwest of Brimhaven Poh");
 	    put(new Point(2845, 3037), "Nature Altar mine north of Shilo");
 	    put(new Point(2827, 2999), "Shilo Village gem mine");
 	    put(new Point(2835, 3296), "North Crandor");
@@ -134,7 +134,7 @@ public class Star
 	    MISTHALIN
 	     */
 	    put(new Point(3258, 3408), "Varrock east bank");
-	    put(new Point(3290, 3353), "South-east Varrock mine");
+	    put(new Point(3290, 3353), "Southeast Varrock mine");
 	    put(new Point(3175, 3362), "Champions' Guild mine");
 	    put(new Point(3094, 3235), "Draynor Village");
 	    put(new Point(3153, 3150), "West Lumbridge Swamp mine");
