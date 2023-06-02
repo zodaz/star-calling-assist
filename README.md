@@ -9,6 +9,8 @@ Posts are made in the following format to the endpoint specified in the plugin s
   "world": "world the star is in",
   "tier": "size of star (1-9)",
   "location": "location of star",
-  "sender": "in-game name of caller"
+  "sender": "in-game name of caller or empty string",
+  "miners": "Players around the star. -1 if too far away to render players"
 }
 ```
+Authorization header is set to what is specified in the plugin settings.
