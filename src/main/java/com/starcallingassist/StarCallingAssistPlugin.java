@@ -1,11 +1,15 @@
 package com.starcallingassist;
 
 import com.google.inject.Provides;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
+import net.runelite.api.Player;
 import net.runelite.api.ScriptEvent;
 import net.runelite.api.SpriteID;
+import net.runelite.api.coords.WorldArea;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameObjectDespawned;
 import net.runelite.api.events.GameObjectSpawned;
 import net.runelite.api.events.GameStateChanged;
@@ -27,15 +31,15 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.ui.overlay.OverlayManager;
+import okhttp3.Response;
+
 import javax.inject.Inject;
 import java.awt.*;
 
 @PluginDescriptor(
-	name = "Star Calling Assist",
-	description = "Assists with calling crashed stars found around the game",
-	enabledByDefault = false
+	name = "Star Calling Assist"
 )
+@Slf4j
 public class StarCallingAssistPlugin extends Plugin
 {
     private static final Point BUTTON_RESIZEABLE_LOCATION = new Point(130, 150);
@@ -43,89 +47,98 @@ public class StarCallingAssistPlugin extends Plugin
     private static final int CALL_STAR = 5;
     private static final int CALL_DEAD = 6;
     private static final int CALL_PRIVATE = 7;
+    private static final int PLAYER_RENDER_DISTANCE = 13;
 
     private Widget parent, callButton;
     private Star lastCalledStar;
-    private boolean autoCall, chatLogging, updateStar;
 
-    @Inject
-    private ChatMessageManager chatMessageManager;
-    @Inject
-    private StarCallingAssistConfig starConfig;
-    @Inject
-    private Client client;
-    @Inject
-    private ClientThread clientThread;
-    @Inject
-    private CallSender sender;
-    @Inject
-    private OverlayManager overlayManager;
+    private int miners = 0;
 
-    @Provides StarCallingAssistConfig
-    provideConfig(ConfigManager configManager) {return configManager.getConfig(StarCallingAssistConfig.class);}
+    private WorldPoint confirmDeadLocation = null;
 
-    @Override
-    protected void startUp() throws Exception
-    {
-	sender.updateConfig();
+    @Inject private ChatMessageManager chatMessageManager;
+    @Inject private StarCallingAssistConfig starConfig;
+    @Inject private Client client;
+    @Inject private ClientThread clientThread;
+    @Inject private CallSender sender;
 
-	autoCall = starConfig.autoCall();
-	chatLogging = starConfig.chatMessages();
-	updateStar = starConfig.updateStar();
-	lastCalledStar = null;
-	if (parent != null) {
-	    clientThread.invokeLater(this::createCallButton);
-	}
-	else
-	{
-	    parent = client.getWidget(WidgetInfo.MINIMAP_ORBS);
-	    clientThread.invokeLater(this::createCallButton);
-	}
+    @Provides StarCallingAssistConfig provideConfig(ConfigManager configManager) {
+	return configManager.getConfig(StarCallingAssistConfig.class);
     }
 
-    @Override
-    protected void shutDown() throws Exception
+    @Override protected void startUp() throws Exception
+    {
+	lastCalledStar = null;
+	parent = client.getWidget(WidgetInfo.MINIMAP_ORBS);
+	clientThread.invokeLater(this::createCallButton);
+    }
+
+    @Override protected void shutDown() throws Exception
     {
 	Star.removeStar();
 	lastCalledStar = null;
 	removeCallButton();
     }
 
-    @Subscribe
-    public void onGameObjectSpawned(GameObjectSpawned event)
+    @Subscribe public void onGameObjectSpawned(GameObjectSpawned event)
     {
 	int tier = Star.getTier(event.getGameObject().getId());
-	if (tier != -1)
-	{
+	if (tier != -1) {
 	    Star.setStar(event.getGameObject(), tier, client.getWorld());
-	    if(autoCall)
-		prepareCall(false);
+	    if (starConfig.autoCall())
+	    {
+		if(whitinPlayerDistance())
+		{
+		    countMiners();
+		    prepareCall(false);
+		}
+		else
+		{
+		    prepareCall(false);
+		}
+	    }
 	}
     }
 
-    @Subscribe
-    public void onGameObjectDespawned(GameObjectDespawned event)
+    @Subscribe public void onGameObjectDespawned(GameObjectDespawned event)
     {
 	if (Star.getTier(event.getGameObject().getId()) != -1)
+	{
+	    //Causes a check for whether the star fully depleted in the next GameTick event
+	    if(starConfig.autoCall())
+		confirmDeadLocation = event.getGameObject().getWorldLocation();
+
 	    Star.removeStar();
+	}
     }
 
-    @Subscribe
-    public void onGameStateChanged(GameStateChanged state)
+    @Subscribe public void onGameStateChanged(GameStateChanged state)
     {
-	if (state.getGameState() == GameState.HOPPING || state.getGameState() == GameState.LOGGING_IN)
-	{
+	if (state.getGameState() == GameState.HOPPING || state.getGameState() == GameState.LOGGING_IN) {
 	    Star.removeStar();
 	    removeCallButton();
 	}
     }
 
-    @Subscribe
-    public void onGameTick(GameTick tick)
+    @Subscribe public void onGameTick(GameTick tick)
     {
+	if(confirmDeadLocation != null)
+	{
+	    if(Star.getStar() == null)
+		if (client.getLocalPlayer().getWorldLocation().distanceTo(confirmDeadLocation) <= 32)
+		    attemptCall(client.getLocalPlayer().getName(), client.getWorld(), 0, Star.getLocationName(confirmDeadLocation));
+
+	    confirmDeadLocation = null;
+	}
+
 	if (Star.getStar() != null)
+	{
 	    if (client.getLocalPlayer().getWorldLocation().distanceTo(Star.getStar().location) > 32)
 		Star.removeStar();
+
+	    if(Star.getStar() != null)
+		countMiners();
+	}
     }
 
     @Subscribe
@@ -133,21 +146,22 @@ public class StarCallingAssistPlugin extends Plugin
     {
 	if (!event.getGroup().equals("starcallingassistplugin"))
 	    return;
-	if(event.getKey().equals("endpoint")) {
-	    sender.updateConfig();
-	}
-	else if (event.getKey().equals("autoCall")) {
-	    autoCall = starConfig.autoCall();
-	    if (autoCall)
+
+	if (event.getKey().equals("autoCall"))
+	{
+	    if (starConfig.autoCall())
 		clientThread.invokeLater(() -> {prepareCall(false);});
 	}
-	else if (event.getKey().equals("chatMessages")) {
-	    chatLogging = starConfig.chatMessages();
-	}
-	else if (event.getKey().equals("updateStar")) {
-	    updateStar = starConfig.updateStar();
-	    if (autoCall && updateStar)
+	else if (event.getKey().equals("updateStar"))
+	{
+	    if (starConfig.autoCall() && starConfig.updateStar())
 		clientThread.invokeLater(() -> {prepareCall(false);});
+	}
+	else if (event.getKey().equals("callHorn"))
+	{
+	    removeCallButton();
+	    parent = client.getWidget(WidgetInfo.MINIMAP_ORBS);
+	    clientThread.invokeLater(this::createCallButton);
 	}
     }
 
@@ -170,9 +184,37 @@ public class StarCallingAssistPlugin extends Plugin
 	createCallButton();
     }
 
+    //Credit to https://github.com/pwatts6060/star-info/. Simplified to fit our needs.
+    private void countMiners()
+    {
+	miners = 0;
+	Star star = Star.getStar();
+
+	if (!whitinPlayerDistance())
+	{
+	    miners = -1;
+	    return;
+	}
+
+	WorldArea areaH = new WorldArea(star.location.dx(-1), 4, 2);
+	WorldArea areaV = new WorldArea(star.location.dy(-1), 2, 4);
+
+	for (Player p : client.getPlayers())
+	{
+	    if (!p.getWorldLocation().isInArea2D(areaH, areaV))
+		continue;
+	    miners++;
+	}
+    }
+
+    private boolean whitinPlayerDistance()
+    {
+	return client.getLocalPlayer().getWorldLocation().distanceTo(new WorldArea(Star.getStar().location, 2, 2)) <= PLAYER_RENDER_DISTANCE;
+    }
+
     private void createCallButton()
     {
-	if (callButton != null || parent == null)
+	if (callButton != null || parent == null || !starConfig.callHorn())
 	    return;
 	callButton = parent.createChild(WidgetType.GRAPHIC);
 	callButton.setSpriteId(SpriteID.BARBARIAN_ASSAULT_HORN_FOR_ATTACKER_ICON);
@@ -190,7 +232,6 @@ public class StarCallingAssistPlugin extends Plugin
 
     private void callButtonClicked(ScriptEvent event)
     {
-	System.out.println(event.getOp());
 	switch (event.getOp())
 	{
 	    case CALL_STAR:
@@ -237,18 +278,18 @@ public class StarCallingAssistPlugin extends Plugin
 		 && lastCalledStar.location.equals(Star.getStar().location))
 	{
 	    if (manual)
-	    	logToChat("Star has already been called.");
+	    	logToChat("This star has already been called.");
 	    return;
 	}
 	//Won't automatically call star again if tier decreased and the updateStar option disabled
 	else if(lastCalledStar != null  && lastCalledStar.world == Star.getStar().world
-					&& lastCalledStar.location.equals(Star.getStar().location)
-					&& lastCalledStar.tier > Star.getStar().tier
-					&& !updateStar && !manual)
+		&& lastCalledStar.location.equals(Star.getStar().location)
+		&& lastCalledStar.tier > Star.getStar().tier
+		&& !starConfig.updateStar() && !manual)
 	{
 	    return;
 	}
-	String location = Star.getLocationName(Star.getStar().location.getX(), Star.getStar().location.getY());
+	String location = Star.getLocationName(Star.getStar().location);
 	if (location.equals("unknown"))
 	{
 	    logToChat("Star location is unknown, manual call required.");
@@ -262,16 +303,23 @@ public class StarCallingAssistPlugin extends Plugin
 	new Thread(() -> {
 	    try
 	    {
-		if(sender.sendCall(username, world, tier, location))
+		Response res = sender.sendCall(username, world, tier, location, miners);
+		if(res.isSuccessful())
 		{
 		    if (tier > 0)
-		    	lastCalledStar = Star.getStar();
+			lastCalledStar = Star.getStar();
 		    clientThread.invokeLater(() -> {
-			logHighlightedToChat("Successfully called: ", "W" + world + " T" + tier + " " + location);
+			logHighlightedToChat(
+				"Successfully posted call: ",
+				"W" + world + " T" + tier + " " + location + ((miners == -1 || tier == 0) ? "" : (" " + miners + " Miners"))
+			);
 		    });
 		}
 		else
-		    clientThread.invokeLater(() -> {logToChat("Unable to post call to " + starConfig.getEndpoint() + ".");});
+		{
+		    clientThread.invokeLater(() -> {logHighlightedToChat("Issue posting call to " + starConfig.getEndpoint() + ": ", res.message());});
+		}
+		res.close();
 	    }
 	    catch (Exception ee)
 	    {
@@ -282,24 +330,24 @@ public class StarCallingAssistPlugin extends Plugin
 
     private void logHighlightedToChat(String normal, String highlight)
     {
-	if(chatLogging)
+	if(starConfig.chatMessages())
 	{
 	    String chatMessage = new ChatMessageBuilder()
-		    .append(ChatColorType.NORMAL)
-		    .append(normal)
-		    .append(ChatColorType.HIGHLIGHT)
-		    .append(highlight)
-		    .build();
+		.append(ChatColorType.NORMAL)
+		.append(normal)
+		.append(ChatColorType.HIGHLIGHT)
+		.append(highlight)
+		.build();
 	    chatMessageManager.queue(QueuedMessage.builder()
-			    .type(ChatMessageType.CONSOLE)
-			    .runeLiteFormattedMessage(chatMessage)
-			    .build());
+		.type(ChatMessageType.CONSOLE)
+		.runeLiteFormattedMessage(chatMessage)
+		.build());
 	}
     }
 
     private void logToChat(String message)
     {
-	if (chatLogging)
+	if (starConfig.chatMessages())
 	    client.addChatMessage(ChatMessageType.CONSOLE, "", message, "");
     }
 
@@ -317,3 +365,8 @@ public class StarCallingAssistPlugin extends Plugin
 	}
     }
 }
+
+
+
+
+

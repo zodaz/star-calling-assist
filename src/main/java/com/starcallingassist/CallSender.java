@@ -4,6 +4,8 @@ import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+import okhttp3.Response;
+
 import javax.inject.Inject;
 import java.io.IOException;
 
@@ -15,40 +17,38 @@ public class CallSender
     {
 	private final int world;
 	private final int tier;
+	private final int miners;
 	private final String location;
 	private final String sender;
 
-	public CallData(String sender, int world, int tier, String location)
+	public CallData(String sender, int world, int tier, String location, int miners)
 	{
 	    this.sender = sender;
 	    this.world = world;
 	    this.tier = tier;
 	    this.location = location;
+	    this.miners = miners;
 	}
     }
 
-    private String endpoint;
+    @Inject
+    private StarCallingAssistConfig starConfig;
+    @Inject
+    private OkHttpClient okHttpClient;
 
-    private final StarCallingAssistConfig config;
-    private final OkHttpClient okHttpClient;
-
-    public void updateConfig() {
-	endpoint = config.getEndpoint();
-    }
-
-    @Inject CallSender(StarCallingAssistConfig config, OkHttpClient okHttpClient)
+    public Response sendCall(String username, int world, int tier, String location, int miners) throws IOException, IllegalArgumentException
     {
-	this.config = config;
-	this.okHttpClient = okHttpClient;
-    }
+	boolean success = false;
 
-    public boolean sendCall(String username, int world, int tier, String location) throws IOException, IllegalArgumentException
-    {
 	Request request = new Request.Builder()
-		.url(endpoint)
-		.post(RequestBody.create(MediaType.parse("application/json"), GSON.toJson(new CallData(username, world, tier, location))))
+		.url(starConfig.getEndpoint())
+		.addHeader("authorization", starConfig.getAuthorization())
+		.post(RequestBody.create(
+			MediaType.parse("application/json"),
+			// Doesn't include in-game name unless toggled on (default value is off)
+			GSON.toJson(new CallData(starConfig.includeIgn() ? username : "", world, tier, location, miners))))
 		.build();
 
-	return okHttpClient.newCall(request).execute().isSuccessful();
+	return okHttpClient.newCall(request).execute();
     }
 }

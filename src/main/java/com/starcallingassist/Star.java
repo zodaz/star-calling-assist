@@ -42,6 +42,14 @@ public class Star
 	return -1;
     }
 
+    public static String getLocationName(WorldPoint location)
+    {
+	String locationName = LOCATION_NAMES.get(new Point(location.getX(), location.getY()));
+	if (locationName != null)
+	    return locationName;
+	return "unknown";
+    }
+
     public static String getLocationName(int x, int y)
     {
 	String locationName = LOCATION_NAMES.get(new Point(x, y));
@@ -76,7 +84,7 @@ public class Star
 	     */
 	    put(new Point(3296, 3298), "Al Kharid mine");
 	    put(new Point(3276, 3164), "Al Kharid bank");
-	    put(new Point(3341, 3267), "Duel Arena");
+	    put(new Point(3351, 3281), "Pvp Arena");
 	    put(new Point(3424, 3160), "Nw of Uzer (Eagle's Eyrie)");
 	    put(new Point(3434, 2889), "Nardah bank");
 	    put(new Point(3316, 2867), "Agility Pyramid mine");
@@ -110,7 +118,7 @@ public class Star
 	     */
 	    put(new Point(2602, 3086), "Yanille bank");
 	    put(new Point(2624, 3141), "Port Khazard mine");
-	    put(new Point(2608, 3233), "Ardougne Monastary");
+	    put(new Point(2608, 3233), "Ardougne Monastery");
 	    put(new Point(2705, 3333), "South of Legends' Guild");
 	    put(new Point(2804, 3434), "Catherby bank");
 	    put(new Point(2589, 3478), "Coal Trucks west of Seers'");
@@ -159,7 +167,7 @@ public class Star
 	    put(new Point(2329, 3163), "Lletya");
 	    put(new Point(2269, 3158), "Isafdar runite rocks");
 	    put(new Point(3274, 6055), "Priffdinas Zalcano entrance");
-	    put(new Point(2318, 3269), "Arandar mine north of Lleyta");
+	    put(new Point(2318, 3269), "Arandar mine north of Lletya");
 	    put(new Point(2173, 3409), "Mynydd nw of Priffdinas");
 	    /*
 	    WILDERNESS
