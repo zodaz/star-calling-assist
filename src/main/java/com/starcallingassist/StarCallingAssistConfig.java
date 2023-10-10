@@ -14,7 +14,7 @@ public interface StarCallingAssistConfig extends Config
 	    description = "Endpoint to post calls to.")
     default String getEndpoint()
     {
-	return "No endpoint set";
+	return "https://public.starminers.site/crowdsource";
     }
 
     @ConfigItem(
