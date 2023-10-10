@@ -37,7 +37,9 @@ import javax.inject.Inject;
 import java.awt.*;
 
 @PluginDescriptor(
-	name = "Star Calling Assist"
+	name = "Star Caller",
+	description = "Crowdsources data about shooting stars you find and mine around the game",
+	tags = {"star","shooting","shootingstar","meteor","crowdsource","crowdsourcing"}
 )
 @Slf4j
 public class StarCallingAssistPlugin extends Plugin
