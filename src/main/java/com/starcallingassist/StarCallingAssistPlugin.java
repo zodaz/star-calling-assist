@@ -96,6 +96,7 @@ public class StarCallingAssistPlugin extends Plugin
 		}
 		else
 		{
+		    miners = -1;
 		    prepareCall(false);
 		}
 	    }
