@@ -31,10 +31,13 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import okhttp3.Call;
+import okhttp3.Callback;
 import okhttp3.Response;
 
 import javax.inject.Inject;
 import java.awt.*;
+import java.io.IOException;
 
 @PluginDescriptor(
 	name = "Star Caller",
@@ -303,32 +306,39 @@ public class StarCallingAssistPlugin extends Plugin
 
     private void attemptCall(String username, int world, int tier, String location)
     {
-	new Thread(() -> {
-	    try
+	try
+	{
+	    sender.sendCall(username, world, tier, location, miners, new Callback()
 	    {
-		Response res = sender.sendCall(username, world, tier, location, miners);
-		if(res.isSuccessful())
+		@Override
+		public void onFailure(Call call, IOException e)
 		{
-		    if (tier > 0)
-			lastCalledStar = Star.getStar();
-		    clientThread.invokeLater(() -> {
-			logHighlightedToChat(
-				"Successfully posted call: ",
-				"W" + world + " T" + tier + " " + location + ((miners == -1 || tier == 0) ? "" : (" " + miners + " Miners"))
-			);
-		    });
+		    clientThread.invokeLater(() -> {logToChat("Unable to post call to " + starConfig.getEndpoint() + ".");});
+		    call.cancel();
 		}
-		else
+		@Override
+		public void onResponse(Call call, Response res) throws IOException
 		{
-		    clientThread.invokeLater(() -> {logHighlightedToChat("Issue posting call to " + starConfig.getEndpoint() + ": ", res.message());});
+		    if (res.isSuccessful()) {
+			if (tier > 0)
+			    lastCalledStar = Star.getStar();
+			clientThread.invokeLater(() -> {
+			    logHighlightedToChat(
+				    "Successfully posted call: ",
+				    "W" + world + " T" + tier + " " + location + ((miners == -1 || tier == 0) ? "" : (" " + miners + " Miners"))
+			    );
+			});
+		    } else {
+			clientThread.invokeLater(() -> {logHighlightedToChat("Issue posting call to " + starConfig.getEndpoint() + ": ", res.message());});
+		    }
+		    res.close();
 		}
-		res.close();
-	    }
-	    catch (Exception ee)
-	    {
-		clientThread.invokeLater(() -> {logToChat("Unable to post call to " + starConfig.getEndpoint() + ".");});
-	    }
-	}).start();
+	    });
+	}
+	catch (IllegalArgumentException iae)
+	{
+	    clientThread.invokeLater(() -> {logHighlightedToChat("Issue posting call to " + starConfig.getEndpoint() + ": ", "Invalid endpoint");});
+	}
     }
 
     private void logHighlightedToChat(String normal, String highlight)

@@ -1,13 +1,12 @@
 package com.starcallingassist;
 
+import okhttp3.Callback;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
-import okhttp3.Response;
 
 import javax.inject.Inject;
-import java.io.IOException;
 
 import static net.runelite.http.api.RuneLiteAPI.GSON;
 
@@ -36,10 +35,8 @@ public class CallSender
     @Inject
     private OkHttpClient okHttpClient;
 
-    public Response sendCall(String username, int world, int tier, String location, int miners) throws IOException, IllegalArgumentException
+    public void sendCall(String username, int world, int tier, String location, int miners, Callback callback) throws IllegalArgumentException
     {
-	boolean success = false;
-
 	Request request = new Request.Builder()
 		.url(starConfig.getEndpoint())
 		.addHeader("authorization", starConfig.getAuthorization())
@@ -49,6 +46,6 @@ public class CallSender
 			GSON.toJson(new CallData(starConfig.includeIgn() ? username : "", world, tier, location, miners))))
 		.build();
 
-	return okHttpClient.newCall(request).execute();
+	okHttpClient.newCall(request).enqueue(callback);
     }
 }
