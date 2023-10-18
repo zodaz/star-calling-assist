@@ -42,7 +42,7 @@ public interface StarCallingAssistConfig extends Config
 	    description = "Automatically call stars as they appear or fully depletes",
 	    position = 3
     )
-    default boolean autoCall() {return false;}
+    default boolean autoCall() {return true;}
 
     @ConfigItem(
 	    keyName = "updateStar",
@@ -50,7 +50,7 @@ public interface StarCallingAssistConfig extends Config
 	    description = "Posts a new call when the tier of a star changes (Auto call must be enabled)",
 	    position = 4
     )
-    default boolean updateStar() {return false;}
+    default boolean updateStar() {return true;}
 
     @ConfigItem(
 	    keyName = "chatMessages",
