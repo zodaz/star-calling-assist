@@ -1,6 +1,7 @@
 package com.starcallingassist;
 
 import com.google.inject.Provides;
+import com.starcallingassist.sidepanel.SidePanel;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
@@ -8,6 +9,7 @@ import net.runelite.api.GameState;
 import net.runelite.api.Player;
 import net.runelite.api.ScriptEvent;
 import net.runelite.api.SpriteID;
+import net.runelite.api.World;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameObjectDespawned;
@@ -29,19 +31,27 @@ import net.runelite.client.chat.QueuedMessage;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
+import net.runelite.client.game.WorldService;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.task.Schedule;
+import net.runelite.client.ui.ClientToolbar;
+import net.runelite.client.ui.NavigationButton;
+import net.runelite.client.util.ImageUtil;
+
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
 import javax.inject.Inject;
+import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
+import java.time.temporal.ChronoUnit;
 
 @PluginDescriptor(
-	name = "Star Caller",
-	description = "Crowdsources data about shooting stars you find and mine around the game",
+	name = "Star Miners",
+	description = "Displays a list of active stars and crowdsources data about stars you find and mine",
 	tags = {"star","shooting","shootingstar","meteor","crowdsource","crowdsourcing"}
 )
 @Slf4j
@@ -57,15 +67,21 @@ public class StarCallingAssistPlugin extends Plugin
     private Widget parent, callButton;
     private Star lastCalledStar;
 
-    private int miners = 0;
+    private int miners = 0, hopTarget = -1, hopAttempts = 0;
 
     private WorldPoint confirmDeadLocation = null;
 
-    @Inject private ChatMessageManager chatMessageManager;
     @Inject private StarCallingAssistConfig starConfig;
+    @Inject private ChatMessageManager chatMessageManager;
+    @Inject private WorldService worldService;
     @Inject private Client client;
     @Inject private ClientThread clientThread;
+    @Inject private ClientToolbar clientToolbar;
     @Inject private CallSender sender;
+
+    private SidePanel sidePanel;
+
+    private NavigationButton navButton;
 
     @Provides StarCallingAssistConfig provideConfig(ConfigManager configManager) {
 	return configManager.getConfig(StarCallingAssistConfig.class);
@@ -76,6 +92,17 @@ public class StarCallingAssistPlugin extends Plugin
 	lastCalledStar = null;
 	parent = client.getWidget(WidgetInfo.MINIMAP_ORBS);
 	clientThread.invokeLater(this::createCallButton);
+
+	sidePanel = injector.getInstance(SidePanel.class);
+	sidePanel.init();
+
+	navButton = NavigationButton.builder()
+		.tooltip("Star Miners")
+		.icon(ImageUtil.loadImageResource(getClass(), "/sminers.png"))
+		.panel(sidePanel)
+		.build();
+	clientToolbar.addNavigation(navButton);
+	navButton.setOnClick(this::fetchStarData);
     }
 
     @Override protected void shutDown() throws Exception
@@ -83,6 +110,7 @@ public class StarCallingAssistPlugin extends Plugin
 	Star.removeStar();
 	lastCalledStar = null;
 	removeCallButton();
+	clientToolbar.removeNavigation(navButton);
     }
 
     @Subscribe public void onGameObjectSpawned(GameObjectSpawned event)
@@ -124,10 +152,18 @@ public class StarCallingAssistPlugin extends Plugin
 	    Star.removeStar();
 	    removeCallButton();
 	}
+	if(state.getGameState() == GameState.LOGGED_IN)
+	{
+	    SwingUtilities.invokeLater(() -> sidePanel.rebuildTableRows());
+	    fetchStarData();
+	}
     }
 
     @Subscribe public void onGameTick(GameTick tick)
     {
+	if(hopTarget != -1)
+	    performHop();
+
 	if(confirmDeadLocation != null)
 	{
 	    if(Star.getStar() == null)
@@ -157,18 +193,38 @@ public class StarCallingAssistPlugin extends Plugin
 	{
 	    if (starConfig.autoCall())
 		clientThread.invokeLater(() -> {prepareCall(false);});
+	    return;
 	}
 	else if (event.getKey().equals("updateStar"))
 	{
 	    if (starConfig.autoCall() && starConfig.updateStar())
 		clientThread.invokeLater(() -> {prepareCall(false);});
+	    return;
 	}
 	else if (event.getKey().equals("callHorn"))
 	{
 	    removeCallButton();
 	    parent = client.getWidget(WidgetInfo.MINIMAP_ORBS);
 	    clientThread.invokeLater(this::createCallButton);
+	    return;
 	}
+	else if (event.equals("endpoint"))
+	{
+	    fetchStarData();
+	    return;
+	}
+	else if (event.getKey().equals("authorization"))
+	{
+	    sidePanel.updateInfoPanel();
+	    return;
+	}
+	else if (event.getKey().equals("estimateTier"))
+	{
+	    sidePanel.rebuildTableRows();
+	    return;
+	}
+
+	sidePanel.updateTableRows();
     }
 
     @Subscribe
@@ -188,6 +244,78 @@ public class StarCallingAssistPlugin extends Plugin
 	removeCallButton();
 	parent = client.getWidget(WidgetInfo.MINIMAP_ORBS);
 	createCallButton();
+    }
+
+    @Schedule(
+	    period = 30,
+	    unit = ChronoUnit.SECONDS
+    )
+    public void fetchStarData()
+    {
+	if(navButton.isSelected())
+	    sidePanel.fetchStarData();
+    }
+
+    @Schedule(
+	    period = 10,
+	    unit = ChronoUnit.MINUTES
+    )
+    public void fetchWorldData()
+    {
+	sidePanel.fetchWorldData();
+    }
+
+    public Client getClient()
+    {
+	return client;
+    }
+
+    public StarCallingAssistConfig getConfig()
+    {
+	return starConfig;
+    }
+
+    public void queueWorldHop(int worldId)
+    {
+	if(client.getGameState() == GameState.LOGGED_IN)
+	{
+	    hopTarget = worldId;
+	    clientThread.invokeLater(() -> logHighlightedToChat("Attempting to quick-hop to world ", hopTarget + ""));
+	}
+    }
+
+    private void performHop()
+    {
+	if(++hopAttempts >= 5)
+	{
+	    logHighlightedToChat("Unable to quick-hop to world ", hopTarget + "");
+	    hopTarget = -1;
+	    hopAttempts = 0;
+	    return;
+	}
+
+	if (client.getWidget(WidgetInfo.WORLD_SWITCHER_LIST) == null)
+	{
+	    client.openWorldHopper();
+	    return;
+	}
+
+	World[] worldList = client.getWorldList();
+
+	if(worldList == null)
+	    return;
+
+	for (World world : worldList)
+	{
+	    if (world.getId() == hopTarget)
+	    {
+		client.hopToWorld(world);
+		break;
+	    }
+	}
+
+	hopTarget = -1;
+	hopAttempts = 0;
     }
 
     //Credit to https://github.com/pwatts6060/star-info/. Simplified to fit our needs.
@@ -275,7 +403,7 @@ public class StarCallingAssistPlugin extends Plugin
 	if (Star.getStar() == null)
 	{
 	    if(manual)
-	    	logToChat("Unable to find star.");
+		logToChat("Unable to find star.");
 	    return;
 	}
 	else if (lastCalledStar != null
@@ -284,7 +412,7 @@ public class StarCallingAssistPlugin extends Plugin
 		 && lastCalledStar.location.equals(Star.getStar().location))
 	{
 	    if (manual)
-	    	logToChat("This star has already been called.");
+		logToChat("This star has already been called.");
 	    return;
 	}
 	//Won't automatically call star again if tier decreased and the updateStar option disabled
@@ -346,15 +474,15 @@ public class StarCallingAssistPlugin extends Plugin
 	if(starConfig.chatMessages())
 	{
 	    String chatMessage = new ChatMessageBuilder()
-		.append(ChatColorType.NORMAL)
-		.append(normal)
-		.append(ChatColorType.HIGHLIGHT)
-		.append(highlight)
-		.build();
+		    .append(ChatColorType.NORMAL)
+		    .append(normal)
+		    .append(ChatColorType.HIGHLIGHT)
+		    .append(highlight)
+		    .build();
 	    chatMessageManager.queue(QueuedMessage.builder()
-		.type(ChatMessageType.CONSOLE)
-		.runeLiteFormattedMessage(chatMessage)
-		.build());
+					     .type(ChatMessageType.CONSOLE)
+					     .runeLiteFormattedMessage(chatMessage)
+					     .build());
 	}
     }
 
@@ -378,8 +506,3 @@ public class StarCallingAssistPlugin extends Plugin
 	}
     }
 }
-
-
-
-
-
