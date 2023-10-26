@@ -61,6 +61,7 @@ public class SidePanel extends PluginPanel
     private InfoPanel infoPanel;
 
     @Inject OkHttpClient okHttpClient;
+    @Inject Gson gson;
     @Inject WorldService worldService;
     @Inject StarCallingAssistPlugin plugin;
     @Inject ConfigManager configManager;
@@ -353,7 +354,8 @@ public class SidePanel extends PluginPanel
 	    return;
 
 	try{
-	    JsonArray jsonArray = new Gson().fromJson(body.string(), JsonArray.class);
+
+	    JsonArray jsonArray = gson.fromJson(body.string(), JsonArray.class);
 	    if(jsonArray.size() < 1)
 		return;
 	    for(final JsonElement element : jsonArray)
