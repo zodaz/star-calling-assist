@@ -112,17 +112,19 @@ public class StarCallingAssistPlugin extends Plugin
     public void onGameObjectSpawned(GameObjectSpawned event)
     {
         int tier = Star.getTier(event.getGameObject().getId());
-        if (tier != -1) {
-            Star.setStar(event.getGameObject(), tier, client.getWorld());
+        if (tier == -1) {
+            return;
+        }
 
-            if (starConfig.autoCall()) {
-                if (whitinPlayerDistance()) {
-                    countMiners();
-                    prepareCall(false);
-                } else {
-                    miners = -1;
-                    prepareCall(false);
-                }
+        Star.setStar(event.getGameObject(), tier, client.getWorld());
+
+        if (starConfig.autoCall()) {
+            if (whitinPlayerDistance()) {
+                countMiners();
+                prepareCall(false);
+            } else {
+                miners = -1;
+                prepareCall(false);
             }
         }
     }
@@ -130,14 +132,16 @@ public class StarCallingAssistPlugin extends Plugin
     @Subscribe
     public void onGameObjectDespawned(GameObjectDespawned event)
     {
-        if (Star.getTier(event.getGameObject().getId()) != -1) {
-            //Causes a check for whether the star fully depleted in the next GameTick event
-            if (starConfig.autoCall()) {
-                confirmDeadLocation = event.getGameObject().getWorldLocation();
-            }
-
-            Star.removeStar();
+        if (Star.getTier(event.getGameObject().getId()) == -1) {
+            return;
         }
+
+        //Causes a check for whether the star fully depleted in the next GameTick event
+        if (starConfig.autoCall()) {
+            confirmDeadLocation = event.getGameObject().getWorldLocation();
+        }
+
+        Star.removeStar();
     }
 
     @Subscribe
