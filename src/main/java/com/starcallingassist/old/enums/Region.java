@@ -1,6 +1,6 @@
-package com.starcallingassist.enums;
+package com.starcallingassist.old.enums;
 
-import com.starcallingassist.constants.RegionKeyName;
+import com.starcallingassist.old.constants.RegionKeyName;
 
 public enum Region
 {

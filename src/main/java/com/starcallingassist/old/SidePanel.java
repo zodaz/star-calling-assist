@@ -1,15 +1,16 @@
-package com.starcallingassist.sidepanel;
+package com.starcallingassist.old;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.starcallingassist.StarCallingAssistPlugin;
-import com.starcallingassist.enums.OrderBy;
-import com.starcallingassist.enums.Region;
-import com.starcallingassist.objects.StarData;
-import com.starcallingassist.sidepanel.elements.TableHeader;
-import com.starcallingassist.sidepanel.elements.TableRow;
+import com.starcallingassist.modules.sidepanel.SidePanelModule;
+import com.starcallingassist.old.elements.TableHeader;
+import com.starcallingassist.old.elements.TableRow;
+import com.starcallingassist.old.enums.OrderBy;
+import com.starcallingassist.old.enums.Region;
+import com.starcallingassist.old.objects.StarData;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -26,6 +27,7 @@ import javax.swing.SwingUtilities;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.game.WorldService;
@@ -67,6 +69,13 @@ public class SidePanel extends PluginPanel
 
 	@Inject
 	OkHttpClient okHttpClient;
+
+	@Inject
+	private Client client;
+
+	@Setter
+	private SidePanelModule module;
+
 	@Inject
 	Gson gson;
 	@Inject
@@ -186,7 +195,7 @@ public class SidePanel extends PluginPanel
 
 		for (StarData data : starData)
 		{
-			tableRows.add(new TableRow(data, plugin));
+			tableRows.add(new TableRow(data, plugin, module));
 		}
 
 		updateTableRows();
@@ -361,7 +370,7 @@ public class SidePanel extends PluginPanel
 			return;
 		}
 
-		if (plugin.getClient().getGameState() != GameState.LOGGED_IN)
+		if (client.getGameState() != GameState.LOGGED_IN)
 		{
 			SwingUtilities.invokeLater(() -> infoPanel.setErrorMessage("You need to be logged in to update the list!"));
 			return;

@@ -1,4 +1,4 @@
-package com.starcallingassist.constants;
+package com.starcallingassist.old.constants;
 
 public class RegionKeyName
 {

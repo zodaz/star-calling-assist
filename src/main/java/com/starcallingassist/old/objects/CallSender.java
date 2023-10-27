@@ -1,4 +1,4 @@
-package com.starcallingassist.objects;
+package com.starcallingassist.old.objects;
 
 import com.starcallingassist.StarCallingAssistConfig;
 import javax.inject.Inject;

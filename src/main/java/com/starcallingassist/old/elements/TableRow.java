@@ -22,11 +22,12 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.starcallingassist.sidepanel.elements;
+package com.starcallingassist.old.elements;
 
 import com.starcallingassist.StarCallingAssistPlugin;
-import com.starcallingassist.objects.StarData;
-import com.starcallingassist.sidepanel.SidePanel;
+import com.starcallingassist.modules.sidepanel.SidePanelModule;
+import com.starcallingassist.old.SidePanel;
+import com.starcallingassist.old.objects.StarData;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -50,6 +51,8 @@ import net.runelite.client.ui.FontManager;
 @Slf4j
 public class TableRow extends JPanel
 {
+	private SidePanelModule module;
+
 	@Getter
 	private StarData data;
 
@@ -95,10 +98,11 @@ public class TableRow extends JPanel
 		}
 	};
 
-	public TableRow(StarData data, StarCallingAssistPlugin plugin)
+	public TableRow(StarData data, StarCallingAssistPlugin plugin, SidePanelModule module)
 	{
 		this.data = data;
 		this.plugin = plugin;
+		this.module = module;
 
 		setRowVisible(true);
 		setLayout(new BorderLayout());
@@ -111,7 +115,7 @@ public class TableRow extends JPanel
 			{
 				if (mouseEvent.getButton() == MouseEvent.BUTTON1 && mouseEvent.getClickCount() == 2)
 				{
-					plugin.queueWorldHop(data.getWorldId());
+					module.queueWorldHop(data.getWorldId());
 				}
 			}
 
@@ -178,7 +182,7 @@ public class TableRow extends JPanel
 
 		Color foreground = null;
 
-		if (data.getWorldId() == plugin.getClient().getWorld())
+		if (data.getWorldId() == module.getClient().getWorld())
 		{
 			foreground = Color.GREEN;
 		}

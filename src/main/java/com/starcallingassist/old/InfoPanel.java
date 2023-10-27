@@ -1,7 +1,7 @@
-package com.starcallingassist.sidepanel;
+package com.starcallingassist.old;
 
 import com.starcallingassist.StarCallingAssistPlugin;
-import com.starcallingassist.sidepanel.elements.Link;
+import com.starcallingassist.modules.sidepanel.elements.Link;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import javax.swing.BoxLayout;

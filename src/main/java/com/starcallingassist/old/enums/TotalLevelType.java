@@ -1,4 +1,4 @@
-package com.starcallingassist.enums;
+package com.starcallingassist.old.enums;
 
 public enum TotalLevelType
 {
