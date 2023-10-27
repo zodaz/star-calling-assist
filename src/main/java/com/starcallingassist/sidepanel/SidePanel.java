@@ -30,7 +30,6 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 public class SidePanel extends PluginPanel
@@ -313,12 +312,10 @@ public class SidePanel extends PluginPanel
 
     private World getWorldObject(int worldId)
     {
-        Optional<World> result = worldList.stream().filter(world -> world.getId() == worldId).findFirst();
-        if (result.isPresent()) {
-            return result.get();
-        }
-
-        return null;
+        return worldList.stream()
+                        .filter(world -> world.getId() == worldId)
+                        .findFirst()
+                        .orElse(null);
     }
 
     public void fetchStarData()
