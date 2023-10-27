@@ -50,7 +50,8 @@ class TableHeader extends JPanel
     private static final Color ARROW_COLOR = ColorScheme.LIGHT_GRAY_COLOR;
     private static final Color HIGHLIGHT_COLOR = ColorScheme.BRAND_ORANGE;
 
-    static {
+    static
+    {
         final BufferedImage arrowDown = ImageUtil.loadImageResource(StarCallingAssistPlugin.class, "/arrow_down.png");
         final BufferedImage arrowUp = ImageUtil.rotateImage(arrowDown, Math.PI);
         final BufferedImage arrowUpFaded = ImageUtil.luminanceOffset(arrowUp, -80);
