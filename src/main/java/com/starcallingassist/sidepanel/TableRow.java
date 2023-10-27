@@ -168,23 +168,22 @@ public class TableRow extends JPanel
         JPanel column = new JPanel(new BorderLayout());
         column.setOpaque(false);
 
-        String worldTypeSpecifier = data.getWorldTypeSpecifier();
-
-        if (worldTypeSpecifier != "") {
-            worldTypeSpecifier = " " + worldTypeSpecifier;
-        }
-
         Color foreground = null;
 
         if (data.getWorldId() == plugin.getClient().getWorld()) {
             foreground = Color.GREEN;
-        } else if (data.getWorldTypeSpecifier() == "PVP") {
+        } else if (data.getWorldTypeSpecifier().equals("PVP")) {
             foreground = Color.RED;
         } else if (data.isP2p()) {
             foreground = Color.ORANGE;
         }
 
-        JPanel worldField = buildMultiLineTextField(data.getWorldId() + worldTypeSpecifier, 3, foreground);
+
+        JPanel worldField = buildMultiLineTextField(
+            (data.getWorldId() + " " + data.getWorldTypeSpecifier()).trim(),
+            3,
+            foreground
+        );
 
         worldField.setBorder(new EmptyBorder(0, 2, 0, 0));
         worldField.setPreferredSize(new Dimension(SidePanel.WORLD_COLUMN_WIDTH, 30));
@@ -200,7 +199,7 @@ public class TableRow extends JPanel
         JPanel column = new JPanel(new BorderLayout());
         column.setOpaque(false);
 
-        JLabel tierField = new JLabel(data.getTier(plugin.getConfig().estimateTier()) + "", SwingConstants.CENTER);
+        JLabel tierField = new JLabel(String.valueOf(data.getTier(plugin.getConfig().estimateTier())), SwingConstants.CENTER);
         tierField.setFont(FontManager.getRunescapeSmallFont());
         tierField.setPreferredSize(new Dimension(SidePanel.TIER_COLUMN_WIDTH, 30));
 
