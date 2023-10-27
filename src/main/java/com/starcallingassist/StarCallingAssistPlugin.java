@@ -394,7 +394,7 @@ public class StarCallingAssistPlugin extends Plugin
         }
 
         Widget[] children = parent.getChildren();
-        if (children.length <= callButton.getIndex() || !children[callButton.getIndex()].equals(callButton)) {
+        if (children == null || children.length <= callButton.getIndex() || !children[callButton.getIndex()].equals(callButton)) {
             return;
         }
 
