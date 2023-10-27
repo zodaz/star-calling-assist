@@ -22,10 +22,11 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.starcallingassist.sidepanel;
+package com.starcallingassist.sidepanel.elements;
 
 import com.starcallingassist.StarCallingAssistPlugin;
 import com.starcallingassist.objects.StarData;
+import com.starcallingassist.sidepanel.SidePanel;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -94,7 +95,7 @@ public class TableRow extends JPanel
 		}
 	};
 
-	TableRow(StarData data, StarCallingAssistPlugin plugin)
+	public TableRow(StarData data, StarCallingAssistPlugin plugin)
 	{
 		this.data = data;
 		this.plugin = plugin;

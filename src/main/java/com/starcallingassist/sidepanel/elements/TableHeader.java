@@ -22,7 +22,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.starcallingassist.sidepanel;
+package com.starcallingassist.sidepanel.elements;
 
 import com.starcallingassist.StarCallingAssistPlugin;
 import java.awt.BorderLayout;
@@ -41,7 +41,7 @@ import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.FontManager;
 import net.runelite.client.util.ImageUtil;
 
-class TableHeader extends JPanel
+public class TableHeader extends JPanel
 {
 	private static final ImageIcon ARROW_UP;
 	private static final ImageIcon HIGHLIGHT_ARROW_DOWN;
@@ -69,7 +69,7 @@ class TableHeader extends JPanel
 	private boolean ordering = false;
 
 	// Sortable
-	TableHeader(String title, boolean ordered, boolean ascending)
+	public TableHeader(String title, boolean ordered, boolean ascending)
 	{
 		setLayout(new BorderLayout(0, 0));
 		setBackground(ColorScheme.SCROLL_TRACK_COLOR);
@@ -114,7 +114,7 @@ class TableHeader extends JPanel
 	}
 
 	// Non-sortable
-	TableHeader(String title)
+	public TableHeader(String title)
 	{
 		setLayout(new BorderLayout(0, 0));
 		setBackground(ColorScheme.SCROLL_TRACK_COLOR);

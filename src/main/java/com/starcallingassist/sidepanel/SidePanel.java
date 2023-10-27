@@ -8,6 +8,8 @@ import com.starcallingassist.StarCallingAssistPlugin;
 import com.starcallingassist.enums.OrderBy;
 import com.starcallingassist.enums.Region;
 import com.starcallingassist.objects.StarData;
+import com.starcallingassist.sidepanel.elements.TableHeader;
+import com.starcallingassist.sidepanel.elements.TableRow;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
