@@ -1,16 +1,12 @@
 package com.starcallingassist.sidepanel;
 
 import com.starcallingassist.StarCallingAssistPlugin;
+import com.starcallingassist.sidepanel.elements.Link;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Desktop;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.net.URI;
+import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.ui.ColorScheme;
@@ -55,33 +51,26 @@ public class InfoPanel extends JPanel
 	private void build()
 	{
 		JPanel top = new JPanel(new BorderLayout());
+		top.setBorder(new EmptyBorder(5, 5, 7, 5));
 		JPanel bottom = new JPanel(new BorderLayout());
-
-		JPanel discordAdvert = new JPanel(new BorderLayout());
-
-		JLabel discordLink = createClickableLink("https://discord.gg/starminers", "Join the Star Miners discord!");
-		discordLink.setHorizontalAlignment(SwingConstants.CENTER);
-
-		discordAdvert.add(discordLink, BorderLayout.CENTER);
-		discordAdvert.setOpaque(false);
-
-		top.add(discordAdvert, BorderLayout.NORTH);
 
 		if (plugin.getConfig().getAuthorization().isEmpty())
 		{
-			JPanel missingKeyInfo = new JPanel(new BorderLayout());
-			JLabel keyInfo = new JLabel(
-				"<html>To see the list of active stars you need to enter your unique key into the " +
-					"<b>Authorization</b> field in the plugin settings. <br><br> You can get your unique key from " +
-					"the starminers discord: <br><br> discord.gg/starminers</html>"
+			JLabel missingKeyDescription = new JLabel("<html>To see the list of active stars you need to enter your unique key into the " +
+				"<b>Authorization</b> field in the plugin settings. <br><br> You can get your unique key from " +
+				"the starminers discord.</html>"
 			);
-			keyInfo.setBorder(new EmptyBorder(10, 3, 5, 3));
-			missingKeyInfo.add(keyInfo);
 
-			missingKeyInfo.setOpaque(false);
-
-			top.add(missingKeyInfo, BorderLayout.SOUTH);
+			JPanel missingKeySection = new JPanel();
+			missingKeySection.setLayout(new BoxLayout(missingKeySection, BoxLayout.Y_AXIS));
+			missingKeySection.setBorder(new EmptyBorder(5, 0, 5, 0));
+			missingKeySection.setOpaque(false);
+			missingKeySection.add(missingKeyDescription);
+			top.add(missingKeySection, BorderLayout.NORTH);
 		}
+
+		Link discordAdvert = new Link("https://discord.gg/starminers", "Join the Star Miners discord!").center();
+		top.add(discordAdvert, BorderLayout.SOUTH);
 
 		top.setOpaque(false);
 		add(top, BorderLayout.NORTH);
@@ -101,41 +90,5 @@ public class InfoPanel extends JPanel
 			bottom.setOpaque(false);
 			add(bottom, BorderLayout.SOUTH);
 		}
-	}
-
-	private JLabel createClickableLink(final String url, String text)
-	{
-		JLabel linkLabel = new JLabel("<html><a href=''>" + text + "</a></html>");
-		linkLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
-		linkLabel.addMouseListener(new MouseAdapter()
-		{
-			@Override
-			public void mouseClicked(MouseEvent e)
-			{
-				try
-				{
-					Desktop.getDesktop().browse(new URI(url));
-				}
-				catch (Exception ex)
-				{
-					log.error(ex.getMessage());
-				}
-			}
-
-			@Override
-			public void mouseEntered(MouseEvent e)
-			{
-				linkLabel.setText("<html><u><font color='orange'>" + text + "</font></u></html>");
-			}
-
-			@Override
-			public void mouseExited(MouseEvent e)
-			{
-				linkLabel.setText("<html><a href=''>" + text + "</a></html>");
-			}
-		});
-
-		return linkLabel;
 	}
 }
