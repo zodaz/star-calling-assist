@@ -64,9 +64,11 @@ public class InfoPanel extends JPanel
 
         if (plugin.getConfig().getAuthorization().isEmpty()) {
             JPanel missingKeyInfo = new JPanel(new BorderLayout());
-            JLabel keyInfo = new JLabel("<html>To see the list of active stars you need to enter your unique key into the " +
-                                        "<b>Authorization</b> field in the plugin settings. <br><br> You can get your unique key from " +
-                                        "the starminers discord: <br><br> discord.gg/starminers</html>");
+            JLabel keyInfo = new JLabel(
+                "<html>To see the list of active stars you need to enter your unique key into the " +
+                "<b>Authorization</b> field in the plugin settings. <br><br> You can get your unique key from " +
+                "the starminers discord: <br><br> discord.gg/starminers</html>"
+            );
             keyInfo.setBorder(new EmptyBorder(10, 3, 5, 3));
             missingKeyInfo.add(keyInfo);
 
