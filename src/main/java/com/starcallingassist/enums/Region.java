@@ -1,4 +1,6 @@
-package com.starcallingassist.sidepanel.constants;
+package com.starcallingassist.enums;
+
+import com.starcallingassist.constants.RegionKeyName;
 
 public enum Region
 {

@@ -1,6 +1,8 @@
 package com.starcallingassist;
 
 import com.google.inject.Provides;
+import com.starcallingassist.objects.CallSender;
+import com.starcallingassist.objects.Star;
 import com.starcallingassist.sidepanel.SidePanel;
 import java.awt.Point;
 import java.io.IOException;

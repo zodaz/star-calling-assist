@@ -1,4 +1,4 @@
-package com.starcallingassist;
+package com.starcallingassist.objects;
 
 import java.awt.Point;
 import java.util.HashMap;

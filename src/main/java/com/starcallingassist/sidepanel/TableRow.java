@@ -25,6 +25,7 @@
 package com.starcallingassist.sidepanel;
 
 import com.starcallingassist.StarCallingAssistPlugin;
+import com.starcallingassist.objects.StarData;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;

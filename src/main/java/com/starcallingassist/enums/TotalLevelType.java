@@ -1,4 +1,4 @@
-package com.starcallingassist.sidepanel.constants;
+package com.starcallingassist.enums;
 
 public enum TotalLevelType
 {

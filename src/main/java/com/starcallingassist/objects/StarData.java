@@ -1,6 +1,6 @@
-package com.starcallingassist.sidepanel;
+package com.starcallingassist.objects;
 
-import com.starcallingassist.sidepanel.constants.TotalLevelType;
+import com.starcallingassist.enums.TotalLevelType;
 import java.util.EnumSet;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
