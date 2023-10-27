@@ -7,6 +7,15 @@ import com.google.gson.JsonObject;
 import com.starcallingassist.StarCallingAssistPlugin;
 import com.starcallingassist.sidepanel.constants.OrderBy;
 import com.starcallingassist.sidepanel.constants.Region;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+import javax.swing.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -18,18 +27,13 @@ import net.runelite.client.ui.DynamicGridLayout;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.http.api.worlds.World;
 import net.runelite.http.api.worlds.WorldResult;
-import okhttp3.*;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
 import okhttp3.Request.Builder;
-
-import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 @Slf4j
 public class SidePanel extends PluginPanel
