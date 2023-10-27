@@ -24,23 +24,23 @@
  */
 package com.starcallingassist.sidepanel;
 
-	import java.awt.*;
-	import java.awt.event.MouseAdapter;
-	import java.awt.event.MouseEvent;
-	import java.util.ArrayList;
-	import java.util.List;
-	import javax.swing.*;
-	import javax.swing.border.EmptyBorder;
+import com.starcallingassist.StarCallingAssistPlugin;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.Value;
+import lombok.extern.slf4j.Slf4j;
+import net.runelite.client.ui.ColorScheme;
+import net.runelite.client.ui.DynamicGridLayout;
+import net.runelite.client.ui.FontManager;
 
-	import com.starcallingassist.StarCallingAssistPlugin;
-	import lombok.AllArgsConstructor;
-	import lombok.Getter;
-	import lombok.Setter;
-	import lombok.Value;
-	import lombok.extern.slf4j.Slf4j;
-	import net.runelite.client.ui.ColorScheme;
-	import net.runelite.client.ui.DynamicGridLayout;
-	import net.runelite.client.ui.FontManager;
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 public class TableRow extends JPanel
@@ -59,267 +59,268 @@ public class TableRow extends JPanel
     // bubble up events
     private final MouseAdapter labelMouseListener = new MouseAdapter()
     {
-	@Override
-	public void mouseClicked(MouseEvent mouseEvent)
-	{
-	    dispatchEvent(mouseEvent);
-	}
+        @Override
+        public void mouseClicked(MouseEvent mouseEvent)
+        {
+            dispatchEvent(mouseEvent);
+        }
 
-	@Override
-	public void mousePressed(MouseEvent mouseEvent)
-	{
-	    dispatchEvent(mouseEvent);
-	}
+        @Override
+        public void mousePressed(MouseEvent mouseEvent)
+        {
+            dispatchEvent(mouseEvent);
+        }
 
-	@Override
-	public void mouseReleased(MouseEvent mouseEvent)
-	{
-	    dispatchEvent(mouseEvent);
-	}
+        @Override
+        public void mouseReleased(MouseEvent mouseEvent)
+        {
+            dispatchEvent(mouseEvent);
+        }
 
-	@Override
-	public void mouseEntered(MouseEvent mouseEvent)
-	{
-	    dispatchEvent(mouseEvent);
-	}
+        @Override
+        public void mouseEntered(MouseEvent mouseEvent)
+        {
+            dispatchEvent(mouseEvent);
+        }
 
-	@Override
-	public void mouseExited(MouseEvent mouseEvent)
-	{
-	    dispatchEvent(mouseEvent);
-	}
+        @Override
+        public void mouseExited(MouseEvent mouseEvent)
+        {
+            dispatchEvent(mouseEvent);
+        }
     };
 
     TableRow(StarData data, StarCallingAssistPlugin plugin)
     {
-	this.data = data;
-	this.plugin = plugin;
+        this.data = data;
+        this.plugin = plugin;
 
-	setRowVisible(true);
-	setLayout(new BorderLayout());
-	setBorder(new EmptyBorder(2, 0, 2, 0));
+        setRowVisible(true);
+        setLayout(new BorderLayout());
+        setBorder(new EmptyBorder(2, 0, 2, 0));
 
-	addMouseListener(new MouseAdapter()
-	{
-	    @Override
-	    public void mouseClicked(MouseEvent mouseEvent)
-	    {
-		if (mouseEvent.getButton() == MouseEvent.BUTTON1 && mouseEvent.getClickCount() == 2)
-		    plugin.queueWorldHop(data.getWorldId());
-	    }
+        addMouseListener(new MouseAdapter()
+        {
+            @Override
+            public void mouseClicked(MouseEvent mouseEvent)
+            {
+                if (mouseEvent.getButton() == MouseEvent.BUTTON1 && mouseEvent.getClickCount() == 2) {
+                    plugin.queueWorldHop(data.getWorldId());
+                }
+            }
 
-	    @Override
-	    public void mousePressed(MouseEvent mouseEvent)
-	    {
-		if (mouseEvent.getClickCount() == 2)
-		    setBackground(getBackground().brighter());
-	    }
+            @Override
+            public void mousePressed(MouseEvent mouseEvent)
+            {
+                if (mouseEvent.getClickCount() == 2) {
+                    setBackground(getBackground().brighter());
+                }
+            }
 
-	    @Override
-	    public void mouseReleased(MouseEvent mouseEvent)
-	    {
-		if (mouseEvent.getClickCount() == 2)
-		    setBackground(getBackground().darker());
-	    }
+            @Override
+            public void mouseReleased(MouseEvent mouseEvent)
+            {
+                if (mouseEvent.getClickCount() == 2) {
+                    setBackground(getBackground().darker());
+                }
+            }
 
-	    @Override
-	    public void mouseEntered(MouseEvent mouseEvent)
-	    {
-		TableRow.this.lastBackground = getBackground();
+            @Override
+            public void mouseEntered(MouseEvent mouseEvent)
+            {
+                TableRow.this.lastBackground = getBackground();
 
-		setBackground(ColorScheme.DARKER_GRAY_HOVER_COLOR);
-	    }
+                setBackground(ColorScheme.DARKER_GRAY_HOVER_COLOR);
+            }
 
-	    @Override
-	    public void mouseExited(MouseEvent mouseEvent)
-	    {
-		setBackground(lastBackground);
-	    }
-	});
+            @Override
+            public void mouseExited(MouseEvent mouseEvent)
+            {
+                setBackground(lastBackground);
+            }
+        });
 
-	JPanel row = new JPanel(new BorderLayout());
-	JPanel leftSide = new JPanel(new BorderLayout());
-	JPanel center = new JPanel(new BorderLayout());
-	JPanel rightSide = new JPanel(new BorderLayout());
+        JPanel row = new JPanel(new BorderLayout());
+        JPanel leftSide = new JPanel(new BorderLayout());
+        JPanel center = new JPanel(new BorderLayout());
+        JPanel rightSide = new JPanel(new BorderLayout());
 
-	row.setOpaque(false);
-	leftSide.setOpaque(false);
-	center.setOpaque(false);
-	rightSide.setOpaque(false);
+        row.setOpaque(false);
+        leftSide.setOpaque(false);
+        center.setOpaque(false);
+        rightSide.setOpaque(false);
 
-	leftSide.add(buildWorldField(), BorderLayout.WEST);
-	leftSide.add(buildTierField(), BorderLayout.CENTER);
-	center.add(buildLocationField(), BorderLayout.CENTER);
-	rightSide.add(buildDeadTimeField(), BorderLayout.CENTER);
-	rightSide.add(buildFoundByField(), BorderLayout.EAST);
+        leftSide.add(buildWorldField(), BorderLayout.WEST);
+        leftSide.add(buildTierField(), BorderLayout.CENTER);
+        center.add(buildLocationField(), BorderLayout.CENTER);
+        rightSide.add(buildDeadTimeField(), BorderLayout.CENTER);
+        rightSide.add(buildFoundByField(), BorderLayout.EAST);
 
-	row.add(leftSide, BorderLayout.WEST);
-	row.add(center, BorderLayout.CENTER);
-	row.add(rightSide, BorderLayout.EAST);
+        row.add(leftSide, BorderLayout.WEST);
+        row.add(center, BorderLayout.CENTER);
+        row.add(rightSide, BorderLayout.EAST);
 
-	add(row);
+        add(row);
     }
 
     private JPanel buildWorldField()
     {
-	JPanel column = new JPanel(new BorderLayout());
-	column.setOpaque(false);
+        JPanel column = new JPanel(new BorderLayout());
+        column.setOpaque(false);
 
-	String worldTypeSpecifier = data.getWorldTypeSpecifier();
+        String worldTypeSpecifier = data.getWorldTypeSpecifier();
 
-	if(worldTypeSpecifier != "")
-	    worldTypeSpecifier = " " + worldTypeSpecifier;
+        if (worldTypeSpecifier != "") {
+            worldTypeSpecifier = " " + worldTypeSpecifier;
+        }
 
-	Color foreground = null;
+        Color foreground = null;
 
-	if(data.getWorldId() == plugin.getClient().getWorld())
-	    foreground = Color.GREEN;
-	else if(data.getWorldTypeSpecifier() == "PVP")
-	    foreground = Color.RED;
-	else if(data.isP2p())
-	    foreground = Color.ORANGE;
+        if (data.getWorldId() == plugin.getClient().getWorld()) {
+            foreground = Color.GREEN;
+        } else if (data.getWorldTypeSpecifier() == "PVP") {
+            foreground = Color.RED;
+        } else if (data.isP2p()) {
+            foreground = Color.ORANGE;
+        }
 
-	JPanel worldField = buildMultiLineTextField(data.getWorldId() + worldTypeSpecifier, 3, foreground);
+        JPanel worldField = buildMultiLineTextField(data.getWorldId() + worldTypeSpecifier, 3, foreground);
 
-	worldField.setBorder(new EmptyBorder(0, 2, 0, 0));
-	worldField.setPreferredSize(new Dimension(SidePanel.WORLD_COLUMN_WIDTH, 30));
+        worldField.setBorder(new EmptyBorder(0, 2, 0, 0));
+        worldField.setPreferredSize(new Dimension(SidePanel.WORLD_COLUMN_WIDTH, 30));
 
-	column.add(worldField);
-	column.addMouseListener(labelMouseListener);
+        column.add(worldField);
+        column.addMouseListener(labelMouseListener);
 
-	return column;
+        return column;
     }
 
     private JPanel buildTierField()
     {
-	JPanel column = new JPanel(new BorderLayout());
-	column.setOpaque(false);
+        JPanel column = new JPanel(new BorderLayout());
+        column.setOpaque(false);
 
-	JLabel tierField = new JLabel(data.getTier(plugin.getConfig().estimateTier()) + "", SwingConstants.CENTER);
-	tierField.setFont(FontManager.getRunescapeSmallFont());
-	tierField.setPreferredSize(new Dimension(SidePanel.TIER_COLUMN_WIDTH, 30));
+        JLabel tierField = new JLabel(data.getTier(plugin.getConfig().estimateTier()) + "", SwingConstants.CENTER);
+        tierField.setFont(FontManager.getRunescapeSmallFont());
+        tierField.setPreferredSize(new Dimension(SidePanel.TIER_COLUMN_WIDTH, 30));
 
-	column.add(tierField);
-	column.addMouseListener(labelMouseListener);
+        column.add(tierField);
+        column.addMouseListener(labelMouseListener);
 
-	return column;
+        return column;
     }
 
     private JPanel buildLocationField()
     {
+        JPanel column = new JPanel(new BorderLayout());
+        column.setOpaque(false);
 
-	JPanel column = new JPanel(new BorderLayout());
-	column.setOpaque(false);
+        JPanel locationField = buildMultiLineTextField(data.getLocation(), 16, data.isWilderness() ? Color.RED : null);
+        locationField.setBorder(new EmptyBorder(0, 2, 0, 2));
 
-	JPanel locationField = buildMultiLineTextField(data.getLocation(), 16, data.isWilderness() ? Color.RED : null);
-	locationField.setBorder(new EmptyBorder(0, 2, 0, 2));
+        column.add(locationField);
+        column.addMouseListener(labelMouseListener);
 
-	column.add(locationField);
-	column.addMouseListener(labelMouseListener);
-
-	return column;
+        return column;
     }
 
     private JPanel buildDeadTimeField()
     {
-	JPanel column = new JPanel(new BorderLayout());
-	column.setOpaque(false);
+        JPanel column = new JPanel(new BorderLayout());
+        column.setOpaque(false);
 
-	JLabel deadTimeField = new JLabel(data.getDeadTime() + "m");
-	deadTimeField.setForeground(data.getDeadTime() <= 0 ? Color.RED : data.getDeadTime() <= 20 ? Color.YELLOW : Color.GREEN);
-	deadTimeField.setHorizontalAlignment(SwingConstants.CENTER);
-	deadTimeField.setFont(FontManager.getRunescapeSmallFont());
+        JLabel deadTimeField = new JLabel(data.getDeadTime() + "m");
+        deadTimeField.setForeground(data.getDeadTime() <= 0 ? Color.RED : data.getDeadTime() <= 20 ? Color.YELLOW : Color.GREEN);
+        deadTimeField.setHorizontalAlignment(SwingConstants.CENTER);
+        deadTimeField.setFont(FontManager.getRunescapeSmallFont());
 
-	deadTimeField.setPreferredSize(new Dimension(SidePanel.DEAD_TIME_COLUMN_WIDTH, 30));
+        deadTimeField.setPreferredSize(new Dimension(SidePanel.DEAD_TIME_COLUMN_WIDTH, 30));
 
-	column.add(deadTimeField);
-	column.addMouseListener(labelMouseListener);
+        column.add(deadTimeField);
+        column.addMouseListener(labelMouseListener);
 
-	return column;
+        return column;
     }
 
     private JPanel buildFoundByField()
     {
-	JPanel column = new JPanel(new BorderLayout());
-	column.setOpaque(false);
+        JPanel column = new JPanel(new BorderLayout());
+        column.setOpaque(false);
 
-	JPanel foundByField = buildMultiLineTextField(fitUsername(data.getFoundBy(), 8), 8,  null);
+        JPanel foundByField = buildMultiLineTextField(fitUsername(data.getFoundBy(), 8), 8, null);
 
-	foundByField.setPreferredSize(new Dimension(SidePanel.FOUND_BY_COLUMN_WIDTH, 30));
+        foundByField.setPreferredSize(new Dimension(SidePanel.FOUND_BY_COLUMN_WIDTH, 30));
 
-	column.add(foundByField);
+        column.add(foundByField);
 
-	column.addMouseListener(labelMouseListener);
+        column.addMouseListener(labelMouseListener);
 
-	return column;
+        return column;
     }
 
     /**
      * Creates a JPanel containing one or more JLabels based on input.
      *
-     * @param text Text to divide into lines.
-     * @param charLimit Maximum length of each line.
+     * @param text       Text to divide into lines.
+     * @param charLimit  Maximum length of each line.
      * @param foreground Color of the text.
      * @return A JPanel containing one or more JLabels.
      */
     private JPanel buildMultiLineTextField(String text, int charLimit, Color foreground)
     {
-	JPanel column = new JPanel(new DynamicGridLayout(3, 1));
+        JPanel column = new JPanel(new DynamicGridLayout(3, 1));
 
-	List<String> lines = getLines(text, charLimit);
+        List<String> lines = getLines(text, charLimit);
 
-	for (int i = 0; i < lines.size(); i++)
-	{
-	    if(i >= 3)
-		break;
-	    JLabel label = new JLabel(lines.get(i));
-	    label.setFont(FontManager.getRunescapeSmallFont());
-	    if(foreground != null)
-		label.setForeground(foreground);
-	    column.add(label);
-	}
+        for (int i = 0; i < lines.size(); i++) {
+            if (i >= 3) {
+                break;
+            }
 
-	column.setOpaque(false);
+            JLabel label = new JLabel(lines.get(i));
+            label.setFont(FontManager.getRunescapeSmallFont());
+            if (foreground != null) {
+                label.setForeground(foreground);
+            }
 
-	return column;
+            column.add(label);
+        }
+
+        column.setOpaque(false);
+
+        return column;
     }
 
     /**
      * Divides a string into a list of lines based on the lineLength parameter.
      *
-     * @param text Text to divide into lines.
+     * @param text       Text to divide into lines.
      * @param lineLength Maximum length of each line.
      * @return A list of String:s where all strings are less than lineLength in length.
      */
     private List<String> getLines(String text, int lineLength)
     {
-	List<String> lines = new ArrayList<>();
+        List<String> lines = new ArrayList<>();
 
-	String currentLine = "";
-	for (String s : text.split(" "))
-	{
-	    if(s.length() + currentLine.length() + 1 > lineLength)
-	    {
-		if(currentLine.isEmpty())
-		{
-		    lines.add(s);
-		}
-		else
-		{
-		    lines.add(currentLine);
-		    currentLine = s;
-		}
-	    }
-	    else
-	    {
-		currentLine += currentLine.isEmpty() ? s : (" " + s);
-	    }
-	}
+        String currentLine = "";
+        for (String s : text.split(" ")) {
+            if (s.length() + currentLine.length() + 1 > lineLength) {
+                if (currentLine.isEmpty()) {
+                    lines.add(s);
+                } else {
+                    lines.add(currentLine);
+                    currentLine = s;
+                }
+            } else {
+                currentLine += currentLine.isEmpty() ? s : (" " + s);
+            }
+        }
 
-	if(!currentLine.isEmpty())
-	    lines.add(currentLine);
+        if (!currentLine.isEmpty()) {
+            lines.add(currentLine);
+        }
 
-	return lines;
+        return lines;
     }
 
     /**
@@ -330,22 +331,26 @@ public class TableRow extends JPanel
      */
     private String fitUsername(String username, int charLimit)
     {
-	if(username.length() > charLimit)
-	{
-	    String[] arr = username.split(" ");
-	    for(int i = 0; i < arr.length; i++)
-		if(arr[i].length() > charLimit - 1)
-		    arr[i] = arr[i].substring(0, charLimit - 1) + " " + arr[i].substring(charLimit - 1);
-	    username = String.join(" ", arr);
-	}
-	return username;
+        if (username.length() > charLimit) {
+            String[] arr = username.split(" ");
+
+            for (int i = 0; i < arr.length; i++) {
+                if (arr[i].length() > charLimit - 1) {
+                    arr[i] = arr[i].substring(0, charLimit - 1) + " " + arr[i].substring(charLimit - 1);
+                }
+            }
+
+            username = String.join(" ", arr);
+        }
+
+        return username;
     }
 
     @Value
     @AllArgsConstructor
     private static class StringBool
     {
-	String string;
-	boolean boolValue;
+        String string;
+        boolean boolValue;
     }
 }

@@ -20,11 +20,13 @@ public enum Region
 
     public final String keyName;
 
-    Region(String keyName) {
-	this.keyName = keyName;
+    Region(String keyName)
+    {
+        this.keyName = keyName;
     }
 
-    public String getKeyName() {
-	return keyName;
+    public String getKeyName()
+    {
+        return keyName;
     }
 }
