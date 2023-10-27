@@ -216,7 +216,7 @@ public class StarCallingAssistPlugin extends Plugin
             return;
         }
 
-        if (event.equals("endpoint")) {
+        if (event.getKey().equals("endpoint")) {
             fetchStarData();
             return;
         }
