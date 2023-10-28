@@ -1,6 +1,8 @@
 package com.starcallingassist.modules.callButton;
 
 import com.starcallingassist.StarModuleContract;
+import com.starcallingassist.events.ManualStarDepletedCallRequested;
+import com.starcallingassist.events.ManualStarDroppedCallRequested;
 import java.awt.Point;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
@@ -72,6 +74,7 @@ public class CallButtonModule extends StarModuleContract
 		{
 			removeCallButton();
 		}
+
 		parent = client.getWidget(WidgetInfo.MINIMAP_ORBS);
 		clientThread.invokeLater(this::createCallButton);
 	}
@@ -152,23 +155,19 @@ public class CallButtonModule extends StarModuleContract
 
 	private void callButtonClicked(ScriptEvent event)
 	{
-		switch (event.getOp())
+		if (event.getOp() == CALL_STAR)
 		{
-			case CALL_STAR:
-			{
-				plugin.prepareCall(true);
-				break;
-			}
-			case CALL_DEAD:
-			{
-				plugin.attemptCall(client.getLocalPlayer().getName(), client.getWorld(), 0, "dead");
-				break;
-			}
-			case CALL_PRIVATE:
-			{
-				plugin.attemptCall(client.getLocalPlayer().getName(), client.getWorld(), 0, "pdead");
-				break;
-			}
+			dispatch(new ManualStarDroppedCallRequested());
+		}
+
+		if (event.getOp() == CALL_DEAD)
+		{
+			dispatch(new ManualStarDepletedCallRequested());
+		}
+
+		if (event.getOp() == CALL_PRIVATE)
+		{
+			dispatch(new ManualStarDepletedCallRequested(false));
 		}
 	}
 }

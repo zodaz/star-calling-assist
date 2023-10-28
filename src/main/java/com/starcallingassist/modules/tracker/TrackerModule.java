@@ -1,7 +1,11 @@
 package com.starcallingassist.modules.tracker;
 
 import com.starcallingassist.StarModuleContract;
+import com.starcallingassist.events.ManualStarDepletedCallRequested;
+import com.starcallingassist.events.ManualStarDroppedCallRequested;
+import com.starcallingassist.old.objects.CallSender;
 import com.starcallingassist.old.objects.Star;
+import java.io.IOException;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
@@ -16,6 +20,9 @@ import net.runelite.api.events.GameTick;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 
 @Slf4j
 public class TrackerModule extends StarModuleContract
@@ -29,10 +36,24 @@ public class TrackerModule extends StarModuleContract
 	@Inject
 	private ClientThread clientThread;
 
+	@Inject
+	private CallSender sender;
+
+	private int miners = 0;
+
+	private Star lastCalledStar;
+
+	@Override
+	public void startUp()
+	{
+		lastCalledStar = null;
+	}
+
 	@Override
 	public void shutDown()
 	{
 		Star.removeStar();
+		lastCalledStar = null;
 	}
 
 	@Subscribe
@@ -47,7 +68,7 @@ public class TrackerModule extends StarModuleContract
 		{
 			if (config.autoCall())
 			{
-				clientThread.invokeLater(() -> plugin.prepareCall(false));
+				clientThread.invokeLater(() -> prepareCall(false));
 			}
 
 			return;
@@ -57,7 +78,7 @@ public class TrackerModule extends StarModuleContract
 		{
 			if (config.autoCall() && config.updateStar())
 			{
-				clientThread.invokeLater(() -> plugin.prepareCall(false));
+				clientThread.invokeLater(() -> prepareCall(false));
 			}
 		}
 	}
@@ -74,33 +95,33 @@ public class TrackerModule extends StarModuleContract
 	@Subscribe
 	public void onGameTick(GameTick tick)
 	{
+		Star star = Star.getStar();
 		if (confirmDeadLocation != null)
 		{
-			if (Star.getStar() == null)
+			if (star == null)
 			{
 				if (client.getLocalPlayer().getWorldLocation().distanceTo(confirmDeadLocation) <= 32)
 				{
-					plugin.attemptCall(client.getLocalPlayer().getName(), client.getWorld(), 0, Star.getLocationName(confirmDeadLocation));
+					attemptCall(client.getLocalPlayer().getName(), client.getWorld(), 0, Star.getLocationName(confirmDeadLocation));
 				}
 			}
 
 			confirmDeadLocation = null;
 		}
 
-		if (Star.getStar() != null)
+		if (star != null)
 		{
-			if (client.getLocalPlayer().getWorldLocation().distanceTo(Star.getStar().location) > 32)
+			if (client.getLocalPlayer().getWorldLocation().distanceTo(star.location) > 32)
 			{
 				Star.removeStar();
 			}
 
-			if (Star.getStar() != null)
+			if (star != null)
 			{
 				countMiners();
 			}
 		}
 	}
-
 
 	@Subscribe
 	public void onGameObjectSpawned(GameObjectSpawned event)
@@ -118,12 +139,12 @@ public class TrackerModule extends StarModuleContract
 			if (withinPlayerDistance())
 			{
 				countMiners();
-				plugin.prepareCall(false);
+				prepareCall(false);
 			}
 			else
 			{
-				plugin.setMiners(-1);
-				plugin.prepareCall(false);
+				miners = -1;
+				prepareCall(false);
 			}
 		}
 	}
@@ -145,6 +166,27 @@ public class TrackerModule extends StarModuleContract
 		Star.removeStar();
 	}
 
+	@Subscribe
+	public void onManualStarDroppedCallRequested(ManualStarDroppedCallRequested event)
+	{
+		log.debug("Manual star dropped call requested");
+	}
+
+	@Subscribe
+	public void onManualStarDepletedCallRequested(ManualStarDepletedCallRequested event)
+	{
+		if (event.getIsPublicCall())
+		{
+			log.debug("Manual (public) star depletion call requested");
+			// attemptCall(client.getLocalPlayer().getName(), client.getWorld(), 0, "dead");
+		}
+		else
+		{
+			log.debug("Manual (private) star depletion call requested");
+			// attemptCall(client.getLocalPlayer().getName(), client.getWorld(), 0, "pdead");
+		}
+	}
+
 	private boolean withinPlayerDistance()
 	{
 		return client.getLocalPlayer().getWorldLocation().distanceTo(new WorldArea(Star.getStar().location, 2, 2)) <= PLAYER_RENDER_DISTANCE;
@@ -153,12 +195,12 @@ public class TrackerModule extends StarModuleContract
 	//Credit to https://github.com/pwatts6060/star-info/. Simplified to fit our needs.
 	private void countMiners()
 	{
-		int miners = 0;
+		miners = 0;
 		Star star = Star.getStar();
 
 		if (!withinPlayerDistance())
 		{
-			plugin.setMiners(-1);
+			miners = -1;
 			return;
 		}
 
@@ -174,7 +216,103 @@ public class TrackerModule extends StarModuleContract
 
 			miners++;
 		}
+	}
 
-		plugin.setMiners(miners);
+	public void prepareCall(boolean manual)
+	{
+		if (Star.getStar() == null)
+		{
+			if (manual)
+			{
+				plugin.logToChat("Unable to find star.");
+			}
+
+			return;
+		}
+
+		if (lastCalledStar != null
+			&& lastCalledStar.world == Star.getStar().world
+			&& lastCalledStar.tier == Star.getStar().tier
+			&& lastCalledStar.location.equals(Star.getStar().location)
+		)
+		{
+			if (manual)
+			{
+				plugin.logToChat("This star has already been called.");
+			}
+
+			return;
+		}
+
+		//Won't automatically call star again if tier decreased and the updateStar option disabled
+		if (lastCalledStar != null
+			&& lastCalledStar.world == Star.getStar().world
+			&& lastCalledStar.location.equals(Star.getStar().location)
+			&& lastCalledStar.tier > Star.getStar().tier
+			&& !config.updateStar() && !manual
+		)
+		{
+			return;
+		}
+
+		String location = Star.getLocationName(Star.getStar().location);
+		if (location.equals("unknown"))
+		{
+			plugin.logToChat("Star location is unknown, manual call required.");
+			return;
+		}
+
+		attemptCall(client.getLocalPlayer().getName(), client.getWorld(), Star.getStar().tier, location);
+	}
+
+	public void attemptCall(String username, int world, int tier, String location)
+	{
+		try
+		{
+			sender.sendCall(username, world, tier, location, miners, new Callback()
+			{
+				@Override
+				public void onFailure(Call call, IOException e)
+				{
+					clientThread.invokeLater(() -> {
+						plugin.logToChat("Unable to post call to " + config.getEndpoint() + ".");
+					});
+
+					call.cancel();
+				}
+
+				@Override
+				public void onResponse(Call call, Response res) throws IOException
+				{
+					if (res.isSuccessful())
+					{
+						if (tier > 0)
+						{
+							lastCalledStar = Star.getStar();
+						}
+
+						clientThread.invokeLater(() -> plugin.logHighlightedToChat(
+							"Successfully posted call: ",
+							"W" + world + " T" + tier + " " + location + ((miners == -1 || tier == 0) ? "" : (" " + miners + " Miners"))
+						));
+					}
+					else
+					{
+						clientThread.invokeLater(() -> plugin.logHighlightedToChat(
+							"Issue posting call to " + config.getEndpoint() + ": ",
+							res.message()
+						));
+					}
+
+					res.close();
+				}
+			});
+		}
+		catch (IllegalArgumentException e)
+		{
+			clientThread.invokeLater(() -> {
+				plugin.logHighlightedToChat("Issue posting call to " + config.getEndpoint() + ": ", "Invalid endpoint");
+			});
+		}
 	}
 }
