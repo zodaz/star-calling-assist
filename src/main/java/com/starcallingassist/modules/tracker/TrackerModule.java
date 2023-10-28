@@ -5,6 +5,7 @@ import com.starcallingassist.events.ChatConsoleMessage;
 import com.starcallingassist.events.ChatDebugMessage;
 import com.starcallingassist.events.ManualStarDepletedCallRequested;
 import com.starcallingassist.events.ManualStarDroppedCallRequested;
+import com.starcallingassist.events.StarCallingAssistConfigChanged;
 import com.starcallingassist.old.objects.CallSender;
 import com.starcallingassist.old.objects.Star;
 import java.io.IOException;
@@ -21,7 +22,6 @@ import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
-import net.runelite.client.events.ConfigChanged;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
@@ -59,13 +59,8 @@ public class TrackerModule extends StarModuleContract
 	}
 
 	@Subscribe
-	public void onConfigChanged(ConfigChanged event)
+	public void onStarCallingAssistConfigChanged(StarCallingAssistConfigChanged event)
 	{
-		if (!event.getGroup().equals("starcallingassistplugin"))
-		{
-			return;
-		}
-
 		if (event.getKey().equals("autoCall"))
 		{
 			if (config.autoCall())

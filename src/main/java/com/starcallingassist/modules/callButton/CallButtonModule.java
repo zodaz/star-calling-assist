@@ -3,6 +3,7 @@ package com.starcallingassist.modules.callButton;
 import com.starcallingassist.StarModuleContract;
 import com.starcallingassist.events.ManualStarDepletedCallRequested;
 import com.starcallingassist.events.ManualStarDroppedCallRequested;
+import com.starcallingassist.events.StarCallingAssistConfigChanged;
 import java.awt.Point;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +21,6 @@ import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.api.widgets.WidgetType;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
-import net.runelite.client.events.ConfigChanged;
 
 @Slf4j
 public class CallButtonModule extends StarModuleContract
@@ -63,13 +63,8 @@ public class CallButtonModule extends StarModuleContract
 	}
 
 	@Subscribe
-	public void onConfigChanged(ConfigChanged event)
+	public void onStarCallingAssistConfigChanged(StarCallingAssistConfigChanged event)
 	{
-		if (!event.getGroup().equals("starcallingassistplugin"))
-		{
-			return;
-		}
-
 		if (event.getKey().equals("callHorn"))
 		{
 			removeCallButton();

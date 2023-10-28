@@ -2,6 +2,7 @@ package com.starcallingassist;
 
 import com.google.inject.Inject;
 import com.google.inject.Provides;
+import com.starcallingassist.events.StarCallingAssistConfigChanged;
 import com.starcallingassist.modules.callButton.CallButtonModule;
 import com.starcallingassist.modules.chat.ChatModule;
 import com.starcallingassist.modules.sidepanel.SidePanelModule;
@@ -12,6 +13,8 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.EventBus;
+import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 
@@ -90,5 +93,16 @@ public class StarCallingAssistPlugin extends Plugin
 			eventBus.unregister(module);
 			module.shutDown();
 		}
+	}
+
+	@Subscribe
+	public void onConfigChanged(ConfigChanged event)
+	{
+		if (!event.getGroup().equals("starcallingassistplugin"))
+		{
+			return;
+		}
+
+		eventBus.post(StarCallingAssistConfigChanged.fromConfigChangedEvent(event));
 	}
 }

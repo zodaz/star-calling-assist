@@ -2,6 +2,7 @@ package com.starcallingassist.modules.sidepanel;
 
 import com.starcallingassist.StarModuleContract;
 import com.starcallingassist.events.ChatConsoleMessage;
+import com.starcallingassist.events.StarCallingAssistConfigChanged;
 import com.starcallingassist.old.SidePanel;
 import java.time.temporal.ChronoUnit;
 import javax.inject.Inject;
@@ -16,7 +17,6 @@ import net.runelite.api.events.GameTick;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
-import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.task.Schedule;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
@@ -75,13 +75,8 @@ public class SidePanelModule extends StarModuleContract
 	}
 
 	@Subscribe
-	public void onConfigChanged(ConfigChanged event)
+	public void onStarCallingAssistConfigChanged(StarCallingAssistConfigChanged event)
 	{
-		if (!event.getGroup().equals("starcallingassistplugin"))
-		{
-			return;
-		}
-
 		if (event.getKey().equals("endpoint"))
 		{
 			fetchStarData();
