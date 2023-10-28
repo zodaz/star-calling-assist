@@ -32,7 +32,8 @@ public class ChatModule extends StarModuleContract
 	@Subscribe
 	public void onChatDebugMessage(ChatDebugMessage event)
 	{
-		if (config.chatMessages()) {
+		if (config.chatMessages())
+		{
 			queueChatMessage(event);
 		}
 	}
@@ -67,7 +68,6 @@ public class ChatModule extends StarModuleContract
 			}
 
 			builder = builder
-				.append(insideAsterisks ? "_" : "=")
 				.append(insideAsterisks ? ChatColorType.HIGHLIGHT : ChatColorType.NORMAL)
 				.append(currentSegment.toString());
 

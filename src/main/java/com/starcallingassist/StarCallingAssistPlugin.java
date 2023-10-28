@@ -7,6 +7,7 @@ import com.starcallingassist.modules.callButton.CallButtonModule;
 import com.starcallingassist.modules.chat.ChatModule;
 import com.starcallingassist.modules.sidepanel.SidePanelModule;
 import com.starcallingassist.modules.tracker.TrackerModule;
+import com.starcallingassist.modules.worldhop.WorldHopModule;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import lombok.Getter;
@@ -55,8 +56,7 @@ public class StarCallingAssistPlugin extends Plugin
 		{
 			module = className.getDeclaredConstructor().newInstance();
 		}
-		catch (InstantiationException | IllegalAccessException | NoSuchMethodException |
-			   InvocationTargetException e)
+		catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e)
 		{
 			e.printStackTrace();
 			return;
@@ -77,6 +77,7 @@ public class StarCallingAssistPlugin extends Plugin
 		this.registerModule(ChatModule.class);
 		this.registerModule(SidePanelModule.class);
 		this.registerModule(TrackerModule.class);
+		this.registerModule(WorldHopModule.class);
 
 		for (StarModuleContract module : this.modules.values())
 		{
@@ -103,6 +104,6 @@ public class StarCallingAssistPlugin extends Plugin
 			return;
 		}
 
-		eventBus.post(StarCallingAssistConfigChanged.fromConfigChangedEvent(event));
+		eventBus.post(new StarCallingAssistConfigChanged(event));
 	}
 }

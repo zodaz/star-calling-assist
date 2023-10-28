@@ -3,9 +3,9 @@ package com.starcallingassist.modules.tracker;
 import com.starcallingassist.StarModuleContract;
 import com.starcallingassist.events.ChatConsoleMessage;
 import com.starcallingassist.events.ChatDebugMessage;
-import com.starcallingassist.events.ManualStarDepletedCallRequested;
-import com.starcallingassist.events.ManualStarDroppedCallRequested;
+import com.starcallingassist.events.StarCallManuallyRequested;
 import com.starcallingassist.events.StarCallingAssistConfigChanged;
+import com.starcallingassist.events.StarDepletionManuallyRequested;
 import com.starcallingassist.old.objects.CallSender;
 import com.starcallingassist.old.objects.Star;
 import java.io.IOException;
@@ -164,13 +164,14 @@ public class TrackerModule extends StarModuleContract
 	}
 
 	@Subscribe
-	public void onManualStarDroppedCallRequested(ManualStarDroppedCallRequested event)
+	public void onStarCallManuallyRequested(StarCallManuallyRequested event)
 	{
+//		prepareCall(true);
 		log.debug("Manual star dropped call requested");
 	}
 
 	@Subscribe
-	public void onManualStarDepletedCallRequested(ManualStarDepletedCallRequested event)
+	public void onStarDepletionManuallyRequested(StarDepletionManuallyRequested event)
 	{
 		if (event.getIsPublicCall())
 		{

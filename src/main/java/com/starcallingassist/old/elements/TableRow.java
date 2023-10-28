@@ -25,6 +25,7 @@
 package com.starcallingassist.old.elements;
 
 import com.starcallingassist.StarCallingAssistPlugin;
+import com.starcallingassist.events.WorldHopRequest;
 import com.starcallingassist.modules.sidepanel.SidePanelModule;
 import com.starcallingassist.old.SidePanel;
 import com.starcallingassist.old.objects.StarData;
@@ -115,7 +116,7 @@ public class TableRow extends JPanel
 			{
 				if (mouseEvent.getButton() == MouseEvent.BUTTON1 && mouseEvent.getClickCount() == 2)
 				{
-					module.queueWorldHop(data.getWorldId());
+					module.dispatch(new WorldHopRequest(data.getWorldId()));
 				}
 			}
 

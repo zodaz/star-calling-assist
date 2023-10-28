@@ -1,9 +1,9 @@
 package com.starcallingassist.modules.callButton;
 
 import com.starcallingassist.StarModuleContract;
-import com.starcallingassist.events.ManualStarDepletedCallRequested;
-import com.starcallingassist.events.ManualStarDroppedCallRequested;
+import com.starcallingassist.events.StarCallManuallyRequested;
 import com.starcallingassist.events.StarCallingAssistConfigChanged;
+import com.starcallingassist.events.StarDepletionManuallyRequested;
 import java.awt.Point;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
@@ -152,17 +152,17 @@ public class CallButtonModule extends StarModuleContract
 	{
 		if (event.getOp() == CALL_STAR)
 		{
-			dispatch(new ManualStarDroppedCallRequested());
+			dispatch(new StarCallManuallyRequested());
 		}
 
 		if (event.getOp() == CALL_DEAD)
 		{
-			dispatch(new ManualStarDepletedCallRequested());
+			dispatch(new StarDepletionManuallyRequested());
 		}
 
 		if (event.getOp() == CALL_PRIVATE)
 		{
-			dispatch(new ManualStarDepletedCallRequested(false));
+			dispatch(new StarDepletionManuallyRequested(false));
 		}
 	}
 }

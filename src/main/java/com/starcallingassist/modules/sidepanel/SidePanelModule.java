@@ -1,7 +1,6 @@
 package com.starcallingassist.modules.sidepanel;
 
 import com.starcallingassist.StarModuleContract;
-import com.starcallingassist.events.ChatConsoleMessage;
 import com.starcallingassist.events.StarCallingAssistConfigChanged;
 import com.starcallingassist.old.SidePanel;
 import java.time.temporal.ChronoUnit;
@@ -11,11 +10,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
-import net.runelite.api.World;
 import net.runelite.api.events.GameStateChanged;
-import net.runelite.api.events.GameTick;
-import net.runelite.api.widgets.WidgetInfo;
-import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.task.Schedule;
 import net.runelite.client.ui.ClientToolbar;
@@ -28,8 +23,6 @@ public class SidePanelModule extends StarModuleContract
 	@Inject
 	@Getter
 	private Client client;
-	@Inject
-	private ClientThread clientThread;
 
 	@Inject
 	private SidePanel sidePanel;
@@ -39,8 +32,6 @@ public class SidePanelModule extends StarModuleContract
 	@Inject
 	private ClientToolbar clientToolbar;
 
-	private int hopTarget = -1;
-	private int hopAttempts = 0;
 
 	@Override
 	public void startUp()
@@ -97,61 +88,6 @@ public class SidePanelModule extends StarModuleContract
 		}
 
 		sidePanel.updateTableRows();
-	}
-
-	@Subscribe
-	public void onGameTick(GameTick tick)
-	{
-		if (hopTarget != -1)
-		{
-			performHop();
-		}
-
-	}
-
-	public void queueWorldHop(int worldId)
-	{
-		if (client.getGameState() == GameState.LOGGED_IN)
-		{
-			hopTarget = worldId;
-			clientThread.invokeLater(() -> dispatch(new ChatConsoleMessage("Attempting to quick-hop to world *" + hopTarget + "*")));
-		}
-	}
-
-	private void performHop()
-	{
-		if (++hopAttempts >= 5)
-		{
-			dispatch(new ChatConsoleMessage("Unable to quick-hop to world *" + hopTarget + "*"));
-			hopTarget = -1;
-			hopAttempts = 0;
-			return;
-		}
-
-		if (client.getWidget(WidgetInfo.WORLD_SWITCHER_LIST) == null)
-		{
-			client.openWorldHopper();
-			return;
-		}
-
-		World[] worldList = client.getWorldList();
-
-		if (worldList == null)
-		{
-			return;
-		}
-
-		for (World world : worldList)
-		{
-			if (world.getId() == hopTarget)
-			{
-				client.hopToWorld(world);
-				break;
-			}
-		}
-
-		hopTarget = -1;
-		hopAttempts = 0;
 	}
 
 	@Schedule(
