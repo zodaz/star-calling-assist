@@ -1,6 +1,8 @@
 package com.starcallingassist.modules.tracker;
 
 import com.starcallingassist.StarModuleContract;
+import com.starcallingassist.events.ChatConsoleMessage;
+import com.starcallingassist.events.ChatDebugMessage;
 import com.starcallingassist.events.ManualStarDepletedCallRequested;
 import com.starcallingassist.events.ManualStarDroppedCallRequested;
 import com.starcallingassist.old.objects.CallSender;
@@ -224,7 +226,7 @@ public class TrackerModule extends StarModuleContract
 		{
 			if (manual)
 			{
-				plugin.logToChat("Unable to find star.");
+				dispatch(new ChatDebugMessage("Unable to find star."));
 			}
 
 			return;
@@ -238,13 +240,13 @@ public class TrackerModule extends StarModuleContract
 		{
 			if (manual)
 			{
-				plugin.logToChat("This star has already been called.");
+				dispatch(new ChatDebugMessage("This star has already been called."));
 			}
 
 			return;
 		}
 
-		//Won't automatically call star again if tier decreased and the updateStar option disabled
+		// Won't automatically call star again if tier decreased and the updateStar option disabled
 		if (lastCalledStar != null
 			&& lastCalledStar.world == Star.getStar().world
 			&& lastCalledStar.location.equals(Star.getStar().location)
@@ -258,7 +260,7 @@ public class TrackerModule extends StarModuleContract
 		String location = Star.getLocationName(Star.getStar().location);
 		if (location.equals("unknown"))
 		{
-			plugin.logToChat("Star location is unknown, manual call required.");
+			dispatch(new ChatDebugMessage("Star location is unknown, manual call required."));
 			return;
 		}
 
@@ -275,7 +277,7 @@ public class TrackerModule extends StarModuleContract
 				public void onFailure(Call call, IOException e)
 				{
 					clientThread.invokeLater(() -> {
-						plugin.logToChat("Unable to post call to " + config.getEndpoint() + ".");
+						dispatch(new ChatDebugMessage("Unable to post call to " + config.getEndpoint() + "."));
 					});
 
 					call.cancel();
@@ -291,17 +293,22 @@ public class TrackerModule extends StarModuleContract
 							lastCalledStar = Star.getStar();
 						}
 
-						clientThread.invokeLater(() -> plugin.logHighlightedToChat(
-							"Successfully posted call: ",
-							"W" + world + " T" + tier + " " + location + ((miners == -1 || tier == 0) ? "" : (" " + miners + " Miners"))
-						));
+						clientThread.invokeLater(() -> {
+							String callout = "W" + world;
+							callout += " T" + tier;
+							callout += " " + location;
+
+							if (miners != -1 && tier != 0)
+							{
+								callout += " " + miners + " Miners";
+							}
+
+							dispatch(new ChatConsoleMessage("Successfully posted call: *" + callout + "*"));
+						});
 					}
 					else
 					{
-						clientThread.invokeLater(() -> plugin.logHighlightedToChat(
-							"Issue posting call to " + config.getEndpoint() + ": ",
-							res.message()
-						));
+						clientThread.invokeLater(() -> dispatch(new ChatConsoleMessage("Issue posting call to " + config.getEndpoint() + ": *" + res.message() + "*")));
 					}
 
 					res.close();
@@ -310,9 +317,7 @@ public class TrackerModule extends StarModuleContract
 		}
 		catch (IllegalArgumentException e)
 		{
-			clientThread.invokeLater(() -> {
-				plugin.logHighlightedToChat("Issue posting call to " + config.getEndpoint() + ": ", "Invalid endpoint");
-			});
+			clientThread.invokeLater(() -> dispatch(new ChatConsoleMessage("Issue posting call to " + config.getEndpoint() + ": *Invalid endpoint*")));
 		}
 	}
 }

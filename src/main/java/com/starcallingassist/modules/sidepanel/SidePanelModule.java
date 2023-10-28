@@ -1,6 +1,7 @@
 package com.starcallingassist.modules.sidepanel;
 
 import com.starcallingassist.StarModuleContract;
+import com.starcallingassist.events.ChatConsoleMessage;
 import com.starcallingassist.old.SidePanel;
 import java.time.temporal.ChronoUnit;
 import javax.inject.Inject;
@@ -118,7 +119,7 @@ public class SidePanelModule extends StarModuleContract
 		if (client.getGameState() == GameState.LOGGED_IN)
 		{
 			hopTarget = worldId;
-			clientThread.invokeLater(() -> plugin.logHighlightedToChat("Attempting to quick-hop to world ", String.valueOf(hopTarget)));
+			clientThread.invokeLater(() -> dispatch(new ChatConsoleMessage("Attempting to quick-hop to world *" + hopTarget + "*")));
 		}
 	}
 
@@ -126,7 +127,7 @@ public class SidePanelModule extends StarModuleContract
 	{
 		if (++hopAttempts >= 5)
 		{
-			plugin.logHighlightedToChat("Unable to quick-hop to world ", String.valueOf(hopTarget));
+			dispatch(new ChatConsoleMessage("Unable to quick-hop to world *" + hopTarget + "*"));
 			hopTarget = -1;
 			hopAttempts = 0;
 			return;
