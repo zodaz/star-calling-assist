@@ -1,12 +1,11 @@
 package com.starcallingassist.modules.callButton;
 
 import com.starcallingassist.StarModuleContract;
-import com.starcallingassist.events.StarCallManuallyRequested;
 import com.starcallingassist.events.PluginConfigChanged;
+import com.starcallingassist.events.StarCallManuallyRequested;
 import com.starcallingassist.events.StarDepletionManuallyRequested;
 import java.awt.Point;
 import javax.inject.Inject;
-import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.ScriptEvent;
@@ -22,7 +21,6 @@ import net.runelite.api.widgets.WidgetType;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
 
-@Slf4j
 public class CallButtonModule extends StarModuleContract
 {
 	@Inject
@@ -146,7 +144,6 @@ public class CallButtonModule extends StarModuleContract
 		callButton = null;
 		parent = null;
 	}
-
 
 	private void callButtonClicked(ScriptEvent event)
 	{

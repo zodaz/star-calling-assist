@@ -7,7 +7,6 @@ import java.time.temporal.ChronoUnit;
 import javax.inject.Inject;
 import javax.swing.SwingUtilities;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.events.GameStateChanged;
@@ -17,7 +16,6 @@ import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.util.ImageUtil;
 
-@Slf4j
 public class SidePanelModule extends StarModuleContract
 {
 	@Inject

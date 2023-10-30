@@ -3,7 +3,7 @@ package com.starcallingassist.support;
 import java.awt.Point;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
+import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 
 public class StarLocation
@@ -178,6 +178,15 @@ public class StarLocation
 			(int) point.getX(),
 			(int) point.getY(),
 			0
+		);
+	}
+
+	public WorldArea getWorldArea()
+	{
+		return new WorldArea(
+			getWorldPoint(),
+			2,
+			2
 		);
 	}
 

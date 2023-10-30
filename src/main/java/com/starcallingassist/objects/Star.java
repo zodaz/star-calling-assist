@@ -19,6 +19,10 @@ public class Star
 	@Setter
 	protected Integer tier;
 
+	@Getter
+	@Setter
+	protected Integer currentMiners;
+
 	public Star(Integer world, WorldPoint location, Integer tier)
 	{
 		this.world = world;

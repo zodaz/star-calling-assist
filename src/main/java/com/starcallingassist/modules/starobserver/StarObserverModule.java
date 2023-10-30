@@ -1,21 +1,25 @@
 package com.starcallingassist.modules.starobserver;
 
 import com.starcallingassist.StarModuleContract;
+import com.starcallingassist.events.StarAbandoned;
 import com.starcallingassist.events.StarDepleted;
 import com.starcallingassist.events.StarDiscovered;
 import com.starcallingassist.events.StarTierChanged;
 import com.starcallingassist.objects.Star;
 import java.util.Objects;
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
-import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
 import net.runelite.api.ObjectID;
+import net.runelite.api.Player;
+import net.runelite.api.coords.WorldArea;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameObjectDespawned;
 import net.runelite.api.events.GameObjectSpawned;
+import net.runelite.api.events.GameTick;
 import net.runelite.client.eventbus.Subscribe;
 
-@Slf4j
 public class StarObserverModule extends StarModuleContract
 {
 	@Inject
@@ -54,6 +58,8 @@ public class StarObserverModule extends StarModuleContract
 
 		if (!Objects.equals(nearbyStar.getTier(), trackedStar.getTier()))
 		{
+			nearbyStar.setCurrentMiners(trackedStar.getCurrentMiners());
+
 			trackedStar = nearbyStar;
 			dispatch(new StarTierChanged(nearbyStar));
 		}
@@ -63,12 +69,7 @@ public class StarObserverModule extends StarModuleContract
 	public void onGameObjectDespawned(GameObjectDespawned event)
 	{
 		GameObject despawnedGameObject = event.getGameObject();
-		if (!isValidStarObject(despawnedGameObject))
-		{
-			return;
-		}
-
-		if (trackedStar == null)
+		if (trackedStar == null || !isValidStarObject(despawnedGameObject))
 		{
 			return;
 		}
@@ -86,28 +87,31 @@ public class StarObserverModule extends StarModuleContract
 			return;
 		}
 
-		nearbyStar.setTier(null);
 		trackedStar = nearbyStar;
-
 		dispatch(new StarDepleted(nearbyStar));
 	}
 
-	@Subscribe
-	public void onStarDiscovered(StarDiscovered event)
+	protected void onGameTick(GameTick event)
 	{
-		log.debug("Star discovered: World {}, Tier {} at {}", event.getStar().getWorld(), event.getStar().getTier(), event.getStar().getLocation().getLocationName());
-	}
+		if (trackedStar == null || trackedStar.getTier() == null)
+		{
+			return;
+		}
 
-	@Subscribe
-	public void onStarTierChanged(StarTierChanged event)
-	{
-		log.debug("Star tier changed: World {}, Tier {} at {}", event.getStar().getWorld(), event.getStar().getTier(), event.getStar().getLocation().getLocationName());
-	}
+		if (!isStarNearby(trackedStar))
+		{
+			dispatch(new StarAbandoned(trackedStar));
+			trackedStar = null;
+			return;
+		}
 
-	@Subscribe
-	public void onStarDepleted(StarDepleted event)
-	{
-		log.debug("Star depleted: World {}, Tier {} at {}", event.getStar().getWorld(), event.getStar().getTier(), event.getStar().getLocation().getLocationName());
+		if (!isStarWithinRenderDistance(trackedStar))
+		{
+			trackedStar.setCurrentMiners(null);
+			return;
+		}
+
+		trackedStar.setCurrentMiners(countMiners(trackedStar));
 	}
 
 	protected Integer calculateStarTier(GameObject object)
@@ -131,5 +135,35 @@ public class StarObserverModule extends StarModuleContract
 	protected Boolean isValidStarObject(GameObject object)
 	{
 		return this.calculateStarTier(object) != null;
+	}
+
+	private boolean isStarWithinRenderDistance(@Nonnull Star star)
+	{
+		return star.getLocation().getWorldArea().distanceTo(client.getLocalPlayer().getWorldLocation()) <= 13;
+	}
+
+	private boolean isStarNearby(@Nonnull Star star)
+	{
+		return star.getLocation().getWorldArea().distanceTo(client.getLocalPlayer().getWorldLocation()) <= 32;
+	}
+
+	protected Integer countMiners(@Nonnull Star star)
+	{
+		WorldPoint starLocation = star.getLocation().getWorldPoint();
+
+		WorldArea areaX = new WorldArea(starLocation.dx(-1), 4, 2);
+		WorldArea areaY = new WorldArea(starLocation.dy(-1), 2, 4);
+
+		int miners = 0;
+
+		for (Player player : client.getPlayers())
+		{
+			if (player.getWorldLocation().isInArea2D(areaX, areaY))
+			{
+				miners++;
+			}
+		}
+
+		return miners;
 	}
 }

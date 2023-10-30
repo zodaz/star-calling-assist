@@ -7,11 +7,11 @@ import com.starcallingassist.modules.callButton.CallButtonModule;
 import com.starcallingassist.modules.chat.ChatModule;
 import com.starcallingassist.modules.sidepanel.SidePanelModule;
 import com.starcallingassist.modules.starobserver.StarObserverModule;
+import com.starcallingassist.modules.tracker.TrackerModule;
 import com.starcallingassist.modules.worldhop.WorldHopModule;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
@@ -19,7 +19,6 @@ import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 
-@Slf4j
 @PluginDescriptor(
 	name = "Star Miners",
 	description = "Displays a list of active stars and crowdsources data about stars you find and mine",
@@ -77,6 +76,7 @@ public class StarCallingAssistPlugin extends Plugin
 		this.registerModule(ChatModule.class);
 		this.registerModule(SidePanelModule.class);
 		this.registerModule(StarObserverModule.class);
+		this.registerModule(TrackerModule.class);
 		this.registerModule(WorldHopModule.class);
 
 		for (StarModuleContract module : this.modules.values())

@@ -8,10 +8,8 @@ import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.ui.ColorScheme;
 
-@Slf4j
 public class InfoPanel extends JPanel
 {
 	private final StarCallingAssistPlugin plugin;

@@ -3,9 +3,8 @@ package com.starcallingassist.modules.chat;
 import com.google.inject.Inject;
 import com.starcallingassist.StarModuleContract;
 import com.starcallingassist.contracts.ChatMessageContract;
-import com.starcallingassist.events.InfoLogMessage;
 import com.starcallingassist.events.DebugLogMessage;
-import lombok.extern.slf4j.Slf4j;
+import com.starcallingassist.events.InfoLogMessage;
 import net.runelite.api.ChatMessageType;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.chat.ChatColorType;
@@ -14,7 +13,6 @@ import net.runelite.client.chat.ChatMessageManager;
 import net.runelite.client.chat.QueuedMessage;
 import net.runelite.client.eventbus.Subscribe;
 
-@Slf4j
 public class ChatModule extends StarModuleContract
 {
 	@Inject
