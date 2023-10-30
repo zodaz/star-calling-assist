@@ -5,7 +5,7 @@ import lombok.Getter;
 import net.runelite.client.events.ConfigChanged;
 
 @AllArgsConstructor
-public class StarCallingAssistConfigChanged
+public class PluginConfigChanged
 {
 	@Getter
 	private ConfigChanged base;

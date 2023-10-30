@@ -1,7 +1,7 @@
 package com.starcallingassist.modules.worldhop;
 
 import com.starcallingassist.StarModuleContract;
-import com.starcallingassist.events.ChatConsoleMessage;
+import com.starcallingassist.events.InfoLogMessage;
 import com.starcallingassist.events.WorldHopRequest;
 import javax.inject.Inject;
 import net.runelite.api.Client;
@@ -36,7 +36,7 @@ public class WorldHopModule extends StarModuleContract
 		if (client.getGameState() == GameState.LOGGED_IN)
 		{
 			hopTarget = event.getWorld();
-			clientThread.invokeLater(() -> dispatch(new ChatConsoleMessage("Attempting to quick-hop to world *" + hopTarget + "*")));
+			clientThread.invokeLater(() -> dispatch(new InfoLogMessage("Attempting to quick-hop to world *" + hopTarget + "*")));
 		}
 	}
 
@@ -54,7 +54,7 @@ public class WorldHopModule extends StarModuleContract
 		if (++hopAttempts >= 5)
 		{
 			resetHopState();
-			dispatch(new ChatConsoleMessage("Unable to quick-hop to world *" + hopTarget + "*"));
+			dispatch(new InfoLogMessage("Unable to quick-hop to world *" + hopTarget + "*"));
 			return;
 		}
 

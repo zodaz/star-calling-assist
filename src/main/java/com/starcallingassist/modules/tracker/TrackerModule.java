@@ -1,10 +1,10 @@
 package com.starcallingassist.modules.tracker;
 
 import com.starcallingassist.StarModuleContract;
-import com.starcallingassist.events.ChatConsoleMessage;
-import com.starcallingassist.events.ChatDebugMessage;
+import com.starcallingassist.events.DebugLogMessage;
+import com.starcallingassist.events.InfoLogMessage;
+import com.starcallingassist.events.PluginConfigChanged;
 import com.starcallingassist.events.StarCallManuallyRequested;
-import com.starcallingassist.events.StarCallingAssistConfigChanged;
 import com.starcallingassist.events.StarDepletionManuallyRequested;
 import com.starcallingassist.old.objects.CallSender;
 import com.starcallingassist.old.objects.Star;
@@ -59,7 +59,7 @@ public class TrackerModule extends StarModuleContract
 	}
 
 	@Subscribe
-	public void onStarCallingAssistConfigChanged(StarCallingAssistConfigChanged event)
+	public void onPluginConfigChanged(PluginConfigChanged event)
 	{
 		if (event.getKey().equals("autoCall"))
 		{
@@ -222,7 +222,7 @@ public class TrackerModule extends StarModuleContract
 		{
 			if (manual)
 			{
-				dispatch(new ChatDebugMessage("Unable to find star."));
+				dispatch(new DebugLogMessage("Unable to find star."));
 			}
 
 			return;
@@ -236,7 +236,7 @@ public class TrackerModule extends StarModuleContract
 		{
 			if (manual)
 			{
-				dispatch(new ChatDebugMessage("This star has already been called."));
+				dispatch(new DebugLogMessage("This star has already been called."));
 			}
 
 			return;
@@ -256,7 +256,7 @@ public class TrackerModule extends StarModuleContract
 		String location = Star.getLocationName(Star.getStar().location);
 		if (location.equals("unknown"))
 		{
-			dispatch(new ChatDebugMessage("Star location is unknown, manual call required."));
+			dispatch(new DebugLogMessage("Star location is unknown, manual call required."));
 			return;
 		}
 
@@ -273,7 +273,7 @@ public class TrackerModule extends StarModuleContract
 				public void onFailure(Call call, IOException e)
 				{
 					clientThread.invokeLater(() -> {
-						dispatch(new ChatDebugMessage("Unable to post call to " + config.getEndpoint() + "."));
+						dispatch(new DebugLogMessage("Unable to post call to " + config.getEndpoint() + "."));
 					});
 
 					call.cancel();
@@ -299,12 +299,12 @@ public class TrackerModule extends StarModuleContract
 								callout += " " + miners + " Miners";
 							}
 
-							dispatch(new ChatConsoleMessage("Successfully posted call: *" + callout + "*"));
+							dispatch(new InfoLogMessage("Successfully posted call: *" + callout + "*"));
 						});
 					}
 					else
 					{
-						clientThread.invokeLater(() -> dispatch(new ChatConsoleMessage("Issue posting call to " + config.getEndpoint() + ": *" + res.message() + "*")));
+						clientThread.invokeLater(() -> dispatch(new InfoLogMessage("Issue posting call to " + config.getEndpoint() + ": *" + res.message() + "*")));
 					}
 
 					res.close();
@@ -313,7 +313,7 @@ public class TrackerModule extends StarModuleContract
 		}
 		catch (IllegalArgumentException e)
 		{
-			clientThread.invokeLater(() -> dispatch(new ChatConsoleMessage("Issue posting call to " + config.getEndpoint() + ": *Invalid endpoint*")));
+			clientThread.invokeLater(() -> dispatch(new InfoLogMessage("Issue posting call to " + config.getEndpoint() + ": *Invalid endpoint*")));
 		}
 	}
 }

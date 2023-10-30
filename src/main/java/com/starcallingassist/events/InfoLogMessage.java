@@ -3,7 +3,7 @@ package com.starcallingassist.events;
 import com.starcallingassist.contracts.ChatMessageContract;
 import lombok.Getter;
 
-public class ChatConsoleMessage implements ChatMessageContract
+public class InfoLogMessage implements ChatMessageContract
 {
 	@Getter
 	protected String message;
@@ -11,12 +11,12 @@ public class ChatConsoleMessage implements ChatMessageContract
 	@Getter
 	protected Boolean useHighlighting;
 
-	public ChatConsoleMessage(String message)
+	public InfoLogMessage(String message)
 	{
 		this(message, true);
 	}
 
-	public ChatConsoleMessage(String message, Boolean useHighlighting)
+	public InfoLogMessage(String message, Boolean useHighlighting)
 	{
 		this.message = message;
 		this.useHighlighting = useHighlighting;

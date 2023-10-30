@@ -2,7 +2,7 @@ package com.starcallingassist.modules.callButton;
 
 import com.starcallingassist.StarModuleContract;
 import com.starcallingassist.events.StarCallManuallyRequested;
-import com.starcallingassist.events.StarCallingAssistConfigChanged;
+import com.starcallingassist.events.PluginConfigChanged;
 import com.starcallingassist.events.StarDepletionManuallyRequested;
 import java.awt.Point;
 import javax.inject.Inject;
@@ -63,7 +63,7 @@ public class CallButtonModule extends StarModuleContract
 	}
 
 	@Subscribe
-	public void onStarCallingAssistConfigChanged(StarCallingAssistConfigChanged event)
+	public void onPluginConfigChanged(PluginConfigChanged event)
 	{
 		if (event.getKey().equals("callHorn"))
 		{

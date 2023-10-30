@@ -1,7 +1,7 @@
 package com.starcallingassist.modules.sidepanel;
 
 import com.starcallingassist.StarModuleContract;
-import com.starcallingassist.events.StarCallingAssistConfigChanged;
+import com.starcallingassist.events.PluginConfigChanged;
 import com.starcallingassist.old.SidePanel;
 import java.time.temporal.ChronoUnit;
 import javax.inject.Inject;
@@ -66,7 +66,7 @@ public class SidePanelModule extends StarModuleContract
 	}
 
 	@Subscribe
-	public void onStarCallingAssistConfigChanged(StarCallingAssistConfigChanged event)
+	public void onPluginConfigChanged(PluginConfigChanged event)
 	{
 		if (event.getKey().equals("endpoint"))
 		{

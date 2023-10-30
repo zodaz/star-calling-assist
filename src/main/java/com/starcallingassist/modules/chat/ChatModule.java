@@ -3,8 +3,8 @@ package com.starcallingassist.modules.chat;
 import com.google.inject.Inject;
 import com.starcallingassist.StarModuleContract;
 import com.starcallingassist.contracts.ChatMessageContract;
-import com.starcallingassist.events.ChatConsoleMessage;
-import com.starcallingassist.events.ChatDebugMessage;
+import com.starcallingassist.events.InfoLogMessage;
+import com.starcallingassist.events.DebugLogMessage;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.client.callback.ClientThread;
@@ -24,13 +24,13 @@ public class ChatModule extends StarModuleContract
 	private ClientThread clientThread;
 
 	@Subscribe
-	public void onChatConsoleMessage(ChatConsoleMessage event)
+	public void onInfoLogMessage(InfoLogMessage event)
 	{
 		queueChatMessage(event);
 	}
 
 	@Subscribe
-	public void onChatDebugMessage(ChatDebugMessage event)
+	public void onDebugLogMessage(DebugLogMessage event)
 	{
 		if (config.chatMessages())
 		{

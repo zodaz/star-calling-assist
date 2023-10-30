@@ -2,7 +2,7 @@ package com.starcallingassist;
 
 import com.google.inject.Inject;
 import com.google.inject.Provides;
-import com.starcallingassist.events.StarCallingAssistConfigChanged;
+import com.starcallingassist.events.PluginConfigChanged;
 import com.starcallingassist.modules.callButton.CallButtonModule;
 import com.starcallingassist.modules.chat.ChatModule;
 import com.starcallingassist.modules.sidepanel.SidePanelModule;
@@ -104,6 +104,6 @@ public class StarCallingAssistPlugin extends Plugin
 			return;
 		}
 
-		eventBus.post(new StarCallingAssistConfigChanged(event));
+		eventBus.post(new PluginConfigChanged(event));
 	}
 }
