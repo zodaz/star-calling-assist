@@ -6,7 +6,7 @@ import com.starcallingassist.events.PluginConfigChanged;
 import com.starcallingassist.modules.callButton.CallButtonModule;
 import com.starcallingassist.modules.chat.ChatModule;
 import com.starcallingassist.modules.sidepanel.SidePanelModule;
-import com.starcallingassist.modules.tracker.TrackerModule;
+import com.starcallingassist.modules.starobserver.StarObserverModule;
 import com.starcallingassist.modules.worldhop.WorldHopModule;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -76,7 +76,7 @@ public class StarCallingAssistPlugin extends Plugin
 		this.registerModule(CallButtonModule.class);
 		this.registerModule(ChatModule.class);
 		this.registerModule(SidePanelModule.class);
-		this.registerModule(TrackerModule.class);
+		this.registerModule(StarObserverModule.class);
 		this.registerModule(WorldHopModule.class);
 
 		for (StarModuleContract module : this.modules.values())

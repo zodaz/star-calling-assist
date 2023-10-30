@@ -3,7 +3,7 @@ package com.starcallingassist.support;
 import java.awt.Point;
 import java.util.HashMap;
 import java.util.Map;
-import net.runelite.api.GameObject;
+import java.util.Objects;
 import net.runelite.api.coords.WorldPoint;
 
 public class StarLocation
@@ -147,19 +147,6 @@ public class StarLocation
 			.map(Map.Entry::getKey)
 			.findFirst()
 			.orElse(null);
-	}
-
-	public StarLocation(GameObject gameObject)
-	{
-		if (gameObject == null)
-		{
-			return;
-		}
-
-		point = new Point(
-			gameObject.getWorldLocation().getX(),
-			gameObject.getWorldLocation().getY()
-		);
 	}
 
 	public StarLocation(WorldPoint location)
