@@ -197,6 +197,12 @@ public class StarLocation
 			return null;
 		}
 
-		return LOCATION_NAMES.get(point);
+		String location = LOCATION_NAMES.get(point);
+		if (location == null)
+		{
+			return this.point.x + "," + this.point.y;
+		}
+
+		return location;
 	}
 }

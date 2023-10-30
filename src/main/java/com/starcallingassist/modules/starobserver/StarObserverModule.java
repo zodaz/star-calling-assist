@@ -40,6 +40,13 @@ public class StarObserverModule extends StarModuleContract
 	protected Star trackedStar = null;
 	protected boolean isNearStar = false;
 
+	@Override
+	public void shutDown()
+	{
+		trackedStar = null;
+		isNearStar = false;
+	}
+
 	@Subscribe
 	public void onGameObjectSpawned(GameObjectSpawned event)
 	{
@@ -107,7 +114,7 @@ public class StarObserverModule extends StarModuleContract
 			return;
 		}
 
-		if (isStarWithinRenderDistance(trackedStar))
+		if (trackedStar.getWorld() == client.getWorld() && isStarWithinRenderDistance(trackedStar))
 		{
 			if (!isNearStar)
 			{
