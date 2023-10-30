@@ -1,6 +1,7 @@
 package com.starcallingassist.modules.worldhop;
 
 import com.starcallingassist.StarModuleContract;
+import com.starcallingassist.events.DebugLogMessage;
 import com.starcallingassist.events.InfoLogMessage;
 import com.starcallingassist.events.WorldHopRequest;
 import javax.inject.Inject;
@@ -20,6 +21,9 @@ public class WorldHopModule extends StarModuleContract
 	@Inject
 	private ClientThread clientThread;
 
+	private static final int DISPLAY_SWITCHER_MAX_ATTEMPTS = 3;
+	private int displaySwitcherAttempts = 0;
+
 	private Integer hopTarget;
 
 	private Integer hopAttempts = 0;
@@ -27,7 +31,7 @@ public class WorldHopModule extends StarModuleContract
 	@Override
 	public void startUp()
 	{
-		resetHopState();
+		resetQuickHopper();
 	}
 
 	@Subscribe
@@ -35,6 +39,7 @@ public class WorldHopModule extends StarModuleContract
 	{
 		if (client.getGameState() == GameState.LOGGED_IN)
 		{
+			displaySwitcherAttempts = 0;
 			hopTarget = event.getWorld();
 			clientThread.invokeLater(() -> dispatch(new InfoLogMessage("Attempting to quick-hop to world *" + hopTarget + "*")));
 		}
@@ -43,25 +48,28 @@ public class WorldHopModule extends StarModuleContract
 	@Subscribe
 	public void onGameTick(GameTick tick)
 	{
-		if (hopTarget != null)
+		if (hopTarget == null)
 		{
-			attemptQuickHop();
-		}
-	}
-
-	private void attemptQuickHop()
-	{
-		if (++hopAttempts >= 5)
-		{
-			resetHopState();
-			dispatch(new InfoLogMessage("Unable to quick-hop to world *" + hopTarget + "*"));
 			return;
 		}
-
 
 		if (client.getWidget(WidgetInfo.WORLD_SWITCHER_LIST) == null)
 		{
 			client.openWorldHopper();
+
+			if (++displaySwitcherAttempts >= DISPLAY_SWITCHER_MAX_ATTEMPTS)
+			{
+				resetQuickHopper();
+				dispatch(new DebugLogMessage("Failed to open world switcher after *" + displaySwitcherAttempts + "* attempts"));
+			}
+
+			return;
+		}
+
+		if (++hopAttempts >= 5)
+		{
+			resetQuickHopper();
+			dispatch(new InfoLogMessage("Unable to quick-hop to world *" + hopTarget + "*"));
 			return;
 		}
 
@@ -76,14 +84,13 @@ public class WorldHopModule extends StarModuleContract
 			if (world.getId() == hopTarget)
 			{
 				client.hopToWorld(world);
+				resetQuickHopper();
 				break;
 			}
 		}
-
-		resetHopState();
 	}
 
-	private void resetHopState()
+	private void resetQuickHopper()
 	{
 		hopTarget = null;
 		hopAttempts = 0;
