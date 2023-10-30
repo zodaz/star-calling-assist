@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @AllArgsConstructor
-public class StarAbandoned
+public class StarApproached
 {
 	@Getter
 	protected Star star;

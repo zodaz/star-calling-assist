@@ -5,8 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @AllArgsConstructor
-public class StarAbandoned
+public class StarMinersChanged
 {
 	@Getter
 	protected Star star;
+
+	@Getter
+	protected Integer previousMiners;
 }

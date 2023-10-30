@@ -2,6 +2,7 @@ package com.starcallingassist.modules.starobserver;
 
 import com.starcallingassist.StarModuleContract;
 import com.starcallingassist.events.StarAbandoned;
+import com.starcallingassist.events.StarApproached;
 import com.starcallingassist.events.StarDepleted;
 import com.starcallingassist.events.StarDiscovered;
 import com.starcallingassist.events.StarTierChanged;
@@ -9,17 +10,16 @@ import com.starcallingassist.objects.Star;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
 import net.runelite.api.ObjectID;
-import net.runelite.api.Player;
-import net.runelite.api.coords.WorldArea;
-import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameObjectDespawned;
 import net.runelite.api.events.GameObjectSpawned;
 import net.runelite.api.events.GameTick;
 import net.runelite.client.eventbus.Subscribe;
 
+@Slf4j
 public class StarObserverModule extends StarModuleContract
 {
 	@Inject
@@ -38,6 +38,7 @@ public class StarObserverModule extends StarModuleContract
 	};
 
 	protected Star trackedStar = null;
+	protected boolean isNearStar = false;
 
 	@Subscribe
 	public void onGameObjectSpawned(GameObjectSpawned event)
@@ -52,14 +53,13 @@ public class StarObserverModule extends StarModuleContract
 		if (trackedStar == null || !nearbyStar.isSameAs(trackedStar))
 		{
 			trackedStar = nearbyStar;
+			isNearStar = false;
 			dispatch(new StarDiscovered(nearbyStar));
 			return;
 		}
 
 		if (!Objects.equals(nearbyStar.getTier(), trackedStar.getTier()))
 		{
-			nearbyStar.setCurrentMiners(trackedStar.getCurrentMiners());
-
 			trackedStar = nearbyStar;
 			dispatch(new StarTierChanged(nearbyStar));
 		}
@@ -80,6 +80,13 @@ public class StarObserverModule extends StarModuleContract
 			return;
 		}
 
+		// When the player leaves the area, the star object will automatically despawn.
+		// We will ignore these objects, since we can't rely on them being accurate.
+		if (!isStarWithinRenderDistance(trackedStar))
+		{
+			return;
+		}
+
 		// When a spawn tier is exhausted, it despawns, and a star of the next tier spawns in its place.
 		// Only when the despawned star was a tier 1, we can consider this a depleted star.
 		if (trackedStar.getTier() > 1)
@@ -88,9 +95,11 @@ public class StarObserverModule extends StarModuleContract
 		}
 
 		trackedStar = nearbyStar;
+		isNearStar = false;
 		dispatch(new StarDepleted(nearbyStar));
 	}
 
+	@Subscribe
 	protected void onGameTick(GameTick event)
 	{
 		if (trackedStar == null || trackedStar.getTier() == null)
@@ -98,20 +107,22 @@ public class StarObserverModule extends StarModuleContract
 			return;
 		}
 
-		if (!isStarNearby(trackedStar))
+		if (isStarWithinRenderDistance(trackedStar))
 		{
+			if (!isNearStar)
+			{
+				isNearStar = true;
+				dispatch(new StarApproached(trackedStar));
+			}
+
+			return;
+		}
+
+		if (isNearStar)
+		{
+			isNearStar = false;
 			dispatch(new StarAbandoned(trackedStar));
-			trackedStar = null;
-			return;
 		}
-
-		if (!isStarWithinRenderDistance(trackedStar))
-		{
-			trackedStar.setCurrentMiners(null);
-			return;
-		}
-
-		trackedStar.setCurrentMiners(countMiners(trackedStar));
 	}
 
 	protected Integer calculateStarTier(GameObject object)
@@ -140,30 +151,5 @@ public class StarObserverModule extends StarModuleContract
 	private boolean isStarWithinRenderDistance(@Nonnull Star star)
 	{
 		return star.getLocation().getWorldArea().distanceTo(client.getLocalPlayer().getWorldLocation()) <= 13;
-	}
-
-	private boolean isStarNearby(@Nonnull Star star)
-	{
-		return star.getLocation().getWorldArea().distanceTo(client.getLocalPlayer().getWorldLocation()) <= 32;
-	}
-
-	protected Integer countMiners(@Nonnull Star star)
-	{
-		WorldPoint starLocation = star.getLocation().getWorldPoint();
-
-		WorldArea areaX = new WorldArea(starLocation.dx(-1), 4, 2);
-		WorldArea areaY = new WorldArea(starLocation.dy(-1), 2, 4);
-
-		int miners = 0;
-
-		for (Player player : client.getPlayers())
-		{
-			if (player.getWorldLocation().isInArea2D(areaX, areaY))
-			{
-				miners++;
-			}
-		}
-
-		return miners;
 	}
 }
