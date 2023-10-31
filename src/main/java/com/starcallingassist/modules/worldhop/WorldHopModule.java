@@ -1,8 +1,8 @@
 package com.starcallingassist.modules.worldhop;
 
 import com.starcallingassist.PluginModuleContract;
-import com.starcallingassist.events.DebugLogMessage;
-import com.starcallingassist.events.InfoLogMessage;
+import com.starcallingassist.enums.ChatLogLevel;
+import com.starcallingassist.events.LogMessage;
 import com.starcallingassist.events.WorldHopRequest;
 import javax.inject.Inject;
 import net.runelite.api.Client;
@@ -41,7 +41,7 @@ public class WorldHopModule extends PluginModuleContract
 		{
 			displaySwitcherAttempts = 0;
 			hopTarget = event.getWorld();
-			clientThread.invokeLater(() -> dispatch(new InfoLogMessage("Attempting to quick-hop to world *" + hopTarget + "*")));
+			clientThread.invokeLater(() -> dispatch(new LogMessage("Attempting to quick-hop to world *" + hopTarget + "*", ChatLogLevel.NORMAL)));
 		}
 	}
 
@@ -60,7 +60,7 @@ public class WorldHopModule extends PluginModuleContract
 			if (++displaySwitcherAttempts >= DISPLAY_SWITCHER_MAX_ATTEMPTS)
 			{
 				resetQuickHopper();
-				dispatch(new DebugLogMessage("Failed to open world switcher after *" + displaySwitcherAttempts + "* attempts"));
+				dispatch(new LogMessage("Failed to open world switcher after *" + displaySwitcherAttempts + "* attempts", ChatLogLevel.NORMAL));
 			}
 
 			return;
@@ -69,7 +69,7 @@ public class WorldHopModule extends PluginModuleContract
 		if (++hopAttempts >= 5)
 		{
 			resetQuickHopper();
-			dispatch(new InfoLogMessage("Unable to quick-hop to world *" + hopTarget + "*"));
+			dispatch(new LogMessage("Unable to quick-hop to world *" + hopTarget + "*", ChatLogLevel.NORMAL));
 			return;
 		}
 

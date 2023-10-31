@@ -1,6 +1,7 @@
 package com.starcallingassist.services;
 
 import com.starcallingassist.objects.Star;
+import java.util.Objects;
 import javax.annotation.Nonnull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,7 +29,11 @@ public class CallStarPayload
 
 	public String toCallout()
 	{
-		String callout = String.format("W%d T%d %s", world, tier, location);
+		String callout = String.format("W%d T%d %s",
+			world,
+			tier,
+			Objects.equals(location, "pdead") ? "dead (private)" : location
+		);
 
 		if (miners == -1 || tier == 0)
 		{

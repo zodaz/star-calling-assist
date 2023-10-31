@@ -1,5 +1,6 @@
 package com.starcallingassist;
 
+import com.starcallingassist.enums.ChatLogLevel;
 import com.starcallingassist.old.constants.RegionKeyName;
 import com.starcallingassist.old.enums.TotalLevelType;
 import net.runelite.client.config.Config;
@@ -77,15 +78,15 @@ public interface StarCallingAssistConfig extends Config
 	}
 
 	@ConfigItem(
-		keyName = "chatMessages",
-		name = "Display chat messages",
-		description = "Display chat messages on successful calls, unsuccessful calls and other errors",
+		keyName = "logLevel",
+		name = "Chat Log Level",
+		description = "To what extent you want to see log messages from the plugin in the game chat.",
 		position = 6,
 		section = callerSection
 	)
-	default boolean chatMessages()
+	default ChatLogLevel logLevel()
 	{
-		return true;
+		return ChatLogLevel.NONE;
 	}
 
 	@ConfigItem(

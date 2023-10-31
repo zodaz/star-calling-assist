@@ -3,9 +3,13 @@ package com.starcallingassist.modules.chat;
 import com.google.inject.Inject;
 import com.starcallingassist.PluginModuleContract;
 import com.starcallingassist.StarCallingAssistConfig;
-import com.starcallingassist.contracts.ChatMessageContract;
-import com.starcallingassist.events.DebugLogMessage;
-import com.starcallingassist.events.InfoLogMessage;
+import com.starcallingassist.enums.ChatLogLevel;
+import com.starcallingassist.events.LogMessage;
+import com.starcallingassist.events.StarAbandoned;
+import com.starcallingassist.events.StarApproached;
+import com.starcallingassist.events.StarDepleted;
+import com.starcallingassist.events.StarDiscovered;
+import com.starcallingassist.events.StarTierChanged;
 import net.runelite.api.ChatMessageType;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.chat.ChatColorType;
@@ -26,22 +30,47 @@ public class ChatModule extends PluginModuleContract
 	private StarCallingAssistConfig config;
 
 	@Subscribe
-	public void onInfoLogMessage(InfoLogMessage event)
+	public void onStarDiscovered(StarDiscovered event)
 	{
-		queueChatMessage(event);
+		dispatch(new LogMessage(String.format(
+			"You've discovered a *T%d* star near *%s*!",
+			event.getStar().getTier(),
+			event.getStar().getLocation().getLocationName()
+		), ChatLogLevel.VERBOSE));
 	}
 
 	@Subscribe
-	public void onDebugLogMessage(DebugLogMessage event)
+	public void onStarApproached(StarApproached event)
 	{
-		if (config.chatMessages())
-		{
-			queueChatMessage(event);
-		}
+		dispatch(new LogMessage("You approach the star..", ChatLogLevel.DEBUG));
 	}
 
-	protected void queueChatMessage(ChatMessageContract event)
+	@Subscribe
+	public void onStarAbandoned(StarAbandoned event)
 	{
+		dispatch(new LogMessage("You've moved away from the star..", ChatLogLevel.DEBUG));
+	}
+
+	@Subscribe
+	public void onStarTierChanged(StarTierChanged event)
+	{
+		dispatch(new LogMessage(String.format("The star has *degraded*. It is now a *T%d*.", event.getStar().getTier()), ChatLogLevel.NORMAL));
+	}
+
+	@Subscribe
+	public void onStarDepleted(StarDepleted event)
+	{
+		dispatch(new LogMessage("The star has fully depleted.", ChatLogLevel.VERBOSE));
+	}
+
+	@Subscribe
+	public void onLogMessage(LogMessage event)
+	{
+		if (config.logLevel().getValue() < event.getLogLevel().getValue())
+		{
+			return;
+		}
+
 		String formattedMessage = event.getUseHighlighting()
 			? buildHighlightedChatMessage(event.getMessage())
 			: buildRegularChatMessage(event.getMessage());
@@ -79,7 +108,9 @@ public class ChatModule extends PluginModuleContract
 
 		if (currentSegment.length() > 0)
 		{
-			builder = builder.append(currentSegment.toString());
+			builder = builder
+				.append(insideAsterisks ? ChatColorType.HIGHLIGHT : ChatColorType.NORMAL)
+				.append(currentSegment.toString());
 		}
 
 		return builder.build();

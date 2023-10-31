@@ -2,7 +2,8 @@ package com.starcallingassist.modules.crowdsourcing;
 
 import com.starcallingassist.PluginModuleContract;
 import com.starcallingassist.StarCallingAssistConfig;
-import com.starcallingassist.events.DebugLogMessage;
+import com.starcallingassist.enums.ChatLogLevel;
+import com.starcallingassist.events.LogMessage;
 import com.starcallingassist.events.PluginConfigChanged;
 import com.starcallingassist.events.StarAbandoned;
 import com.starcallingassist.events.StarApproached;
@@ -145,13 +146,13 @@ public class CrowdSourcingModule extends PluginModuleContract
 	{
 		if (currentStar == null)
 		{
-			dispatch(new DebugLogMessage("Unable to find star."));
+			dispatch(new LogMessage("Unable to find star.", ChatLogLevel.NORMAL));
 			return;
 		}
 
 		if (lastCalledStar != null && lastCalledStar.isSameAs(currentStar) && Objects.equals(lastCalledStar.getTier(), currentStar.getTier()))
 		{
-			dispatch(new DebugLogMessage("This star has already been called."));
+			dispatch(new LogMessage("This star has already been called.", ChatLogLevel.NORMAL));
 			return;
 		}
 
@@ -179,17 +180,9 @@ public class CrowdSourcingModule extends PluginModuleContract
 	@Subscribe
 	protected void onGameTick(GameTick event)
 	{
-		if (currentStar == null || !currentStarApproached)
+		if (currentStar != null && currentStarApproached)
 		{
-			return;
-		}
-
-		Integer previousMiners = currentStar.getCurrentMiners();
-		Integer currentMiners = countMiners(currentStar);
-
-		if (!currentMiners.equals(previousMiners))
-		{
-			currentStar.setCurrentMiners(currentMiners);
+			currentStar.setCurrentMiners(countMiners(currentStar));
 		}
 	}
 
@@ -249,7 +242,7 @@ public class CrowdSourcingModule extends PluginModuleContract
 				@Override
 				public void onFailure(Call call, IOException e)
 				{
-					clientThread.invokeLater(() -> dispatch(new DebugLogMessage("Unable to post call to " + config.getEndpoint() + ".")));
+					clientThread.invokeLater(() -> dispatch(new LogMessage("Unable to post call to " + config.getEndpoint() + ".", ChatLogLevel.DEBUG)));
 					call.cancel();
 				}
 
@@ -258,13 +251,13 @@ public class CrowdSourcingModule extends PluginModuleContract
 				{
 					if (!res.isSuccessful())
 					{
-						clientThread.invokeLater(() -> dispatch(new DebugLogMessage("Issue posting call to " + config.getEndpoint() + ": *" + res.message() + "*")));
+						clientThread.invokeLater(() -> dispatch(new LogMessage("Issue posting call to " + config.getEndpoint() + ": *" + res.message() + "*", ChatLogLevel.DEBUG)));
 						res.close();
 						return;
 					}
 
 					lastCalledStar = star;
-					clientThread.invokeLater(() -> dispatch(new DebugLogMessage("Successfully posted call: *" + payload.toCallout() + "*")));
+					clientThread.invokeLater(() -> dispatch(new LogMessage("Star successfully called: *" + payload.toCallout() + "*", ChatLogLevel.CALLS)));
 					dispatch(new StarCalled(star, payload));
 					res.close();
 				}
@@ -272,7 +265,7 @@ public class CrowdSourcingModule extends PluginModuleContract
 		}
 		catch (IllegalArgumentException e)
 		{
-			clientThread.invokeLater(() -> dispatch(new DebugLogMessage("Issue posting call to " + config.getEndpoint() + ": *Invalid endpoint*")));
+			clientThread.invokeLater(() -> dispatch(new LogMessage("Issue posting call to " + config.getEndpoint() + ": *Invalid endpoint*", ChatLogLevel.DEBUG)));
 		}
 	}
 }

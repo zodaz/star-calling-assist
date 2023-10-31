@@ -81,8 +81,8 @@ public class StarObserverModule extends PluginModuleContract
 			return;
 		}
 
-		Star nearbyStar = new Star(client.getWorld(), despawnedGameObject.getWorldLocation());
-		if (!nearbyStar.isSameAs(trackedStar))
+		Star despawnedStar = new Star(client.getWorld(), despawnedGameObject.getWorldLocation());
+		if (!despawnedStar.isSameAs(trackedStar))
 		{
 			return;
 		}
@@ -101,9 +101,9 @@ public class StarObserverModule extends PluginModuleContract
 			return;
 		}
 
-		trackedStar = nearbyStar;
+		trackedStar = despawnedStar;
 		isNearStar = false;
-		dispatch(new StarDepleted(nearbyStar));
+		dispatch(new StarDepleted(despawnedStar));
 	}
 
 	@Subscribe
