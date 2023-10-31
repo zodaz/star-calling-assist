@@ -3,7 +3,7 @@ package com.starcallingassist;
 import com.google.inject.Inject;
 import com.google.inject.Provides;
 import com.starcallingassist.events.PluginConfigChanged;
-import com.starcallingassist.modules.call.CallModule;
+import com.starcallingassist.modules.crowdsourcing.CrowdSourcingModule;
 import com.starcallingassist.modules.callButton.CallButtonModule;
 import com.starcallingassist.modules.chat.ChatModule;
 import com.starcallingassist.modules.sidepanel.SidePanelModule;
@@ -45,7 +45,7 @@ public class StarCallingAssistPlugin extends Plugin
 		ChatModule.class,
 		SidePanelModule.class,
 		StarObserverModule.class,
-		CallModule.class,
+		CrowdSourcingModule.class,
 		WorldHopModule.class
 	));
 

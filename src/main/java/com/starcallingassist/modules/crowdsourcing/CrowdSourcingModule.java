@@ -1,4 +1,4 @@
-package com.starcallingassist.modules.call;
+package com.starcallingassist.modules.crowdsourcing;
 
 import com.starcallingassist.PluginModuleContract;
 import com.starcallingassist.StarCallingAssistConfig;
@@ -7,12 +7,15 @@ import com.starcallingassist.events.PluginConfigChanged;
 import com.starcallingassist.events.StarAbandoned;
 import com.starcallingassist.events.StarApproached;
 import com.starcallingassist.events.StarCallManuallyRequested;
+import com.starcallingassist.events.StarCalled;
 import com.starcallingassist.events.StarDepleted;
 import com.starcallingassist.events.StarDepletionManuallyRequested;
 import com.starcallingassist.events.StarDiscovered;
 import com.starcallingassist.events.StarTierChanged;
 import com.starcallingassist.objects.Star;
-import com.starcallingassist.old.objects.CallSender;
+import com.starcallingassist.services.CallStarPayload;
+import com.starcallingassist.services.HttpService;
+import java.io.IOException;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -26,9 +29,12 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameTick;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 
 @Slf4j
-public class CallModule extends PluginModuleContract
+public class CrowdSourcingModule extends PluginModuleContract
 {
 	@Inject
 	private Client client;
@@ -40,7 +46,7 @@ public class CallModule extends PluginModuleContract
 	private StarCallingAssistConfig config;
 
 	@Inject
-	private CallSender sender;
+	private HttpService httpService;
 
 	private Star currentStar = null;
 
@@ -89,8 +95,6 @@ public class CallModule extends PluginModuleContract
 			// the number of players that are mining the star, without a secondary update call.
 			attemptAutomaticUpdateWithDelay(currentStar);
 		}
-
-		log.debug("Star discovered: World {}, Tier {}, {} Miners, at {}", event.getStar().getWorld(), event.getStar().getTier(), event.getStar().getCurrentMiners(), event.getStar().getLocation().getLocationName());
 	}
 
 	@Subscribe
@@ -98,8 +102,6 @@ public class CallModule extends PluginModuleContract
 	{
 		currentStar = event.getStar();
 		currentStarApproached = true;
-
-		log.debug("Star approached: World {}, Tier {}, {} Miners, at {}", event.getStar().getWorld(), event.getStar().getTier(), event.getStar().getCurrentMiners(), event.getStar().getLocation().getLocationName());
 	}
 
 	@Subscribe
@@ -107,13 +109,10 @@ public class CallModule extends PluginModuleContract
 	{
 		if (event.getStar().getWorld() != client.getWorld())
 		{
-			log.debug("Resetting current star - hopped world while star not depleted.");
 			currentStar = null;
 		}
 
 		currentStarApproached = false;
-
-		log.debug("Star abandoned: World {}, Tier {}, {} Miners, at {}", event.getStar().getWorld(), event.getStar().getTier(), event.getStar().getCurrentMiners(), event.getStar().getLocation().getLocationName());
 	}
 
 	@Subscribe
@@ -122,8 +121,6 @@ public class CallModule extends PluginModuleContract
 		Star nextStar = event.getStar();
 		nextStar.setCurrentMiners(currentStar == null ? null : currentStar.getCurrentMiners());
 		currentStar = nextStar;
-
-		log.debug("Star changed: World {}, Tier {}, {} Miners, at {}", event.getStar().getWorld(), event.getStar().getTier(), event.getStar().getCurrentMiners(), event.getStar().getLocation().getLocationName());
 
 		if (config.autoCall() && config.updateStar())
 		{
@@ -134,8 +131,6 @@ public class CallModule extends PluginModuleContract
 	@Subscribe
 	public void onStarDepleted(StarDepleted event)
 	{
-		log.debug("Star depleted: World {}, Tier {}, {} Miners, at {}", event.getStar().getWorld(), event.getStar().getTier(), event.getStar().getCurrentMiners(), event.getStar().getLocation().getLocationName());
-
 		if (config.autoCall())
 		{
 			attemptAutomaticUpdate(event.getStar());
@@ -164,6 +159,7 @@ public class CallModule extends PluginModuleContract
 			currentStar,
 			currentStar.getTier() == null ? "dead" : currentStar.getLocation().getLocationName()
 		);
+
 	}
 
 	@Subscribe
@@ -220,8 +216,6 @@ public class CallModule extends PluginModuleContract
 
 	private void attemptAutomaticUpdateWithDelay(@Nonnull Star star)
 	{
-		log.debug("DELAYED PREPARE CALL");
-
 		new Timer().schedule(new TimerTask()
 		{
 			@Override
@@ -244,60 +238,41 @@ public class CallModule extends PluginModuleContract
 
 	private void attemptCall(@Nonnull Star star, String locationName)
 	{
-		Player player = client.getLocalPlayer();
-		String playerName = config.includeIgn() && player != null ? player.getName() : "";
+		String playerName = config.includeIgn() ? client.getLocalPlayer().getName() : null;
 
-		int tier = star.getTier() == null ? 0 : star.getTier();
-		int miners = star.getCurrentMiners() == null ? -1 : star.getCurrentMiners();
+		CallStarPayload payload = new CallStarPayload(playerName, star, locationName);
 
-		log.debug("ATTEMPT CALL; Player {} World {} Tier {}, {} Miners, Location {}", playerName, star.getWorld(), tier, miners, locationName);
+		try
+		{
+			httpService.post(payload, new Callback()
+			{
+				@Override
+				public void onFailure(Call call, IOException e)
+				{
+					clientThread.invokeLater(() -> dispatch(new DebugLogMessage("Unable to post call to " + config.getEndpoint() + ".")));
+					call.cancel();
+				}
 
-//		try
-//		{
-//			sender.sendCall(playerName, star.getWorld(), tier, locationName, miners, new Callback()
-//			{
-//				@Override
-//				public void onFailure(Call call, IOException e)
-//				{
-//					clientThread.invokeLater(() -> {
-//						dispatch(new DebugLogMessage("Unable to post call to " + config.getEndpoint() + "."));
-//					});
-//
-//					call.cancel();
-//				}
-//
-//				@Override
-//				public void onResponse(Call call, Response res) throws IOException
-//				{
-//					if (res.isSuccessful())
-//					{
-//						lastCalledStar = star;
-//
-//						clientThread.invokeLater(() -> {
-//							String callout = "W" + star.getWorld();
-//							callout += " T" + tier;
-//							callout += " " + locationName;
-//
-//							if (miners != -1 && tier != 0)
-//							{
-//								callout += " " + miners + " Miners";
-//							}
-//
-//							dispatch(new InfoLogMessage("Successfully posted call: *" + callout + "*"));
-//						});
-//					}
-//					else
-//					{
-//						clientThread.invokeLater(() -> dispatch(new InfoLogMessage("Issue posting call to " + config.getEndpoint() + ": *" + res.message() + "*")));
-//					}
-//
-//					res.close();
-//				}
-//			});
-//		}
-//		catch (IllegalArgumentException e)
-//		{
-//			clientThread.invokeLater(() -> dispatch(new InfoLogMessage("Issue posting call to " + config.getEndpoint() + ": *Invalid endpoint*")));
-//		}
+				@Override
+				public void onResponse(Call call, Response res) throws IOException
+				{
+					if (!res.isSuccessful())
+					{
+						clientThread.invokeLater(() -> dispatch(new DebugLogMessage("Issue posting call to " + config.getEndpoint() + ": *" + res.message() + "*")));
+						res.close();
+						return;
+					}
+
+					lastCalledStar = star;
+					clientThread.invokeLater(() -> dispatch(new DebugLogMessage("Successfully posted call: *" + payload.toCallout() + "*")));
+					dispatch(new StarCalled(star, payload));
+					res.close();
+				}
+			});
+		}
+		catch (IllegalArgumentException e)
+		{
+			clientThread.invokeLater(() -> dispatch(new DebugLogMessage("Issue posting call to " + config.getEndpoint() + ": *Invalid endpoint*")));
+		}
 	}
 }

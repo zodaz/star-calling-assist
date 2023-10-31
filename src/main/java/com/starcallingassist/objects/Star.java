@@ -1,6 +1,5 @@
 package com.starcallingassist.objects;
 
-import com.starcallingassist.support.StarLocation;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import lombok.Getter;
