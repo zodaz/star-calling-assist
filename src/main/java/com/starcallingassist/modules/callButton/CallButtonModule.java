@@ -5,7 +5,6 @@ import com.starcallingassist.StarCallingAssistConfig;
 import com.starcallingassist.events.PluginConfigChanged;
 import com.starcallingassist.events.StarCallManuallyRequested;
 import com.starcallingassist.events.StarDepletionManuallyRequested;
-import java.awt.Point;
 import javax.inject.Inject;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
@@ -13,6 +12,7 @@ import net.runelite.api.ScriptEvent;
 import net.runelite.api.SpriteID;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.ResizeableChanged;
+import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.widgets.JavaScriptCallback;
 import net.runelite.api.widgets.Widget;
@@ -33,19 +33,16 @@ public class CallButtonModule extends PluginModuleContract
 	@Inject
 	private StarCallingAssistConfig config;
 
-	private static final Point BUTTON_RESIZEABLE_LOCATION = new Point(130, 150);
-	private static final Point BUTTON_FIXED_LOCATION = new Point(208, 55);
 	private static final int CALL_STAR = 5;
 	private static final int CALL_DEAD = 6;
 	private static final int CALL_PRIVATE = 7;
 
-	private Widget parent = null;
-	private Widget callButton = null;
+	private Widget minimapOrbsWidget = null;
 
 	@Override
 	public void startUp()
 	{
-		parent = client.getWidget(WidgetInfo.MINIMAP_ORBS);
+		minimapOrbsWidget = client.getWidget(WidgetInfo.MINIMAP_ORBS);
 		clientThread.invokeLater(this::createCallButton);
 	}
 
@@ -69,84 +66,105 @@ public class CallButtonModule extends PluginModuleContract
 	{
 		if (event.getKey().equals("callHorn"))
 		{
-			removeCallButton();
+			redrawCallButton();
 		}
-
-		parent = client.getWidget(WidgetInfo.MINIMAP_ORBS);
-		clientThread.invokeLater(this::createCallButton);
 	}
 
+	@Subscribe
+	public void onVarbitChanged(VarbitChanged event)
+	{
+		redrawCallButton();
+	}
 
 	@Subscribe
 	public void onWidgetLoaded(WidgetLoaded event)
 	{
-		if (event.getGroupId() == WidgetID.MINIMAP_GROUP_ID && (callButton == null || parent == null))
+		if (event.getGroupId() == WidgetID.MINIMAP_GROUP_ID && minimapOrbsWidget == null)
 		{
-			removeCallButton();
-			parent = client.getWidget(WidgetInfo.MINIMAP_ORBS);
-			createCallButton();
+			redrawCallButton();
 		}
 	}
 
 	@Subscribe
 	public void onResizeableChanged(ResizeableChanged event)
 	{
-		removeCallButton();
-		parent = client.getWidget(WidgetInfo.MINIMAP_ORBS);
-		createCallButton();
+		redrawCallButton();
 	}
 
-	private void setCallButtonLocation()
+	private void redrawCallButton()
+	{
+		removeCallButton();
+		minimapOrbsWidget = client.getWidget(WidgetInfo.MINIMAP_ORBS);
+		clientThread.invokeLater(this::createCallButton);
+	}
+
+	private void setWidgetLocation(Widget widget, int offsetX, int offsetY)
 	{
 		if (client.isResized())
 		{
-			callButton.setOriginalX(BUTTON_RESIZEABLE_LOCATION.x);
-			callButton.setOriginalY(BUTTON_RESIZEABLE_LOCATION.y);
+			widget.setOriginalX(119 + offsetX);
+			widget.setOriginalY(147 + offsetY);
+			return;
 		}
-		else
+
+		// If the activity advisor is enabled on fixed mode
+		if (client.getVarbitValue(5368) == 0)
 		{
-			callButton.setOriginalX(BUTTON_FIXED_LOCATION.x);
-			callButton.setOriginalY(BUTTON_FIXED_LOCATION.y);
+			widget.setOriginalX(195 + offsetX);
+			widget.setOriginalY(18 + offsetY);
+			return;
 		}
+
+		widget.setOriginalX(202 + offsetX);
+		widget.setOriginalY(49 + offsetY);
 	}
 
 	private void createCallButton()
 	{
-		if (callButton != null || parent == null || !config.callHorn())
+		if (minimapOrbsWidget == null || !config.callHorn())
 		{
 			return;
 		}
 
-		callButton = parent.createChild(WidgetType.GRAPHIC);
-		callButton.setSpriteId(SpriteID.BARBARIAN_ASSAULT_HORN_FOR_ATTACKER_ICON);
-		callButton.setOriginalWidth(20);
-		callButton.setOriginalHeight(23);
-		setCallButtonLocation();
-		callButton.setAction(4, "Call star");
-		callButton.setAction(5, "Call dead");
-		callButton.setAction(6, "Call private");
-		callButton.setHasListener(true);
-		callButton.setNoClickThrough(true);
-		callButton.setOnOpListener((JavaScriptCallback) this::callButtonClicked);
-		callButton.revalidate();
+		Widget callButtonContainer = minimapOrbsWidget.createChild(-1, WidgetType.GRAPHIC);
+		callButtonContainer.setSpriteId(2138);
+		callButtonContainer.setOriginalWidth(34);
+		callButtonContainer.setOriginalHeight(34);
+		callButtonContainer.setHasListener(true);
+		callButtonContainer.setOnMouseOverListener((JavaScriptCallback) ev -> callButtonContainer.setSpriteId(3517));
+		callButtonContainer.setOnMouseLeaveListener((JavaScriptCallback) ev -> callButtonContainer.setSpriteId(2138));
+		setWidgetLocation(callButtonContainer, 0, 0);
+		callButtonContainer.revalidate();
+
+		Widget callButtonBackground = minimapOrbsWidget.createChild(-1, WidgetType.GRAPHIC);
+		callButtonBackground.setSpriteId(1061);
+		callButtonBackground.setOriginalWidth(26);
+		callButtonBackground.setOriginalHeight(26);
+		setWidgetLocation(callButtonBackground, 4, 4);
+		callButtonBackground.setAction(4, "Call star");
+		callButtonBackground.setAction(5, "Call dead");
+		callButtonBackground.setAction(6, "Call private");
+		callButtonBackground.setHasListener(true);
+		callButtonBackground.setNoClickThrough(true);
+		callButtonBackground.setOnOpListener((JavaScriptCallback) this::callButtonClicked);
+		callButtonBackground.revalidate();
+
+		Widget callButtonIcon = minimapOrbsWidget.createChild(WidgetType.GRAPHIC);
+		callButtonIcon.setSpriteId(SpriteID.BARBARIAN_ASSAULT_HORN_FOR_ATTACKER_ICON);
+		callButtonIcon.setOriginalWidth(16);
+		callButtonIcon.setOriginalHeight(16);
+		setWidgetLocation(callButtonIcon, 9, 9);
+		callButtonIcon.revalidate();
 	}
 
 	private void removeCallButton()
 	{
-		if (parent == null || callButton == null)
+		if (minimapOrbsWidget != null)
 		{
-			return;
+			minimapOrbsWidget.deleteAllChildren();
+			minimapOrbsWidget = null;
 		}
 
-		Widget[] children = parent.getChildren();
-		if (children == null || children.length <= callButton.getIndex() || !children[callButton.getIndex()].equals(callButton))
-		{
-			return;
-		}
-
-		children[callButton.getIndex()] = null;
-		callButton = null;
-		parent = null;
 	}
 
 	private void callButtonClicked(ScriptEvent event)
