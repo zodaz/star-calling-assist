@@ -18,8 +18,6 @@ import com.starcallingassist.services.CallStarPayload;
 import com.starcallingassist.services.HttpService;
 import java.io.IOException;
 import java.util.Objects;
-import java.util.Timer;
-import java.util.TimerTask;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
@@ -155,7 +153,7 @@ public class CrowdSourcingModule extends PluginModuleContract
 
 		attemptCall(
 			currentStar,
-			currentStar.getTier() == null ? "dead" : currentStar.getLocation().getLocationName()
+			currentStar.getTier() == null ? "dead" : currentStar.getLocation().getName()
 		);
 
 	}
@@ -211,7 +209,7 @@ public class CrowdSourcingModule extends PluginModuleContract
 			return;
 		}
 
-		attemptCall(star, star.getLocation().getLocationName());
+		attemptCall(star, star.getLocation().getName());
 	}
 
 	private void attemptCall(@Nonnull Star star, String locationName)

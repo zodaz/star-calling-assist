@@ -35,7 +35,7 @@ public class ChatModule extends PluginModuleContract
 		dispatch(new LogMessage(String.format(
 			"You've discovered a *T%d* star near *%s*!",
 			event.getStar().getTier(),
-			event.getStar().getLocation().getLocationName()
+			event.getStar().getLocation().getName()
 		), ChatLogLevel.VERBOSE));
 	}
 

@@ -9,7 +9,7 @@ import com.starcallingassist.modules.sidepanel.SidePanelModule;
 import com.starcallingassist.old.elements.TableHeader;
 import com.starcallingassist.old.elements.TableRow;
 import com.starcallingassist.old.enums.OrderBy;
-import com.starcallingassist.old.enums.Region;
+import com.starcallingassist.enums.Region;
 import com.starcallingassist.old.objects.StarData;
 import java.awt.BorderLayout;
 import java.awt.Color;

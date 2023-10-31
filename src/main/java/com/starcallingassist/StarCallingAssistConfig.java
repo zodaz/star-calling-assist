@@ -1,7 +1,7 @@
 package com.starcallingassist;
 
 import com.starcallingassist.enums.ChatLogLevel;
-import com.starcallingassist.old.constants.RegionKeyName;
+import com.starcallingassist.constants.RegionKeyName;
 import com.starcallingassist.old.enums.TotalLevelType;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
