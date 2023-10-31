@@ -1,6 +1,6 @@
 package com.starcallingassist.modules.starobserver;
 
-import com.starcallingassist.StarModuleContract;
+import com.starcallingassist.PluginModuleContract;
 import com.starcallingassist.events.StarAbandoned;
 import com.starcallingassist.events.StarApproached;
 import com.starcallingassist.events.StarDepleted;
@@ -20,12 +20,12 @@ import net.runelite.api.events.GameTick;
 import net.runelite.client.eventbus.Subscribe;
 
 @Slf4j
-public class StarObserverModule extends StarModuleContract
+public class StarObserverModule extends PluginModuleContract
 {
 	@Inject
 	private Client client;
 
-	public static final int[] STAR_TIER_IDS = new int[]{
+	private static final int[] STAR_TIER_IDS = new int[]{
 		ObjectID.CRASHED_STAR_41229,
 		ObjectID.CRASHED_STAR_41228,
 		ObjectID.CRASHED_STAR_41227,
@@ -37,8 +37,8 @@ public class StarObserverModule extends StarModuleContract
 		ObjectID.CRASHED_STAR,
 	};
 
-	protected Star trackedStar = null;
-	protected boolean isNearStar = false;
+	private Star trackedStar = null;
+	private boolean isNearStar = false;
 
 	@Override
 	public void shutDown()

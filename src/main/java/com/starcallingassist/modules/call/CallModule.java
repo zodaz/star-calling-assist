@@ -1,8 +1,8 @@
 package com.starcallingassist.modules.call;
 
-import com.starcallingassist.StarModuleContract;
+import com.starcallingassist.PluginModuleContract;
+import com.starcallingassist.StarCallingAssistConfig;
 import com.starcallingassist.events.DebugLogMessage;
-import com.starcallingassist.events.InfoLogMessage;
 import com.starcallingassist.events.PluginConfigChanged;
 import com.starcallingassist.events.StarAbandoned;
 import com.starcallingassist.events.StarApproached;
@@ -13,7 +13,6 @@ import com.starcallingassist.events.StarDiscovered;
 import com.starcallingassist.events.StarTierChanged;
 import com.starcallingassist.objects.Star;
 import com.starcallingassist.old.objects.CallSender;
-import java.io.IOException;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -27,27 +26,27 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameTick;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.Response;
 
 @Slf4j
-public class CallModule extends StarModuleContract
+public class CallModule extends PluginModuleContract
 {
 	@Inject
-	protected Client client;
+	private Client client;
 
 	@Inject
-	protected ClientThread clientThread;
+	private ClientThread clientThread;
+
+	@Inject
+	private StarCallingAssistConfig config;
 
 	@Inject
 	private CallSender sender;
 
-	protected Star currentStar = null;
+	private Star currentStar = null;
 
-	protected Star lastCalledStar = null;
+	private Star lastCalledStar = null;
 
-	protected boolean currentStarApproached = false;
+	private boolean currentStarApproached = false;
 
 	@Override
 	public void shutDown()
@@ -60,22 +59,20 @@ public class CallModule extends StarModuleContract
 	@Subscribe
 	public void onPluginConfigChanged(PluginConfigChanged event)
 	{
-		if (event.getKey().equals("autoCall"))
+		if (currentStar == null || !config.autoCall())
 		{
-			if (config.autoCall() && currentStar != null)
-			{
-				clientThread.invokeLater(() -> attemptAutomaticUpdate(currentStar));
-			}
-
 			return;
 		}
 
-		if (event.getKey().equals("updateStar"))
+		if (event.getKey().equals("autoCall"))
 		{
-			if (config.autoCall() && config.updateStar() && currentStar != null)
-			{
-				clientThread.invokeLater(() -> attemptAutomaticUpdate(currentStar));
-			}
+			clientThread.invokeLater(() -> attemptAutomaticUpdate(currentStar));
+			return;
+		}
+
+		if (event.getKey().equals("updateStar") && config.updateStar())
+		{
+			clientThread.invokeLater(() -> attemptAutomaticUpdate(currentStar));
 		}
 	}
 

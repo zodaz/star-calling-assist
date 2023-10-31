@@ -7,5 +7,5 @@ import lombok.Getter;
 public class WorldHopRequest
 {
 	@Getter
-	protected int world;
+	private final int world;
 }

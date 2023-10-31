@@ -5,16 +5,10 @@ import javax.inject.Inject;
 import lombok.Setter;
 import net.runelite.client.eventbus.EventBus;
 
-public class StarModuleContract
+public class PluginModuleContract
 {
 	@Setter
-	protected StarCallingAssistConfig config;
-
-	@Setter
 	protected Injector injector;
-
-	@Setter
-	protected StarCallingAssistPlugin plugin;
 
 	@Inject
 	private EventBus eventBus;

@@ -8,5 +8,5 @@ import lombok.Getter;
 public class StarAbandoned
 {
 	@Getter
-	protected Star star;
+	private final Star star;
 }

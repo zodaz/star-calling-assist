@@ -10,18 +10,17 @@ import net.runelite.api.coords.WorldPoint;
 public class Star
 {
 	@Getter
-	protected Integer world;
+	private final Integer world;
 
 	@Getter
-	protected StarLocation location;
+	private final StarLocation location;
+
+	@Getter
+	private final Integer tier;
 
 	@Getter
 	@Setter
-	protected Integer tier;
-
-	@Getter
-	@Setter
-	protected Integer currentMiners;
+	private Integer currentMiners;
 
 	public Star(Integer world, WorldPoint location, Integer tier)
 	{

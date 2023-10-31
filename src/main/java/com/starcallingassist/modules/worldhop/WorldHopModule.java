@@ -1,6 +1,6 @@
 package com.starcallingassist.modules.worldhop;
 
-import com.starcallingassist.StarModuleContract;
+import com.starcallingassist.PluginModuleContract;
 import com.starcallingassist.events.DebugLogMessage;
 import com.starcallingassist.events.InfoLogMessage;
 import com.starcallingassist.events.WorldHopRequest;
@@ -13,7 +13,7 @@ import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
 
-public class WorldHopModule extends StarModuleContract
+public class WorldHopModule extends PluginModuleContract
 {
 	@Inject
 	private Client client;

@@ -6,10 +6,10 @@ import lombok.Getter;
 public class InfoLogMessage implements ChatMessageContract
 {
 	@Getter
-	protected String message;
+	private final String message;
 
 	@Getter
-	protected Boolean useHighlighting;
+	private final Boolean useHighlighting;
 
 	public InfoLogMessage(String message)
 	{

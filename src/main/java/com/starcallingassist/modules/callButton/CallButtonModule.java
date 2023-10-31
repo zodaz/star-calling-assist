@@ -1,6 +1,7 @@
 package com.starcallingassist.modules.callButton;
 
-import com.starcallingassist.StarModuleContract;
+import com.starcallingassist.PluginModuleContract;
+import com.starcallingassist.StarCallingAssistConfig;
 import com.starcallingassist.events.PluginConfigChanged;
 import com.starcallingassist.events.StarCallManuallyRequested;
 import com.starcallingassist.events.StarDepletionManuallyRequested;
@@ -21,13 +22,16 @@ import net.runelite.api.widgets.WidgetType;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
 
-public class CallButtonModule extends StarModuleContract
+public class CallButtonModule extends PluginModuleContract
 {
 	@Inject
 	private Client client;
 
 	@Inject
 	private ClientThread clientThread;
+
+	@Inject
+	private StarCallingAssistConfig config;
 
 	private static final Point BUTTON_RESIZEABLE_LOCATION = new Point(130, 150);
 	private static final Point BUTTON_FIXED_LOCATION = new Point(208, 55);

@@ -162,11 +162,6 @@ public class StarLocation
 		);
 	}
 
-	public StarLocation(Point location)
-	{
-		point = location;
-	}
-
 	public WorldPoint getWorldPoint()
 	{
 		if (point == null)

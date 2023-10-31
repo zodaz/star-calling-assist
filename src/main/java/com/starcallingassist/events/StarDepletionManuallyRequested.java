@@ -7,7 +7,7 @@ import lombok.Getter;
 public class StarDepletionManuallyRequested
 {
 	@Getter
-	protected Boolean isPublicCall;
+	private final Boolean isPublicCall;
 
 	public StarDepletionManuallyRequested()
 	{

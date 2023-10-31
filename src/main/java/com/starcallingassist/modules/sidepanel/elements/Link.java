@@ -12,8 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class Link extends JLabel
 {
-	protected final String href;
-	protected final String label;
+	private final String href;
+	private final String label;
 
 	public Link(String href, String label)
 	{
@@ -60,17 +60,17 @@ public class Link extends JLabel
 		return this;
 	}
 
-	protected String buildHref(String color)
+	private String buildHref(String color)
 	{
 		return "<html><a href='" + href + "' style='color: " + color + "'>" + label + "</a></html>";
 	}
 
-	protected String getDefaultState()
+	private String getDefaultState()
 	{
 		return buildHref("#4287f5");
 	}
 
-	protected String getHoverState()
+	private String getHoverState()
 	{
 		return buildHref("orange");
 	}

@@ -1,6 +1,6 @@
 package com.starcallingassist.modules.sidepanel;
 
-import com.starcallingassist.StarModuleContract;
+import com.starcallingassist.PluginModuleContract;
 import com.starcallingassist.events.PluginConfigChanged;
 import com.starcallingassist.old.SidePanel;
 import java.time.temporal.ChronoUnit;
@@ -16,7 +16,7 @@ import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.util.ImageUtil;
 
-public class SidePanelModule extends StarModuleContract
+public class SidePanelModule extends PluginModuleContract
 {
 	@Inject
 	@Getter
@@ -29,7 +29,6 @@ public class SidePanelModule extends StarModuleContract
 
 	@Inject
 	private ClientToolbar clientToolbar;
-
 
 	@Override
 	public void startUp()

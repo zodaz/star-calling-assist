@@ -3,15 +3,18 @@ package com.starcallingassist;
 import com.google.inject.Inject;
 import com.google.inject.Provides;
 import com.starcallingassist.events.PluginConfigChanged;
+import com.starcallingassist.modules.call.CallModule;
 import com.starcallingassist.modules.callButton.CallButtonModule;
 import com.starcallingassist.modules.chat.ChatModule;
 import com.starcallingassist.modules.sidepanel.SidePanelModule;
 import com.starcallingassist.modules.starobserver.StarObserverModule;
-import com.starcallingassist.modules.call.CallModule;
 import com.starcallingassist.modules.worldhop.WorldHopModule;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import lombok.Getter;
+import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
@@ -31,20 +34,29 @@ public class StarCallingAssistPlugin extends Plugin
 	@Inject
 	private StarCallingAssistConfig config;
 
-	@Inject
-	protected EventBus eventBus;
-
-	protected final HashMap<Class<? extends StarModuleContract>, StarModuleContract> modules = new HashMap<>();
-
 	@Provides
 	protected StarCallingAssistConfig provideConfig(ConfigManager configManager)
 	{
 		return configManager.getConfig(StarCallingAssistConfig.class);
 	}
 
-	protected <T extends StarModuleContract> void registerModule(Class<T> className)
+	private final ArrayList<Class<? extends PluginModuleContract>> modules = new ArrayList<>(Arrays.asList(
+		CallButtonModule.class,
+		ChatModule.class,
+		SidePanelModule.class,
+		StarObserverModule.class,
+		CallModule.class,
+		WorldHopModule.class
+	));
+
+	@Inject
+	private EventBus eventBus;
+
+	private final HashMap<Class<? extends PluginModuleContract>, PluginModuleContract> registeredModules = new HashMap<>();
+
+	protected <T extends PluginModuleContract> void registerModule(Class<T> className)
 	{
-		if (this.modules.containsKey(className))
+		if (this.registeredModules.containsKey(className))
 		{
 			return;
 		}
@@ -63,23 +75,19 @@ public class StarCallingAssistPlugin extends Plugin
 
 		injector.injectMembers(module);
 		module.setInjector(injector);
-		module.setConfig(config);
-		module.setPlugin(this);
 
-		this.modules.put(className, module);
+		this.registeredModules.put(className, module);
 	}
 
 	@Override
 	protected void startUp()
 	{
-		this.registerModule(CallButtonModule.class);
-		this.registerModule(ChatModule.class);
-		this.registerModule(SidePanelModule.class);
-		this.registerModule(StarObserverModule.class);
-		this.registerModule(CallModule.class);
-		this.registerModule(WorldHopModule.class);
+		for (Class<? extends PluginModuleContract> module : modules)
+		{
+			this.registerModule(module);
+		}
 
-		for (StarModuleContract module : this.modules.values())
+		for (PluginModuleContract module : this.registeredModules.values())
 		{
 			eventBus.register(module);
 			module.startUp();
@@ -89,7 +97,7 @@ public class StarCallingAssistPlugin extends Plugin
 	@Override
 	protected void shutDown()
 	{
-		for (StarModuleContract module : this.modules.values())
+		for (PluginModuleContract module : this.registeredModules.values())
 		{
 			eventBus.unregister(module);
 			module.shutDown();
@@ -99,11 +107,12 @@ public class StarCallingAssistPlugin extends Plugin
 	@Subscribe
 	public void onConfigChanged(ConfigChanged event)
 	{
-		if (!event.getGroup().equals("starcallingassistplugin"))
-		{
-			return;
-		}
+		Class<?> inter = config.getClass().getInterfaces()[0];
+		ConfigGroup group = inter.getAnnotation(ConfigGroup.class);
 
-		eventBus.post(new PluginConfigChanged(event));
+		if (group != null && event.getGroup().equals(group.value()))
+		{
+			eventBus.post(PluginConfigChanged.fromRuneLiteEvent(event));
+		}
 	}
 }

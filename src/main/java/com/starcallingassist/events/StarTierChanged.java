@@ -9,5 +9,5 @@ import lombok.Getter;
 public class StarTierChanged
 {
 	@Getter
-	protected Star star;
+	private final Star star;
 }
