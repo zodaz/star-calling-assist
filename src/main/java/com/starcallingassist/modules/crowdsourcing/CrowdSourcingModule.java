@@ -91,10 +91,7 @@ public class CrowdSourcingModule extends PluginModuleContract
 
 		if (config.autoCall())
 		{
-			// We'll attempt to call the star with a slight delay, so that the player has an opportunity
-			// to get close enough for the "miner count" logic to run. This allows us to communicate
-			// the number of players that are mining the star, without a secondary update call.
-			attemptAutomaticUpdateWithDelay(currentStar);
+			attemptAutomaticUpdate(currentStar);
 		}
 	}
 
@@ -205,18 +202,6 @@ public class CrowdSourcingModule extends PluginModuleContract
 		}
 
 		return miners;
-	}
-
-	private void attemptAutomaticUpdateWithDelay(@Nonnull Star star)
-	{
-		new Timer().schedule(new TimerTask()
-		{
-			@Override
-			public void run()
-			{
-				attemptAutomaticUpdate(star);
-			}
-		}, 10000);
 	}
 
 	private void attemptAutomaticUpdate(@Nonnull Star star)
