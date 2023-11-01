@@ -23,6 +23,11 @@ public class PluginModuleContract
 		//
 	}
 
+	public void onSecondElapsed(int secondsSinceStartup)
+	{
+		//
+	}
+
 	public void dispatch(Object event)
 	{
 		eventBus.post(event);

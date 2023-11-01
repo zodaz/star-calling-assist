@@ -2,7 +2,9 @@ package com.starcallingassist.modules.sidepanel;
 
 import com.google.inject.Inject;
 import com.starcallingassist.PluginModuleContract;
+import com.starcallingassist.events.AnnouncementReceived;
 import com.starcallingassist.events.PluginConfigChanged;
+import com.starcallingassist.events.NavButtonClicked;
 import com.starcallingassist.old.SidePanel;
 import java.time.temporal.ChronoUnit;
 import javax.swing.SwingUtilities;
@@ -34,6 +36,7 @@ public class SidePanelModule extends PluginModuleContract
 	public void startUp()
 	{
 		sidePanel.init();
+		sidePanel.setModule(this);
 
 		navButton = NavigationButton.builder()
 			.tooltip("Star Miners")
@@ -42,7 +45,7 @@ public class SidePanelModule extends PluginModuleContract
 			.build();
 
 		clientToolbar.addNavigation(navButton);
-		navButton.setOnClick(this::fetchStarData);
+		navButton.setOnClick(() -> dispatch(new NavButtonClicked(navButton)));
 	}
 
 	@Override
@@ -56,9 +59,8 @@ public class SidePanelModule extends PluginModuleContract
 	{
 		if (state.getGameState() == GameState.LOGGED_IN)
 		{
-			sidePanel.setModule(this);
 			SwingUtilities.invokeLater(() -> sidePanel.rebuildTableRows());
-			fetchStarData();
+//			fetchStarData();
 		}
 	}
 
@@ -67,7 +69,7 @@ public class SidePanelModule extends PluginModuleContract
 	{
 		if (event.getKey().equals("endpoint"))
 		{
-			fetchStarData();
+//			fetchStarData();
 			return;
 		}
 
@@ -79,7 +81,6 @@ public class SidePanelModule extends PluginModuleContract
 
 		if (event.getKey().equals("estimateTier"))
 		{
-			sidePanel.setModule(this);
 			sidePanel.rebuildTableRows();
 			return;
 		}
@@ -87,17 +88,10 @@ public class SidePanelModule extends PluginModuleContract
 		sidePanel.updateTableRows();
 	}
 
-	@Schedule(
-		period = 30,
-		unit = ChronoUnit.SECONDS
-	)
-	public void fetchStarData()
+	@Subscribe
+	public void onAnnouncementReceived(AnnouncementReceived event)
 	{
-		if (navButton.isSelected())
-		{
-			sidePanel.setModule(this);
-			sidePanel.fetchStarData();
-		}
+		sidePanel.onAnnouncementReceived(event);
 	}
 
 	@Schedule(

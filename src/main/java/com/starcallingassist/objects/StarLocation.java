@@ -19,7 +19,7 @@ public class StarLocation
 		private Region region;
 	}
 
-	private static final Map<Point, StarLocationDetails> LOCATION_NAMES = new HashMap<>()
+	private static final Map<Point, StarLocationDetails> LOCATION_NAMES = new HashMap<Point, StarLocationDetails>()
 	{
 		{
 			put(new Point(2974, 3241), new StarLocationDetails("Rimmington mine", Region.ASGARNIA));
@@ -114,7 +114,9 @@ public class StarLocation
 		}
 	};
 
-	protected Point point;
+	private Point point;
+
+	private String originalInputName;
 
 	public StarLocation(String location)
 	{
@@ -123,6 +125,7 @@ public class StarLocation
 			return;
 		}
 
+		originalInputName = location;
 		point = LOCATION_NAMES.entrySet()
 			.stream()
 			.filter(entry -> entry.getValue().getName().equalsIgnoreCase(location))
@@ -160,6 +163,11 @@ public class StarLocation
 
 	public WorldArea getWorldArea()
 	{
+		if (point == null)
+		{
+			return null;
+		}
+
 		return new WorldArea(
 			getWorldPoint(),
 			2,
@@ -169,6 +177,11 @@ public class StarLocation
 
 	public String getName()
 	{
+		if (point == null && originalInputName != null)
+		{
+			return originalInputName;
+		}
+
 		if (point == null)
 		{
 			return null;
@@ -187,7 +200,7 @@ public class StarLocation
 	{
 		if (point == null)
 		{
-			return null;
+			return Region.UNKNOWN;
 		}
 
 		StarLocationDetails location = LOCATION_NAMES.get(point);

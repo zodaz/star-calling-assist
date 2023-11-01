@@ -4,13 +4,14 @@ import com.google.inject.Inject;
 import com.google.inject.Provides;
 import com.starcallingassist.events.PluginConfigChanged;
 import com.starcallingassist.modules.callButton.CallButtonModule;
+import com.starcallingassist.modules.crowdsourcing.AnnouncementModule;
 import com.starcallingassist.modules.crowdsourcing.BroadcastModule;
-import com.starcallingassist.modules.crowdsourcing.ReceiveModule;
 import com.starcallingassist.modules.logging.ChatLoggerModule;
 import com.starcallingassist.modules.sidepanel.SidePanelModule;
 import com.starcallingassist.modules.starobserver.StarObserverModule;
 import com.starcallingassist.modules.worldhop.WorldHopModule;
 import java.lang.reflect.InvocationTargetException;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -22,6 +23,7 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.task.Schedule;
 
 @PluginDescriptor(
 	name = "Star Miners",
@@ -44,7 +46,7 @@ public class StarCallingAssistPlugin extends Plugin
 	private final ArrayList<Class<? extends PluginModuleContract>> modules = new ArrayList<>(Arrays.asList(
 		CallButtonModule.class,
 		BroadcastModule.class,
-		ReceiveModule.class,
+		AnnouncementModule.class,
 		ChatLoggerModule.class,
 		SidePanelModule.class,
 		StarObserverModule.class,
@@ -55,6 +57,8 @@ public class StarCallingAssistPlugin extends Plugin
 	private EventBus eventBus;
 
 	private final HashMap<Class<? extends PluginModuleContract>, PluginModuleContract> registeredModules = new HashMap<>();
+
+	private int secondsElapsed = 1;
 
 	protected <T extends PluginModuleContract> void registerModule(Class<T> className)
 	{
@@ -104,6 +108,8 @@ public class StarCallingAssistPlugin extends Plugin
 			eventBus.unregister(module);
 			module.shutDown();
 		}
+
+		secondsElapsed = 1;
 	}
 
 	@Subscribe
@@ -116,5 +122,19 @@ public class StarCallingAssistPlugin extends Plugin
 		{
 			eventBus.post(PluginConfigChanged.fromRuneLiteEvent(event));
 		}
+	}
+
+	@Schedule(
+		period = 1,
+		unit = ChronoUnit.SECONDS
+	)
+	public void everySecondTick()
+	{
+		for (PluginModuleContract module : this.registeredModules.values())
+		{
+			module.onSecondElapsed(secondsElapsed);
+		}
+
+		secondsElapsed++;
 	}
 }

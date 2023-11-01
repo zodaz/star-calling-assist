@@ -21,11 +21,16 @@ public class Star
 	@Setter
 	private Integer currentMiners;
 
-	public Star(Integer world, WorldPoint location, Integer tier)
+	public Star(Integer world, StarLocation location, Integer tier)
 	{
 		this.world = world;
-		this.location = new StarLocation(location);
+		this.location = location;
 		this.tier = tier;
+	}
+
+	public Star(Integer world, WorldPoint location, Integer tier)
+	{
+		this(world, new StarLocation(location), tier);
 	}
 
 	public Star(Integer world, WorldPoint location)

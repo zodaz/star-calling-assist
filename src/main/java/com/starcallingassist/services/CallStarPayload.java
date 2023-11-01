@@ -2,6 +2,7 @@ package com.starcallingassist.services;
 
 import com.starcallingassist.objects.Star;
 import java.util.Objects;
+import java.util.Optional;
 import javax.annotation.Nonnull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,11 +20,11 @@ public class CallStarPayload
 	public CallStarPayload(String playerName, @Nonnull Star star, @Nonnull String location)
 	{
 		this(
-			playerName == null ? "" : playerName,
+			Optional.ofNullable(playerName).orElse(""),
 			star.getWorld(),
-			star.getTier() == null ? 0 : star.getTier(),
+			Optional.ofNullable(star.getTier()).orElse(0),
 			location,
-			star.getCurrentMiners() == null ? -1 : star.getCurrentMiners()
+			Optional.ofNullable(star.getCurrentMiners()).orElse(-1)
 		);
 	}
 
