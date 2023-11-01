@@ -1,7 +1,7 @@
 package com.starcallingassist.services;
 
+import com.google.inject.Inject;
 import com.starcallingassist.StarCallingAssistConfig;
-import javax.inject.Inject;
 import static net.runelite.http.api.RuneLiteAPI.GSON;
 import okhttp3.Callback;
 import okhttp3.MediaType;

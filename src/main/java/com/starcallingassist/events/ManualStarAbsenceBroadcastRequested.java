@@ -4,12 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @AllArgsConstructor
-public class StarDepletionManuallyRequested
+public class ManualStarAbsenceBroadcastRequested
 {
 	@Getter
 	private final Boolean isPublicCall;
 
-	public StarDepletionManuallyRequested()
+	public ManualStarAbsenceBroadcastRequested()
 	{
 		this(true);
 	}

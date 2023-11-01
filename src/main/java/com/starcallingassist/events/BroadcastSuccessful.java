@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @AllArgsConstructor
-public class StarCalled
+public class BroadcastSuccessful
 {
 	@Getter
 	private final Star star;

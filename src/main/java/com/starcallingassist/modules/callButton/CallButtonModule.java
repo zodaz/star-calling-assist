@@ -1,11 +1,12 @@
 package com.starcallingassist.modules.callButton;
 
+import com.google.inject.Inject;
 import com.starcallingassist.PluginModuleContract;
 import com.starcallingassist.StarCallingAssistConfig;
+import com.starcallingassist.events.ManualStarAbsenceBroadcastRequested;
+import com.starcallingassist.events.ManualStarPresenceBroadcastRequested;
 import com.starcallingassist.events.PluginConfigChanged;
-import com.starcallingassist.events.StarCallManuallyRequested;
-import com.starcallingassist.events.StarDepletionManuallyRequested;
-import javax.inject.Inject;
+import com.starcallingassist.modules.callButton.enums.CallType;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.ScriptEvent;
@@ -32,10 +33,6 @@ public class CallButtonModule extends PluginModuleContract
 
 	@Inject
 	private StarCallingAssistConfig config;
-
-	private static final int CALL_STAR = 5;
-	private static final int CALL_DEAD = 6;
-	private static final int CALL_PRIVATE = 7;
 
 	private Widget minimapOrbsWidget = null;
 
@@ -141,9 +138,9 @@ public class CallButtonModule extends PluginModuleContract
 		callButtonBackground.setOriginalWidth(26);
 		callButtonBackground.setOriginalHeight(26);
 		setWidgetLocation(callButtonBackground, 4, 4);
-		callButtonBackground.setAction(4, "Call star");
-		callButtonBackground.setAction(5, "Call dead");
-		callButtonBackground.setAction(6, "Call private");
+		callButtonBackground.setAction(CallType.STAR.getOp(), "Call star");
+		callButtonBackground.setAction(CallType.DEAD.getOp(), "Call dead");
+		callButtonBackground.setAction(CallType.DEAD_PRIVATE.getOp(), "Call private");
 		callButtonBackground.setHasListener(true);
 		callButtonBackground.setNoClickThrough(true);
 		callButtonBackground.setOnOpListener((JavaScriptCallback) this::callButtonClicked);
@@ -169,19 +166,19 @@ public class CallButtonModule extends PluginModuleContract
 
 	private void callButtonClicked(ScriptEvent event)
 	{
-		if (event.getOp() == CALL_STAR)
+		if (event.getOp() == CallType.STAR.getOp())
 		{
-			dispatch(new StarCallManuallyRequested());
+			dispatch(new ManualStarPresenceBroadcastRequested());
 		}
 
-		if (event.getOp() == CALL_DEAD)
+		if (event.getOp() == CallType.DEAD.getOp())
 		{
-			dispatch(new StarDepletionManuallyRequested());
+			dispatch(new ManualStarAbsenceBroadcastRequested());
 		}
 
-		if (event.getOp() == CALL_PRIVATE)
+		if (event.getOp() == CallType.DEAD_PRIVATE.getOp())
 		{
-			dispatch(new StarDepletionManuallyRequested(false));
+			dispatch(new ManualStarAbsenceBroadcastRequested(false));
 		}
 	}
 }

@@ -1,7 +1,7 @@
 package com.starcallingassist;
 
+import com.google.inject.Inject;
 import com.google.inject.Injector;
-import javax.inject.Inject;
 import lombok.Setter;
 import net.runelite.client.eventbus.EventBus;
 

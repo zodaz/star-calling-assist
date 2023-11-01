@@ -3,9 +3,10 @@ package com.starcallingassist;
 import com.google.inject.Inject;
 import com.google.inject.Provides;
 import com.starcallingassist.events.PluginConfigChanged;
-import com.starcallingassist.modules.crowdsourcing.CrowdSourcingModule;
 import com.starcallingassist.modules.callButton.CallButtonModule;
-import com.starcallingassist.modules.chat.ChatModule;
+import com.starcallingassist.modules.crowdsourcing.BroadcastModule;
+import com.starcallingassist.modules.crowdsourcing.ReceiveModule;
+import com.starcallingassist.modules.logging.ChatLoggerModule;
 import com.starcallingassist.modules.sidepanel.SidePanelModule;
 import com.starcallingassist.modules.starobserver.StarObserverModule;
 import com.starcallingassist.modules.worldhop.WorldHopModule;
@@ -42,10 +43,11 @@ public class StarCallingAssistPlugin extends Plugin
 
 	private final ArrayList<Class<? extends PluginModuleContract>> modules = new ArrayList<>(Arrays.asList(
 		CallButtonModule.class,
-		ChatModule.class,
+		BroadcastModule.class,
+		ReceiveModule.class,
+		ChatLoggerModule.class,
 		SidePanelModule.class,
 		StarObserverModule.class,
-		CrowdSourcingModule.class,
 		WorldHopModule.class
 	));
 

@@ -21,7 +21,6 @@ public enum ChatLogLevel
 		return getName();
 	}
 
-
 	public int getValue()
 	{
 		if (this == NORMAL)

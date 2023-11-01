@@ -1,10 +1,10 @@
 package com.starcallingassist.modules.sidepanel;
 
+import com.google.inject.Inject;
 import com.starcallingassist.PluginModuleContract;
 import com.starcallingassist.events.PluginConfigChanged;
 import com.starcallingassist.old.SidePanel;
 import java.time.temporal.ChronoUnit;
-import javax.inject.Inject;
 import javax.swing.SwingUtilities;
 import lombok.Getter;
 import net.runelite.api.Client;

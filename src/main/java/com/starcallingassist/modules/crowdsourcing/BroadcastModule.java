@@ -1,16 +1,17 @@
 package com.starcallingassist.modules.crowdsourcing;
 
+import com.google.inject.Inject;
 import com.starcallingassist.PluginModuleContract;
 import com.starcallingassist.StarCallingAssistConfig;
 import com.starcallingassist.enums.ChatLogLevel;
+import com.starcallingassist.events.BroadcastSuccessful;
 import com.starcallingassist.events.LogMessage;
+import com.starcallingassist.events.ManualStarAbsenceBroadcastRequested;
+import com.starcallingassist.events.ManualStarPresenceBroadcastRequested;
 import com.starcallingassist.events.PluginConfigChanged;
 import com.starcallingassist.events.StarAbandoned;
 import com.starcallingassist.events.StarApproached;
-import com.starcallingassist.events.StarCallManuallyRequested;
-import com.starcallingassist.events.StarCalled;
 import com.starcallingassist.events.StarDepleted;
-import com.starcallingassist.events.StarDepletionManuallyRequested;
 import com.starcallingassist.events.StarDiscovered;
 import com.starcallingassist.events.StarTierChanged;
 import com.starcallingassist.objects.Star;
@@ -19,8 +20,6 @@ import com.starcallingassist.services.HttpService;
 import java.io.IOException;
 import java.util.Objects;
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
-import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.Player;
 import net.runelite.api.coords.WorldArea;
@@ -32,8 +31,7 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
-@Slf4j
-public class CrowdSourcingModule extends PluginModuleContract
+public class BroadcastModule extends PluginModuleContract
 {
 	@Inject
 	private Client client;
@@ -137,7 +135,7 @@ public class CrowdSourcingModule extends PluginModuleContract
 	}
 
 	@Subscribe
-	public void onStarCallManuallyRequested(StarCallManuallyRequested event)
+	public void onManualStarPresenceBroadcastRequested(ManualStarPresenceBroadcastRequested event)
 	{
 		if (currentStar == null)
 		{
@@ -151,7 +149,7 @@ public class CrowdSourcingModule extends PluginModuleContract
 			return;
 		}
 
-		attemptCall(
+		attemptBroadcast(
 			currentStar,
 			currentStar.getTier() == null ? "dead" : currentStar.getLocation().getName()
 		);
@@ -159,14 +157,14 @@ public class CrowdSourcingModule extends PluginModuleContract
 	}
 
 	@Subscribe
-	public void onStarDepletionManuallyRequested(StarDepletionManuallyRequested event)
+	public void onManualStarAbsenceBroadcastRequested(ManualStarAbsenceBroadcastRequested event)
 	{
 		if (currentStar == null)
 		{
 			return;
 		}
 
-		attemptCall(
+		attemptBroadcast(
 			new Star(currentStar.getWorld(), currentStar.getLocation().getWorldPoint()),
 			event.getIsPublicCall() ? "dead" : "pdead"
 		);
@@ -209,10 +207,10 @@ public class CrowdSourcingModule extends PluginModuleContract
 			return;
 		}
 
-		attemptCall(star, star.getLocation().getName());
+		attemptBroadcast(star, star.getLocation().getName());
 	}
 
-	private void attemptCall(@Nonnull Star star, String locationName)
+	private void attemptBroadcast(@Nonnull Star star, String locationName)
 	{
 		String playerName = config.includeIgn() ? client.getLocalPlayer().getName() : null;
 
@@ -241,7 +239,7 @@ public class CrowdSourcingModule extends PluginModuleContract
 
 					lastCalledStar = star;
 					clientThread.invokeLater(() -> dispatch(new LogMessage("Star successfully called: *" + payload.toCallout() + "*", ChatLogLevel.CALLS)));
-					dispatch(new StarCalled(star, payload));
+					dispatch(new BroadcastSuccessful(star, payload));
 					res.close();
 				}
 			});

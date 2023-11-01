@@ -1,10 +1,10 @@
 package com.starcallingassist.modules.worldhop;
 
+import com.google.inject.Inject;
 import com.starcallingassist.PluginModuleContract;
 import com.starcallingassist.enums.ChatLogLevel;
 import com.starcallingassist.events.LogMessage;
 import com.starcallingassist.events.WorldHopRequest;
-import javax.inject.Inject;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.World;

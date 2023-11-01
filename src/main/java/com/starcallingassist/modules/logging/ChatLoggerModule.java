@@ -1,4 +1,4 @@
-package com.starcallingassist.modules.chat;
+package com.starcallingassist.modules.logging;
 
 import com.google.inject.Inject;
 import com.starcallingassist.PluginModuleContract;
@@ -18,7 +18,7 @@ import net.runelite.client.chat.ChatMessageManager;
 import net.runelite.client.chat.QueuedMessage;
 import net.runelite.client.eventbus.Subscribe;
 
-public class ChatModule extends PluginModuleContract
+public class ChatLoggerModule extends PluginModuleContract
 {
 	@Inject
 	private ChatMessageManager chatMessageManager;

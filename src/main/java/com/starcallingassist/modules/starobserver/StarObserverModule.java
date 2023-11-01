@@ -1,5 +1,6 @@
 package com.starcallingassist.modules.starobserver;
 
+import com.google.inject.Inject;
 import com.starcallingassist.PluginModuleContract;
 import com.starcallingassist.events.StarAbandoned;
 import com.starcallingassist.events.StarApproached;
@@ -9,7 +10,6 @@ import com.starcallingassist.events.StarTierChanged;
 import com.starcallingassist.objects.Star;
 import java.util.Objects;
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
