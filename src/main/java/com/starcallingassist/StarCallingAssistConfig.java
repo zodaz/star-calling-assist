@@ -2,7 +2,7 @@ package com.starcallingassist;
 
 import com.starcallingassist.constants.RegionKeyName;
 import com.starcallingassist.enums.ChatLogLevel;
-import com.starcallingassist.old.enums.TotalLevelType;
+import com.starcallingassist.modules.sidepanel.enums.TotalLevelType;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
@@ -34,11 +34,12 @@ public interface StarCallingAssistConfig extends Config
 	}
 
 	@ConfigSection(
-		name = "Caller Settings",
-		description = "Settings to configure the caller part of the plugin.",
-		position = 2
+		name = "Scout Settings",
+		description = "Settings to configure the scouting part of the plugin.",
+		position = 2,
+		closedByDefault = true
 	)
-	String callerSection = "Caller Settings";
+	String scoutingSection = "Scout Settings";
 
 	@ConfigItem(
 		keyName = "includeIgn",
@@ -46,7 +47,7 @@ public interface StarCallingAssistConfig extends Config
 		description = "Includes your in-game name with your calls. This is required if you want the stars you find " +
 			"to count towards your called stars total.",
 		position = 3,
-		section = callerSection
+		section = scoutingSection
 	)
 	default boolean includeIgn()
 	{
@@ -58,7 +59,7 @@ public interface StarCallingAssistConfig extends Config
 		name = "Auto call stars",
 		description = "Automatically call stars as they appear or fully depletes",
 		position = 4,
-		section = callerSection
+		section = scoutingSection
 	)
 	default boolean autoCall()
 	{
@@ -70,9 +71,77 @@ public interface StarCallingAssistConfig extends Config
 		name = "Auto update stars",
 		description = "Posts a new call when the tier of a star changes (Auto call must be enabled)",
 		position = 5,
-		section = callerSection
+		section = scoutingSection
 	)
 	default boolean updateStar()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "callHorn",
+		name = "Call Button",
+		description = "Enables a button which can be used to call a star.",
+		position = 6,
+		section = scoutingSection
+	)
+	default boolean callHorn()
+	{
+		return false;
+	}
+
+	@ConfigSection(
+		name = "Display Settings",
+		description = "Settings to configure the layout of active stars within the side panel.",
+		position = 7,
+		closedByDefault = true
+	)
+	String displaySection = "Display Settings";
+
+	@ConfigItem(
+		keyName = "showTier",
+		name = "Show Tier",
+		description = "Displays the current tier of the star in the list.",
+		position = 8,
+		section = displaySection
+	)
+	default boolean showTier()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "showFoundBy",
+		name = "Show Found By",
+		description = "Displays the name of the player who first discovered the star in the list.",
+		position = 9,
+		section = displaySection
+	)
+	default boolean showFoundBy()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "showDeadTime",
+		name = "Show Death Time Estimate",
+		description = "Displays the estimated time (in minutes) until the star is dead.",
+		position = 10,
+		section = displaySection
+	)
+	default boolean showDeadTime()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "showWorldType",
+		name = "Show World Type",
+		description = "Displays the world type (e.g. PvP, 2200 total) in the list.",
+		position = 11,
+		section = displaySection
+	)
+	default boolean showWorldType()
 	{
 		return true;
 	}
@@ -81,51 +150,40 @@ public interface StarCallingAssistConfig extends Config
 		keyName = "logLevel",
 		name = "Chat Log Level",
 		description = "To what extent you want to see log messages from the plugin in the game chat.",
-		position = 6,
-		section = callerSection
+		position = 12,
+		section = displaySection
 	)
 	default ChatLogLevel logLevel()
 	{
-		return ChatLogLevel.NONE;
+		return ChatLogLevel.NORMAL;
 	}
-
-	@ConfigItem(
-		keyName = "callHorn",
-		name = "Call Button",
-		description = "Enables a button which can be used to call a star.",
-		position = 7,
-		section = callerSection
-	)
-	default boolean callHorn()
-	{
-		return false;
-	}
-
-	@ConfigSection(
-		name = "Star Panel Settings",
-		description = "Settings to configure side panel displaying active stars.",
-		position = 8
-	)
-	String panelSection = "Star Panel Settings";
 
 	@ConfigItem(
 		keyName = "estimateTier",
-		name = "Estimate Tier",
-		description = "Estimates the current tier of stars in the list.",
-		position = 9,
-		section = panelSection
+		name = "Use estimated tiers",
+		description = "Estimates the current tier of stars in the list, instead of showing the last known tier.",
+		position = 13,
+		section = displaySection
 	)
 	default boolean estimateTier()
 	{
 		return true;
 	}
 
+	@ConfigSection(
+		name = "Star Filters",
+		description = "Settings to filter out certain stars.",
+		position = 14,
+		closedByDefault = true
+	)
+	String starSection = "Star Filters";
+
 	@ConfigItem(
 		keyName = "minTier",
 		name = "Minimum Tier",
 		description = "Lowest tier of stars to be displayed in the side-panel.",
-		position = 10,
-		section = panelSection
+		position = 15,
+		section = starSection
 	)
 	@Range(
 		min = 1,
@@ -140,8 +198,8 @@ public interface StarCallingAssistConfig extends Config
 		keyName = "maxTier",
 		name = "Maximum Tier",
 		description = "Highest tier of stars to be displayed in the side-panel.",
-		position = 11,
-		section = panelSection
+		position = 16,
+		section = starSection
 	)
 	@Range(
 		min = 1,
@@ -154,10 +212,10 @@ public interface StarCallingAssistConfig extends Config
 
 	@ConfigItem(
 		keyName = "minDeadTime",
-		name = "Min. Dead Time",
+		name = "Minimum Dead Time",
 		description = "Hides stars that are estimated to be depleted in less than the specified amount of minutes",
-		position = 12,
-		section = panelSection
+		position = 17,
+		section = starSection
 	)
 	@Range(
 		min = -90,
@@ -171,12 +229,20 @@ public interface StarCallingAssistConfig extends Config
 		return -5;
 	}
 
+	@ConfigSection(
+		name = "World Filters",
+		description = "Settings to filter out certain worlds.",
+		position = 18,
+		closedByDefault = true
+	)
+	String worldSection = "World Filters";
+
 	@ConfigItem(
 		keyName = "showF2P",
-		name = "Show F2P",
+		name = "Show Free-to-Play",
 		description = "Show or hide f2p worlds.",
-		position = 13,
-		section = panelSection
+		position = 19,
+		section = worldSection
 	)
 	default boolean showF2P()
 	{
@@ -187,8 +253,8 @@ public interface StarCallingAssistConfig extends Config
 		keyName = "showMembers",
 		name = "Show Members",
 		description = "Show or hide members worlds.",
-		position = 14,
-		section = panelSection
+		position = 20,
+		section = worldSection
 	)
 	default boolean showMembers()
 	{
@@ -197,10 +263,10 @@ public interface StarCallingAssistConfig extends Config
 
 	@ConfigItem(
 		keyName = "showPvp",
-		name = "Show PVP",
-		description = "Show or hide PVP worlds.",
-		position = 15,
-		section = panelSection
+		name = "Show PvP",
+		description = "Show or hide PvP worlds.",
+		position = 21,
+		section = worldSection
 	)
 	default boolean showPvp()
 	{
@@ -209,22 +275,22 @@ public interface StarCallingAssistConfig extends Config
 
 	@ConfigItem(
 		keyName = "showHighRisk",
-		name = "Show High-Risk",
-		description = "Show or hide high-risk worlds.",
-		position = 16,
-		section = panelSection
+		name = "Show High-Risk PvP",
+		description = "Show or hide high-risk PvP worlds.",
+		position = 22,
+		section = worldSection
 	)
 	default boolean showHighRisk()
 	{
-		return true;
+		return false;
 	}
 
 	@ConfigItem(
 		keyName = "totalLevelType",
 		name = "Max total world",
 		description = "Hides worlds with a total level requirement higher than this.",
-		position = 17,
-		section = panelSection
+		position = 23,
+		section = worldSection
 	)
 	default TotalLevelType totalLevelType()
 	{
@@ -232,17 +298,18 @@ public interface StarCallingAssistConfig extends Config
 	}
 
 	@ConfigSection(
-		name = "Region Toggles",
-		description = "Toggle regions to be displayed in the side-panel",
-		position = 18
+		name = "Region Filters",
+		description = "Settings to filter out stars in certain regions.",
+		position = 24,
+		closedByDefault = true
 	)
-	String regionSection = "Region Toggles";
+	String regionSection = "Region Filters";
 
 	@ConfigItem(
 		keyName = RegionKeyName.KEY_ASGARNIA,
 		name = "Asgarnia",
 		description = "Show or hide this region.",
-		position = 19,
+		position = 25,
 		section = regionSection
 	)
 	default boolean asgarnia()
@@ -254,7 +321,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_KARAMJA,
 		name = "Crandor/Karamja",
 		description = "Show or hide this region.",
-		position = 20,
+		position = 26,
 		section = regionSection
 	)
 	default boolean karamja()
@@ -266,7 +333,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_FELDIP,
 		name = "Feldip Hills/Isle Of Souls",
 		description = "Show or hide this region.",
-		position = 21,
+		position = 27,
 		section = regionSection
 	)
 	default boolean feldip()
@@ -278,7 +345,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_FOSSIL,
 		name = "Fossil Island/Mos Le Harmless",
 		description = "Show or hide this region.",
-		position = 22,
+		position = 28,
 		section = regionSection
 	)
 	default boolean fossil()
@@ -290,7 +357,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_FREMMENIK,
 		name = "Fremmenik/Lunar Isle",
 		description = "Show or hide this region.",
-		position = 23,
+		position = 29,
 		section = regionSection
 	)
 	default boolean fremmenik()
@@ -302,7 +369,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_KOUREND,
 		name = "Kourend",
 		description = "Show or hide this region.",
-		position = 24,
+		position = 30,
 		section = regionSection
 	)
 	default boolean kourend()
@@ -314,7 +381,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_KANDARIN,
 		name = "Kandarin",
 		description = "Show or hide this region.",
-		position = 25,
+		position = 31,
 		section = regionSection
 	)
 	default boolean kandarin()
@@ -326,7 +393,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_KEBOS,
 		name = "Kebos Lowlands",
 		description = "Show or hide this region.",
-		position = 26,
+		position = 32,
 		section = regionSection
 	)
 	default boolean kebos()
@@ -338,7 +405,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_DESERT,
 		name = "Desert",
 		description = "Show or hide this region.",
-		position = 27,
+		position = 33,
 		section = regionSection
 	)
 	default boolean desert()
@@ -350,7 +417,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_MISTHALIN,
 		name = "Misthalin",
 		description = "Show or hide this region.",
-		position = 28,
+		position = 34,
 		section = regionSection
 	)
 	default boolean misthalin()
@@ -362,7 +429,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_MORYTANIA,
 		name = "Morytania",
 		description = "Show or hide this region.",
-		position = 29,
+		position = 35,
 		section = regionSection
 	)
 	default boolean morytania()
@@ -374,7 +441,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_GNOME,
 		name = "Piscatoris/Gnome Stronghold",
 		description = "Show or hide this region.",
-		position = 30,
+		position = 36,
 		section = regionSection
 	)
 	default boolean gnome()
@@ -386,7 +453,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_TIRANNWN,
 		name = "Tirannwn",
 		description = "Show or hide this region.",
-		position = 31,
+		position = 37,
 		section = regionSection
 	)
 	default boolean tirannwn()
@@ -398,7 +465,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_WILDERNESS,
 		name = "Wilderness",
 		description = "Show or hide this region.",
-		position = 32,
+		position = 38,
 		section = regionSection
 	)
 	default boolean wilderness()
@@ -408,13 +475,13 @@ public interface StarCallingAssistConfig extends Config
 
 	@ConfigItem(
 		keyName = RegionKeyName.KEY_UNKNOWN,
-		name = "Unknown/Unscoped",
-		description = "Show or hide stars where the region is unscoped.",
-		position = 33,
+		name = "Unknown / Unconfirmed",
+		description = "Show or hide stars that haven't been confirmed / mapped to a region yet.",
+		position = 39,
 		section = regionSection
 	)
 	default boolean unknown()
 	{
-		return true;
+		return false;
 	}
 }

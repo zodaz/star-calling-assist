@@ -3,40 +3,59 @@ package com.starcallingassist.modules.sidepanel;
 import com.google.inject.Inject;
 import com.starcallingassist.PluginModuleContract;
 import com.starcallingassist.events.AnnouncementReceived;
-import com.starcallingassist.events.PluginConfigChanged;
+import com.starcallingassist.events.AnnouncementRefreshFailed;
+import com.starcallingassist.events.AnnouncementsRefreshed;
 import com.starcallingassist.events.NavButtonClicked;
-import com.starcallingassist.old.SidePanel;
-import java.time.temporal.ChronoUnit;
+import com.starcallingassist.events.PluginConfigChanged;
+import com.starcallingassist.events.StarDepleted;
+import com.starcallingassist.events.StarTierChanged;
+import com.starcallingassist.modules.crowdsourcing.objects.AnnouncedStar;
+import com.starcallingassist.objects.Star;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.SwingUtilities;
-import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.events.GameStateChanged;
+import net.runelite.api.events.WorldChanged;
 import net.runelite.client.eventbus.Subscribe;
-import net.runelite.client.task.Schedule;
+import net.runelite.client.game.WorldService;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.util.ImageUtil;
+import net.runelite.http.api.worlds.World;
+import net.runelite.http.api.worlds.WorldResult;
 
+@Slf4j
 public class SidePanelModule extends PluginModuleContract
 {
 	@Inject
-	@Getter
 	private Client client;
-
-	@Inject
-	private SidePanel sidePanel;
-
-	private NavigationButton navButton;
 
 	@Inject
 	private ClientToolbar clientToolbar;
 
+	@Inject
+	private WorldService worldService;
+
+	private SidePanel sidePanel;
+
+	private NavigationButton navButton;
+
+	private List<World> worldList = new ArrayList<>();
+
 	@Override
 	public void startUp()
 	{
-		sidePanel.init();
-		sidePanel.setModule(this);
+		if (sidePanel == null)
+		{
+			sidePanel = new SidePanel(this::dispatch);
+			sidePanel.setInjector(injector);
+			injector.injectMembers(sidePanel);
+		}
+
+		sidePanel.startUp();
 
 		navButton = NavigationButton.builder()
 			.tooltip("Star Miners")
@@ -46,11 +65,14 @@ public class SidePanelModule extends PluginModuleContract
 
 		clientToolbar.addNavigation(navButton);
 		navButton.setOnClick(() -> dispatch(new NavButtonClicked(navButton)));
+
+		fetchWorldData();
 	}
 
 	@Override
 	public void shutDown()
 	{
+		sidePanel.shutDown();
 		clientToolbar.removeNavigation(navButton);
 	}
 
@@ -59,47 +81,120 @@ public class SidePanelModule extends PluginModuleContract
 	{
 		if (state.getGameState() == GameState.LOGGED_IN)
 		{
-			SwingUtilities.invokeLater(() -> sidePanel.rebuildTableRows());
-//			fetchStarData();
+			SwingUtilities.invokeLater(sidePanel::rebuild);
 		}
+	}
+
+	@Subscribe
+	public void onWorldChanged(WorldChanged state)
+	{
+		sidePanel.setCurrentWorld(client.getWorld());
+		SwingUtilities.invokeLater(sidePanel::rebuild);
 	}
 
 	@Subscribe
 	public void onPluginConfigChanged(PluginConfigChanged event)
 	{
-		if (event.getKey().equals("endpoint"))
+		if (event.getKey().equals("endpoint") || event.getKey().equals("authorization"))
 		{
-//			fetchStarData();
-			return;
+			sidePanel.setErrorMessage("");
 		}
 
-		if (event.getKey().equals("authorization"))
-		{
-			sidePanel.updateInfoPanel();
-			return;
-		}
+		sidePanel.rebuild();
+	}
 
-		if (event.getKey().equals("estimateTier"))
-		{
-			sidePanel.rebuildTableRows();
-			return;
-		}
+	@Subscribe
+	public void onAnnouncementRefreshFailed(AnnouncementRefreshFailed event)
+	{
+		SwingUtilities.invokeLater(() -> sidePanel.setErrorMessage(event.getMessage()));
+	}
 
-		sidePanel.updateTableRows();
+	@Subscribe
+	public void onAnnouncementsRefreshed(AnnouncementsRefreshed event)
+	{
+		SwingUtilities.invokeLater(() -> sidePanel.setErrorMessage(""));
 	}
 
 	@Subscribe
 	public void onAnnouncementReceived(AnnouncementReceived event)
 	{
-		sidePanel.onAnnouncementReceived(event);
+		AnnouncedStar announcement = event.getAnnouncement();
+		Integer world = announcement.getStar().getWorld();
+
+		World worldObject = getWorldObject(world);
+		if (worldObject == null)
+		{
+			return;
+		}
+
+		sidePanel.onStarUpdate(
+			announcement.getStar(),
+			worldObject,
+			announcement.getUpdatedAt(),
+			announcement.getPlayerName()
+		);
 	}
 
-	@Schedule(
-		period = 10,
-		unit = ChronoUnit.MINUTES
-	)
-	public void fetchWorldData()
+	@Subscribe
+	public void onStarTierChanged(StarTierChanged event)
 	{
-		sidePanel.fetchWorldData();
+		updateStarFromLocalStateChange(event.getStar());
+	}
+
+	@Subscribe
+	public void onStarDepleted(StarDepleted event)
+	{
+		updateStarFromLocalStateChange(event.getStar());
+	}
+
+	@Override
+	public void onSecondElapsed(int secondsSinceStartup)
+	{
+		// Every 10 minutes
+		if (secondsSinceStartup % (60 * 10) == 0)
+		{
+			fetchWorldData();
+		}
+	}
+
+	private void fetchWorldData()
+	{
+		WorldResult worldResult = worldService.getWorlds();
+		if (worldResult == null)
+		{
+			return;
+		}
+
+		List<World> worlds = worldResult.getWorlds();
+		if (worlds == null || worlds.isEmpty())
+		{
+			return;
+		}
+
+		worldList = worlds;
+	}
+
+	private World getWorldObject(int worldId)
+	{
+		return worldList.stream()
+			.filter(world -> world.getId() == worldId)
+			.findFirst()
+			.orElse(null);
+	}
+
+	private void updateStarFromLocalStateChange(Star star)
+	{
+		World worldObject = getWorldObject(star.getWorld());
+		if (worldObject == null)
+		{
+			return;
+		}
+
+		sidePanel.onStarUpdate(
+			star,
+			worldObject,
+			(System.currentTimeMillis() / 1000L) - 5, // Always make sure it's slightly outdated.
+			"you"
+		);
 	}
 }

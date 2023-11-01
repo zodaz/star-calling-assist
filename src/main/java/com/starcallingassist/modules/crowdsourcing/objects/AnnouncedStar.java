@@ -16,7 +16,7 @@ public class AnnouncedStar
 	private final Star star;
 
 	@Getter
-	private final long calledAt;
+	private final long updatedAt;
 
 	@Getter
 	private final String playerName;
@@ -53,6 +53,6 @@ public class AnnouncedStar
 			return false;
 		}
 
-		return previous.getCalledAt() < calledAt;
+		return previous.getUpdatedAt() < updatedAt;
 	}
 }

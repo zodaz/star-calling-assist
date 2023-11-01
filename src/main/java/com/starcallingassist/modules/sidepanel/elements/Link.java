@@ -1,5 +1,6 @@
 package com.starcallingassist.modules.sidepanel.elements;
 
+import com.starcallingassist.constants.PluginColors;
 import java.awt.Cursor;
 import java.awt.Desktop;
 import java.awt.event.MouseAdapter;
@@ -67,12 +68,12 @@ public class Link extends JLabel
 
 	private String getDefaultState()
 	{
-		return buildHref("#4287f5");
+		return buildHref(PluginColors.LINK_COLOR);
 	}
 
 	private String getHoverState()
 	{
-		return buildHref("orange");
+		return buildHref(PluginColors.LINK_HOVER_COLOR);
 	}
 }
 

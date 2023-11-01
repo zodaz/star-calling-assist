@@ -1,4 +1,4 @@
-package com.starcallingassist.services;
+package com.starcallingassist.modules.crowdsourcing.objects;
 
 import com.starcallingassist.objects.Star;
 import java.util.Objects;

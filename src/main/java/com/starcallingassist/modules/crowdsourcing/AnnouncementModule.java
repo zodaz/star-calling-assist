@@ -8,13 +8,16 @@ import com.starcallingassist.PluginModuleContract;
 import com.starcallingassist.StarCallingAssistConfig;
 import com.starcallingassist.events.AnnouncementReceived;
 import com.starcallingassist.events.AnnouncementRefreshFailed;
+import com.starcallingassist.events.AnnouncementsRefreshed;
 import com.starcallingassist.events.NavButtonClicked;
 import com.starcallingassist.events.PluginConfigChanged;
 import com.starcallingassist.modules.crowdsourcing.objects.AnnouncedStar;
 import com.starcallingassist.services.HttpService;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import javax.swing.SwingUtilities;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.AnimationID;
 import net.runelite.api.Client;
@@ -85,9 +88,10 @@ public class AnnouncementModule extends PluginModuleContract
 	@Subscribe
 	public void onPluginConfigChanged(PluginConfigChanged event)
 	{
-		if (event.getKey().equals("endpoint"))
+		if (event.getKey().equals("endpoint") || event.getKey().equals("authorization"))
 		{
-			refreshAnnouncements();
+			announcementsLastRefreshedAt = null;
+			this.refreshAnnouncements();
 		}
 	}
 
@@ -124,7 +128,7 @@ public class AnnouncementModule extends PluginModuleContract
 
 		if (sidePanelOpened)
 		{
-			refreshAnnouncements();
+			SwingUtilities.invokeLater(this::refreshAnnouncements);
 		}
 	}
 
@@ -161,7 +165,7 @@ public class AnnouncementModule extends PluginModuleContract
 
 	private void refreshAnnouncements()
 	{
-		if (isRefreshing || config.getAuthorization().isEmpty())
+		if (isRefreshing || config.getAuthorization().isEmpty() || config.getEndpoint().isEmpty())
 		{
 			return;
 		}
@@ -213,6 +217,7 @@ public class AnnouncementModule extends PluginModuleContract
 						{
 							res.close();
 							isRefreshing = false;
+							dispatch(new AnnouncementsRefreshed(new ArrayList<>(stars.values())));
 							return;
 						}
 
@@ -245,6 +250,7 @@ public class AnnouncementModule extends PluginModuleContract
 						return;
 					}
 
+					dispatch(new AnnouncementsRefreshed(new ArrayList<>(stars.values())));
 					res.close();
 					isRefreshing = false;
 				}

@@ -1,7 +1,7 @@
 package com.starcallingassist.events;
 
+import com.starcallingassist.modules.crowdsourcing.objects.CallStarPayload;
 import com.starcallingassist.objects.Star;
-import com.starcallingassist.services.CallStarPayload;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

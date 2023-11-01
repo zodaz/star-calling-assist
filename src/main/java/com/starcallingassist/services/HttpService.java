@@ -3,6 +3,7 @@ package com.starcallingassist.services;
 import com.google.inject.Inject;
 import com.starcallingassist.StarCallingAssistConfig;
 import com.starcallingassist.StarCallingAssistPlugin;
+import com.starcallingassist.modules.crowdsourcing.objects.CallStarPayload;
 import static net.runelite.http.api.RuneLiteAPI.GSON;
 import okhttp3.Callback;
 import okhttp3.MediaType;
