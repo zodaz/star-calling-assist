@@ -12,6 +12,7 @@ import net.runelite.api.events.GameTick;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.util.WorldUtil;
 
 public class WorldHopModule extends PluginModuleContract
 {
@@ -37,12 +38,36 @@ public class WorldHopModule extends PluginModuleContract
 	@Subscribe
 	public void onWorldHopRequest(WorldHopRequest event)
 	{
+		if (client.getGameState() == GameState.LOGIN_SCREEN)
+		{
+			clientThread.invokeLater(() -> changeWorldLoginScreen(event.getWorld()));
+			return;
+		}
+
 		if (client.getGameState() == GameState.LOGGED_IN)
 		{
-			displaySwitcherAttempts = 0;
-			hopTarget = event.getWorld();
-			clientThread.invokeLater(() -> dispatch(new LogMessage("Attempting to quick-hop to world *" + hopTarget + "*", ChatLogLevel.NORMAL)));
+			clientThread.invokeLater(() -> changeWorldLoggedIn(event.getWorld()));
 		}
+	}
+
+	private void changeWorldLoginScreen(net.runelite.http.api.worlds.World world)
+	{
+		final World rsWorld = client.createWorld();
+		rsWorld.setActivity(world.getActivity());
+		rsWorld.setAddress(world.getAddress());
+		rsWorld.setId(world.getId());
+		rsWorld.setPlayerCount(world.getPlayers());
+		rsWorld.setLocation(world.getLocation());
+		rsWorld.setTypes(WorldUtil.toWorldTypes(world.getTypes()));
+
+		client.changeWorld(rsWorld);
+	}
+
+	private void changeWorldLoggedIn(net.runelite.http.api.worlds.World world)
+	{
+		displaySwitcherAttempts = 0;
+		hopTarget = world.getId();
+		dispatch(new LogMessage("Attempting to quick-hop to world *" + hopTarget + "*", ChatLogLevel.NORMAL));
 	}
 
 	@Subscribe

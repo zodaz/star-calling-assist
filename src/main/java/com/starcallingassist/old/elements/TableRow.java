@@ -116,7 +116,7 @@ public class TableRow extends JPanel
 			{
 				if (mouseEvent.getButton() == MouseEvent.BUTTON1 && mouseEvent.getClickCount() == 2)
 				{
-					module.dispatch(new WorldHopRequest(data.getWorldId()));
+					module.dispatch(new WorldHopRequest(data.getWorld()));
 				}
 			}
 
