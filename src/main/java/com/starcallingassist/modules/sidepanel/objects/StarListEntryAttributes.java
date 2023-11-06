@@ -2,7 +2,7 @@ package com.starcallingassist.modules.sidepanel.objects;
 
 import com.starcallingassist.constants.PluginColors;
 import com.starcallingassist.enums.Region;
-import com.starcallingassist.modules.sidepanel.decorators.StarListPanelDecorator;
+import com.starcallingassist.modules.sidepanel.decorators.StarListGroupEntryDecorator;
 import com.starcallingassist.modules.sidepanel.enums.TotalLevelType;
 import com.starcallingassist.objects.Star;
 import java.awt.Color;
@@ -26,7 +26,7 @@ public class StarListEntryAttributes
 	@Getter
 	private final String playerName;
 
-	private final StarListPanelDecorator decorator;
+	private final StarListGroupEntryDecorator decorator;
 
 
 	private final int[] timeUntilDead = {
@@ -42,7 +42,7 @@ public class StarListEntryAttributes
 		9 * 7 * 60 * 1000    // 63 minutes
 	};
 
-	public StarListEntryAttributes(@Nonnull Star star, @Nonnull World world, long updatedAt, @Nonnull String playerName, StarListPanelDecorator decorator)
+	public StarListEntryAttributes(@Nonnull Star star, @Nonnull World world, long updatedAt, @Nonnull String playerName, StarListGroupEntryDecorator decorator)
 	{
 		this.star = star;
 		this.world = world;
@@ -188,22 +188,12 @@ public class StarListEntryAttributes
 			return PluginColors.MEMBERS_WORLD;
 		}
 
-		return PluginColors.ENTRY_PANEL_LABEL;
+		return PluginColors.STAR_LIST_GROUP_LABEL;
 	}
 
-	public Color getAreaColor()
+	public boolean isDangerousArea()
 	{
-		if (isUnverified())
-		{
-			return PluginColors.UNVERIFIED_AREA;
-		}
-
-		if (isWilderness() || getWorldColor() == PluginColors.DANGEROUS_AREA)
-		{
-			return PluginColors.DANGEROUS_AREA;
-		}
-
-		return PluginColors.ENTRY_PANEL_LABEL;
+		return isWilderness() || getWorldColor() == PluginColors.DANGEROUS_AREA;
 	}
 
 	public String getWorldType()

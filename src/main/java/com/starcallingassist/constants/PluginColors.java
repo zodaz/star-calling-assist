@@ -13,15 +13,15 @@ public class PluginColors
 	public static final Color DROPDOWN_BACKGROUND = new Color(38, 38, 38);
 	public static final Color DROPDOWN_ARROW = new Color(82, 82, 82);
 
-	public static final Color ENTRY_PANEL_BORDER = new Color(21, 21, 21);
-	public static final Color ENTRY_PANEL_BACKGROUND = new Color(30, 30, 30);
-	public static final Color ENTRY_PANEL_BORDER_HOVER = new Color(22, 78, 99);
-	public static final Color ENTRY_PANEL_BORDER_CURRENT_WORLD = new Color(20, 83, 45);
-	public static final Color ENTRY_PANEL_BACKGROUND_HOVER = ENTRY_PANEL_BACKGROUND;
+	public static final Color STAR_LIST_GROUP_BORDER = new Color(21, 21, 21);
+	public static final Color STAR_LIST_GROUP_BORDER_HOVER = new Color(22, 78, 99);
+	public static final Color STAR_LIST_GROUP_BORDER_CURRENT_WORLD = new Color(20, 83, 45);
+	public static final Color STAR_LIST_GROUP_ENTRY_BACKGROUND = new Color(30, 30, 30);
+	public static final Color STAR_LIST_GROUP_ENTRY_BACKGROUND_HOVER = new Color(21, 29, 36);
 	public static final Color SCROLLBOX_BACKGROUND = new Color(38, 38, 38);
 	public static final Color ENTRY_IRRELEVANT_AREA = new Color(48, 48, 48);
-	public static final Color ENTRY_PANEL_WORLDBOX_BACKGROUND = new Color(41, 37, 36);
-	public static final Color ENTRY_PANEL_LABEL = new Color(168, 162, 158);
+	public static final Color STAR_LIST_GROUP_ENTRY_WORLBOX_BACKGROUND = new Color(41, 37, 36);
+	public static final Color STAR_LIST_GROUP_LABEL = new Color(168, 162, 158);
 
 	public static final String STAR_DEAD = "#fca5a5";
 	public static final String STAR_EXPIRING = "#fde047";

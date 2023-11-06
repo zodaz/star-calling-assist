@@ -6,5 +6,7 @@ public interface HeaderPanelDecorator
 {
 	boolean hasAuthorization();
 
+	OrderBy getOrderBy();
+
 	void onSortingChanged(OrderBy orderBy);
 }

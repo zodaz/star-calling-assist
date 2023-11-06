@@ -2,10 +2,10 @@ package com.starcallingassist.modules.sidepanel.panels;
 
 import com.starcallingassist.constants.PluginColors;
 import com.starcallingassist.events.WorldHopRequest;
-import com.starcallingassist.modules.sidepanel.decorators.StarListPanelDecorator;
+import com.starcallingassist.modules.sidepanel.decorators.StarListGroupDecorator;
+import com.starcallingassist.modules.sidepanel.decorators.StarListGroupEntryDecorator;
 import com.starcallingassist.modules.sidepanel.objects.StarListEntryAttributes;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -14,63 +14,38 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.MatteBorder;
 import lombok.Getter;
+import lombok.Setter;
 import net.runelite.client.ui.FontManager;
 
-public class StarListEntryPanel extends JPanel
+public class StarListGroupEntryPanel extends JPanel
 {
 	@Getter
 	private final StarListEntryAttributes attributes;
-	private final StarListPanelDecorator decorator;
-	private final JPanel titlePanel;
+	private final StarListGroupEntryDecorator entry;
+
+	@Setter
+	private StarListGroupDecorator group;
 	private final JPanel mainContentPanel;
 
-	public StarListEntryPanel(StarListEntryAttributes attributes, StarListPanelDecorator decorator)
+	public StarListGroupEntryPanel(StarListEntryAttributes attributes, StarListGroupEntryDecorator entry)
 	{
 		this.attributes = attributes;
-		this.decorator = decorator;
+		this.entry = entry;
 
 		setOpaque(false);
 		setLayout(new BorderLayout());
 
-		titlePanel = createTitlePanel();
 		mainContentPanel = createMainContentPanel();
-
-		setPanelColors(PluginColors.ENTRY_PANEL_BACKGROUND, PluginColors.ENTRY_PANEL_BORDER);
-
-		add(titlePanel, BorderLayout.NORTH);
-		add(mainContentPanel, BorderLayout.SOUTH);
+		mainContentPanel.setBackground(PluginColors.STAR_LIST_GROUP_ENTRY_BACKGROUND);
+		add(mainContentPanel);
 	}
 
-	private void setPanelColors(Color backgroundColor, Color borderColor)
-	{
-		if (attributes.isCurrentWorld())
-		{
-			borderColor = PluginColors.ENTRY_PANEL_BORDER_CURRENT_WORLD;
-		}
-
-		setBorder(new MatteBorder(2, 2, 2, 2, borderColor));
-		titlePanel.setBackground(borderColor);
-		titlePanel.setBorder(new MatteBorder(0, 1, 0, 0, borderColor));
-
-		mainContentPanel.setBackground(backgroundColor);
-	}
-
-	private JPanel createTitlePanel()
-	{
-		JPanel titlePanel = new JPanel(new BorderLayout());
-
-		JLabel locationLabel = createLocationColumn();
-		titlePanel.add(locationLabel, BorderLayout.WEST);
-
-		return titlePanel;
-	}
 
 	private JPanel createMainContentPanel()
 	{
 		JPanel mainContentPanel = new JPanel(new BorderLayout());
-		mainContentPanel.setBackground(PluginColors.ENTRY_PANEL_BACKGROUND);
+		mainContentPanel.setBackground(PluginColors.STAR_LIST_GROUP_ENTRY_BACKGROUND);
 		mainContentPanel.setBorder(new EmptyBorder(2, 2, 2, 2));
 
 		mainContentPanel.add(createWestPanel(), BorderLayout.WEST);
@@ -83,7 +58,7 @@ public class StarListEntryPanel extends JPanel
 			{
 				if (mouseEvent.getButton() == MouseEvent.BUTTON1 && mouseEvent.getClickCount() == 2)
 				{
-					decorator.onWorldHopRequest(new WorldHopRequest(attributes.getWorld()));
+					entry.onWorldHopRequest(new WorldHopRequest(attributes.getWorld()));
 				}
 			}
 
@@ -92,7 +67,8 @@ public class StarListEntryPanel extends JPanel
 			{
 				if (mouseEvent.getClickCount() == 2)
 				{
-					setPanelColors(mainContentPanel.getBackground().brighter(), titlePanel.getBackground().brighter());
+					group.onMousePressed();
+					mainContentPanel.setBackground(mainContentPanel.getBackground().brighter());
 				}
 			}
 
@@ -101,20 +77,23 @@ public class StarListEntryPanel extends JPanel
 			{
 				if (mouseEvent.getClickCount() == 2)
 				{
-					setPanelColors(mainContentPanel.getBackground().darker(), titlePanel.getBackground().darker());
+					group.onMouseReleased();
+					mainContentPanel.setBackground(mainContentPanel.getBackground().darker());
 				}
 			}
 
 			@Override
 			public void mouseEntered(MouseEvent mouseEvent)
 			{
-				setPanelColors(PluginColors.ENTRY_PANEL_BACKGROUND_HOVER, PluginColors.ENTRY_PANEL_BORDER_HOVER);
+				group.onMouseEntered();
+				mainContentPanel.setBackground(PluginColors.STAR_LIST_GROUP_ENTRY_BACKGROUND_HOVER);
 			}
 
 			@Override
 			public void mouseExited(MouseEvent mouseEvent)
 			{
-				setPanelColors(PluginColors.ENTRY_PANEL_BACKGROUND, PluginColors.ENTRY_PANEL_BORDER);
+				group.onMouseExited();
+				mainContentPanel.setBackground(PluginColors.STAR_LIST_GROUP_ENTRY_BACKGROUND);
 			}
 		});
 
@@ -130,15 +109,15 @@ public class StarListEntryPanel extends JPanel
 		JLabel worldPanel = new JLabel();
 		worldPanel.setLayout(new BorderLayout());
 		worldPanel.setOpaque(true);
-		worldPanel.setBackground(PluginColors.ENTRY_PANEL_WORLDBOX_BACKGROUND);
+		worldPanel.setBackground(PluginColors.STAR_LIST_GROUP_ENTRY_WORLBOX_BACKGROUND);
 		worldPanel.setHorizontalAlignment(SwingConstants.CENTER);
 		worldPanel.setVerticalAlignment(SwingConstants.CENTER);
 		worldPanel.setFont(FontManager.getRunescapeSmallFont());
 		worldPanel.setToolTipText(attributes.getWorldType());
 		worldPanel.setForeground(attributes.getWorldColor());
 
-		if ((decorator.showFoundByColumn() && decorator.showDeadTimeColumn()) ||
-			(decorator.showFoundByColumn() && decorator.showWorldTypeColumn())
+		if ((entry.showFoundByColumn() && entry.showDeadTimeColumn()) ||
+			(entry.showFoundByColumn() && entry.showWorldTypeColumn())
 		)
 		{
 			worldPanel.setText("<html><center>World<br>" + attributes.getWorld().getId() + "</center></html>");
@@ -168,9 +147,9 @@ public class StarListEntryPanel extends JPanel
 		JPanel bottomLine = new JPanel(new BorderLayout());
 		bottomLine.setOpaque(false);
 
-		if (decorator.showTierColumn())
+		if (entry.showTierColumn())
 		{
-			if (decorator.showFoundByColumn() || decorator.showDeadTimeColumn() || decorator.showWorldTypeColumn())
+			if (entry.showFoundByColumn() || entry.showDeadTimeColumn() || entry.showWorldTypeColumn())
 			{
 				topLine.add(createTierColumn(SwingConstants.LEFT), BorderLayout.WEST);
 			}
@@ -180,14 +159,14 @@ public class StarListEntryPanel extends JPanel
 			}
 		}
 
-		if (decorator.showFoundByColumn())
+		if (entry.showFoundByColumn())
 		{
 			topLine.add(createFoundByColumn(SwingConstants.RIGHT), BorderLayout.EAST);
 		}
 
-		if (decorator.showDeadTimeColumn())
+		if (entry.showDeadTimeColumn())
 		{
-			if (decorator.showTierColumn() && topLine.getComponentCount() == 1)
+			if (entry.showTierColumn() && topLine.getComponentCount() == 1)
 			{
 				topLine.add(createDeadTimeColumn(SwingConstants.RIGHT), BorderLayout.EAST);
 			}
@@ -197,13 +176,13 @@ public class StarListEntryPanel extends JPanel
 			}
 		}
 
-		if (decorator.showWorldTypeColumn())
+		if (entry.showWorldTypeColumn())
 		{
-			if (decorator.showTierColumn() && topLine.getComponentCount() == 1)
+			if (entry.showTierColumn() && topLine.getComponentCount() == 1)
 			{
 				topLine.add(createWorldTypeColumn(SwingConstants.RIGHT), BorderLayout.EAST);
 			}
-			else if (decorator.showDeadTimeColumn() && bottomLine.getComponentCount() == 1)
+			else if (entry.showDeadTimeColumn() && bottomLine.getComponentCount() == 1)
 			{
 				bottomLine.add(createWorldTypeColumn(SwingConstants.LEFT), BorderLayout.WEST);
 			}
@@ -228,15 +207,6 @@ public class StarListEntryPanel extends JPanel
 		}
 
 		return centerPanel;
-	}
-
-	private JLabel createLocationColumn()
-	{
-		JLabel locationLabel = new JLabel(attributes.getStar().getLocation().getName(), SwingConstants.CENTER);
-		locationLabel.setFont(FontManager.getRunescapeSmallFont());
-		locationLabel.setForeground(attributes.getAreaColor());
-
-		return locationLabel;
 	}
 
 	private JLabel createFoundByColumn(int textPosition)
@@ -295,9 +265,14 @@ public class StarListEntryPanel extends JPanel
 		columnLabel.setVerticalAlignment(SwingConstants.CENTER);
 		columnLabel.setHorizontalTextPosition(textPosition);
 		columnLabel.setFont(FontManager.getRunescapeSmallFont());
-		columnLabel.setForeground(PluginColors.ENTRY_PANEL_LABEL);
+		columnLabel.setForeground(PluginColors.STAR_LIST_GROUP_LABEL);
 		columnLabel.setText(text);
 
 		return columnLabel;
+	}
+
+	public String getGroupingTitle()
+	{
+		return attributes.getStar().getLocation().getName();
 	}
 }

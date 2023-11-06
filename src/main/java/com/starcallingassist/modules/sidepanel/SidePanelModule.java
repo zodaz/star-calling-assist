@@ -67,6 +67,7 @@ public class SidePanelModule extends PluginModuleContract
 		navButton.setOnClick(() -> dispatch(new NavButtonClicked(navButton)));
 
 		fetchWorldData();
+		sidePanel.setCurrentWorld(client.getWorld());
 	}
 
 	@Override
@@ -86,7 +87,7 @@ public class SidePanelModule extends PluginModuleContract
 	}
 
 	@Subscribe
-	public void onWorldChanged(WorldChanged state)
+	public void onWorldChanged(WorldChanged event)
 	{
 		sidePanel.setCurrentWorld(client.getWorld());
 		SwingUtilities.invokeLater(sidePanel::rebuild);

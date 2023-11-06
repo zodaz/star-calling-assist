@@ -20,6 +20,7 @@ public class HeaderPanel extends JPanel
 	private String errorMessage = "";
 
 	private final JPanel sortingPanel = new JPanel(new BorderLayout());
+	private final JComboBox<String> dropdown;
 
 	public HeaderPanel(HeaderPanelDecorator decorator)
 	{
@@ -32,8 +33,10 @@ public class HeaderPanel extends JPanel
 			BorderFactory.createEmptyBorder(3, 5, 1, 5)
 		));
 
+		dropdown = createSortingDropdown();
+
 		sortingPanel.setOpaque(false);
-		sortingPanel.add(createSortingDropdown(), BorderLayout.CENTER);
+		sortingPanel.add(dropdown, BorderLayout.CENTER);
 		sortingPanel.setBorder(new EmptyBorder(0, 0, 3, 0));
 	}
 
@@ -63,6 +66,8 @@ public class HeaderPanel extends JPanel
 
 	public void startUp()
 	{
+		dropdown.setSelectedItem(decorator.getOrderBy().getName());
+
 		rebuild();
 	}
 

@@ -5,7 +5,7 @@ import com.starcallingassist.events.WorldHopRequest;
 import com.starcallingassist.modules.sidepanel.enums.TotalLevelType;
 import java.util.List;
 
-public interface StarListPanelDecorator
+public interface StarListGroupEntryDecorator
 {
 	boolean hasAuthorization();
 

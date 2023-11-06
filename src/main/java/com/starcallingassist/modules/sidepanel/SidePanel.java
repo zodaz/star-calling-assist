@@ -8,7 +8,7 @@ import com.starcallingassist.enums.Region;
 import com.starcallingassist.events.WorldHopRequest;
 import com.starcallingassist.modules.sidepanel.decorators.HeaderPanelDecorator;
 import com.starcallingassist.modules.sidepanel.decorators.MasterPanelDecorator;
-import com.starcallingassist.modules.sidepanel.decorators.StarListPanelDecorator;
+import com.starcallingassist.modules.sidepanel.decorators.StarListGroupEntryDecorator;
 import com.starcallingassist.modules.sidepanel.enums.OrderBy;
 import com.starcallingassist.modules.sidepanel.enums.TotalLevelType;
 import com.starcallingassist.modules.sidepanel.panels.HeaderPanel;
@@ -40,7 +40,7 @@ public class SidePanel extends PluginPanel
 
 	private final HeaderPanel headerPanel;
 
-	private StarListPanel starTable;
+	private final StarListPanel starListPanel;
 
 	public SidePanel(MasterPanelDecorator decorator)
 	{
@@ -48,7 +48,7 @@ public class SidePanel extends PluginPanel
 		setLayout(new BorderLayout());
 		setBackground(PluginColors.SCROLLBOX_BACKGROUND);
 
-		starTable = new StarListPanel(new StarListPanelDecorator()
+		starListPanel = new StarListPanel(new StarListGroupEntryDecorator()
 		{
 
 			@Override
@@ -165,15 +165,21 @@ public class SidePanel extends PluginPanel
 			}
 
 			@Override
+			public OrderBy getOrderBy()
+			{
+				return config.orderBy();
+			}
+
+			@Override
 			public void onSortingChanged(OrderBy orderBy)
 			{
-				starTable.setOrderByColumn(orderBy);
-				starTable.rebuild();
+				starListPanel.setOrderByColumn(orderBy);
+				starListPanel.rebuild();
 			}
 		});
 
 		add(headerPanel, BorderLayout.NORTH);
-		add(starTable, BorderLayout.CENTER);
+		add(starListPanel, BorderLayout.CENTER);
 	}
 
 	private boolean hasAuthorization()
@@ -184,7 +190,7 @@ public class SidePanel extends PluginPanel
 	public void startUp()
 	{
 		headerPanel.startUp();
-		starTable.startUp();
+		starListPanel.startUp();
 	}
 
 	public void shutDown()
@@ -194,7 +200,7 @@ public class SidePanel extends PluginPanel
 
 	public void onStarUpdate(@Nonnull Star star, @Nonnull World world, long updatedAt, @Nonnull String playerName)
 	{
-		starTable.onStarUpdate(star, world, updatedAt, playerName);
+		starListPanel.onStarUpdate(star, world, updatedAt, playerName);
 	}
 
 	public void setErrorMessage(String errorMessage)
@@ -206,7 +212,7 @@ public class SidePanel extends PluginPanel
 	public void rebuild()
 	{
 		headerPanel.rebuild();
-		starTable.rebuild();
+		starListPanel.rebuild();
 
 		revalidate();
 		repaint();

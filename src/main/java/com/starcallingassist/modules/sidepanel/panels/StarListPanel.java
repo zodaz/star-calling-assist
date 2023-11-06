@@ -1,7 +1,7 @@
 package com.starcallingassist.modules.sidepanel.panels;
 
 import com.starcallingassist.constants.PluginColors;
-import com.starcallingassist.modules.sidepanel.decorators.StarListPanelDecorator;
+import com.starcallingassist.modules.sidepanel.decorators.StarListGroupEntryDecorator;
 import com.starcallingassist.modules.sidepanel.enums.OrderBy;
 import com.starcallingassist.modules.sidepanel.objects.StarListEntryAttributes;
 import com.starcallingassist.objects.Star;
@@ -38,11 +38,11 @@ public class StarListPanel extends JPanel
 	private final PluginErrorPanel noStarsPanel = new PluginErrorPanel();
 	private final JPanel starPanel = new JPanel();
 	public final JPanel starPanelContainer = new JPanel(cardLayout);
-	private final StarListPanelDecorator decorator;
+	private final StarListGroupEntryDecorator decorator;
 
 	public final ConcurrentHashMap<Integer, StarListEntryAttributes> announcementAttributes = new ConcurrentHashMap<>();
 
-	public StarListPanel(StarListPanelDecorator decorator)
+	public StarListPanel(StarListGroupEntryDecorator decorator)
 	{
 		super(false);
 		this.decorator = decorator;
@@ -89,7 +89,7 @@ public class StarListPanel extends JPanel
 		{
 			rebuildNoStarsPanel();
 
-			List<StarListEntryPanel> tableEntries = new ArrayList<>();
+			List<StarListGroupEntryPanel> tableEntries = new ArrayList<>();
 			for (StarListEntryAttributes announcementAttribute : announcementAttributes.values())
 			{
 				if (!announcementAttribute.shouldBeVisible())
@@ -97,7 +97,7 @@ public class StarListPanel extends JPanel
 					continue;
 				}
 
-				tableEntries.add(new StarListEntryPanel(announcementAttribute, decorator));
+				tableEntries.add(new StarListGroupEntryPanel(announcementAttribute, decorator));
 			}
 
 			if (tableEntries.isEmpty() || !decorator.hasAuthorization())
@@ -112,9 +112,28 @@ public class StarListPanel extends JPanel
 			starPanel.removeAll();
 			starPanel.add(Box.createVerticalStrut(4));
 
-			for (StarListEntryPanel entry : tableEntries)
+			StarListGroupPanel group = null;
+			for (StarListGroupEntryPanel entry : tableEntries)
 			{
-				starPanel.add(entry);
+				if (group != null && entry.getGroupingTitle().equals(group.getTitle()))
+				{
+					group.addEntry(entry);
+					continue;
+				}
+
+				if (group != null)
+				{
+					starPanel.add(group);
+					starPanel.add(Box.createVerticalStrut(4));
+				}
+
+				group = new StarListGroupPanel(entry.getGroupingTitle());
+				group.addEntry(entry);
+			}
+
+			if (group != null)
+			{
+				starPanel.add(group);
 				starPanel.add(Box.createVerticalStrut(4));
 			}
 
@@ -148,7 +167,7 @@ public class StarListPanel extends JPanel
 		);
 	}
 
-	private int sorter(StarListEntryPanel panelA, StarListEntryPanel panelB)
+	private int sorter(StarListGroupEntryPanel panelA, StarListGroupEntryPanel panelB)
 	{
 		StarListEntryAttributes a1 = panelA.getAttributes();
 		StarListEntryAttributes a2 = panelB.getAttributes();
