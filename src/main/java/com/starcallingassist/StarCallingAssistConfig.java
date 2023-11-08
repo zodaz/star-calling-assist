@@ -91,10 +91,22 @@ public interface StarCallingAssistConfig extends Config
 		return false;
 	}
 
+	@ConfigItem(
+		keyName = "scoutOverlay",
+		name = "Scout Overlay",
+		description = "Enables an overlay which shows the tiles used to scout stars easily.",
+		position = 7,
+		section = scoutingSection
+	)
+	default boolean scoutOverlay()
+	{
+		return false;
+	}
+
 	@ConfigSection(
 		name = "Display Settings",
 		description = "Settings to configure the layout of active stars within the side panel.",
-		position = 7,
+		position = 8,
 		closedByDefault = true
 	)
 	String displaySection = "Display Settings";
@@ -103,7 +115,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = "showTier",
 		name = "Show Tier",
 		description = "Displays the current tier of the star in the list.",
-		position = 8,
+		position = 9,
 		section = displaySection
 	)
 	default boolean showTier()
@@ -115,7 +127,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = "showFoundBy",
 		name = "Show Found By",
 		description = "Displays the name of the player who first discovered the star in the list.",
-		position = 9,
+		position = 10,
 		section = displaySection
 	)
 	default boolean showFoundBy()
@@ -127,7 +139,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = "showDeadTime",
 		name = "Show Death Time Estimate",
 		description = "Displays the estimated time (in minutes) until the star is dead.",
-		position = 10,
+		position = 11,
 		section = displaySection
 	)
 	default boolean showDeadTime()
@@ -139,7 +151,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = "showWorldType",
 		name = "Show World Type",
 		description = "Displays the world type (e.g. PvP, 2200 total) in the list.",
-		position = 11,
+		position = 12,
 		section = displaySection
 	)
 	default boolean showWorldType()
@@ -151,7 +163,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = "logLevel",
 		name = "Chat Log Level",
 		description = "To what extent you want to see log messages from the plugin in the game chat.",
-		position = 12,
+		position = 13,
 		section = displaySection
 	)
 	default ChatLogLevel logLevel()
@@ -163,7 +175,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = "orderBy",
 		name = "Default Sorting",
 		description = "In what order you want the stars to be sorted in the side-panel by default.",
-		position = 13,
+		position = 14,
 		section = displaySection
 	)
 	default OrderBy orderBy()
@@ -175,7 +187,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = "estimateTier",
 		name = "Use estimated tiers",
 		description = "Estimates the current tier of stars in the list, instead of showing the last known tier.",
-		position = 14,
+		position = 15,
 		section = displaySection
 	)
 	default boolean estimateTier()
@@ -186,7 +198,7 @@ public interface StarCallingAssistConfig extends Config
 	@ConfigSection(
 		name = "Star Filters",
 		description = "Settings to filter out certain stars.",
-		position = 15,
+		position = 16,
 		closedByDefault = true
 	)
 	String starSection = "Star Filters";
@@ -195,7 +207,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = "minTier",
 		name = "Minimum Tier",
 		description = "Lowest tier of stars to be displayed in the side-panel.",
-		position = 16,
+		position = 17,
 		section = starSection
 	)
 	@Range(
@@ -211,7 +223,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = "maxTier",
 		name = "Maximum Tier",
 		description = "Highest tier of stars to be displayed in the side-panel.",
-		position = 17,
+		position = 18,
 		section = starSection
 	)
 	@Range(
@@ -227,7 +239,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = "minDeadTime",
 		name = "Minimum Dead Time",
 		description = "Hides stars that are estimated to be depleted in less than the specified amount of minutes",
-		position = 18,
+		position = 19,
 		section = starSection
 	)
 	@Range(
@@ -245,7 +257,7 @@ public interface StarCallingAssistConfig extends Config
 	@ConfigSection(
 		name = "World Filters",
 		description = "Settings to filter out certain worlds.",
-		position = 19,
+		position = 20,
 		closedByDefault = true
 	)
 	String worldSection = "World Filters";
@@ -254,7 +266,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = "showF2P",
 		name = "Show Free-to-Play",
 		description = "Show or hide f2p worlds.",
-		position = 20,
+		position = 21,
 		section = worldSection
 	)
 	default boolean showF2P()
@@ -266,7 +278,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = "showMembers",
 		name = "Show Members",
 		description = "Show or hide members worlds.",
-		position = 21,
+		position = 22,
 		section = worldSection
 	)
 	default boolean showMembers()
@@ -278,7 +290,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = "showPvp",
 		name = "Show PvP",
 		description = "Show or hide PvP worlds.",
-		position = 22,
+		position = 23,
 		section = worldSection
 	)
 	default boolean showPvp()
@@ -290,7 +302,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = "showHighRisk",
 		name = "Show High-Risk PvP",
 		description = "Show or hide high-risk PvP worlds.",
-		position = 23,
+		position = 24,
 		section = worldSection
 	)
 	default boolean showHighRisk()
@@ -302,7 +314,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = "totalLevelType",
 		name = "Max total world",
 		description = "Hides worlds with a total level requirement higher than this.",
-		position = 24,
+		position = 25,
 		section = worldSection
 	)
 	default TotalLevelType totalLevelType()
@@ -313,7 +325,7 @@ public interface StarCallingAssistConfig extends Config
 	@ConfigSection(
 		name = "Region Filters",
 		description = "Settings to filter out stars in certain regions.",
-		position = 25,
+		position = 26,
 		closedByDefault = true
 	)
 	String regionSection = "Region Filters";
@@ -322,7 +334,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_ASGARNIA,
 		name = "Asgarnia",
 		description = "Show or hide this region.",
-		position = 26,
+		position = 27,
 		section = regionSection
 	)
 	default boolean asgarnia()
@@ -334,7 +346,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_KARAMJA,
 		name = "Crandor/Karamja",
 		description = "Show or hide this region.",
-		position = 27,
+		position = 28,
 		section = regionSection
 	)
 	default boolean karamja()
@@ -346,7 +358,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_FELDIP,
 		name = "Feldip Hills/Isle Of Souls",
 		description = "Show or hide this region.",
-		position = 28,
+		position = 29,
 		section = regionSection
 	)
 	default boolean feldip()
@@ -358,7 +370,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_FOSSIL,
 		name = "Fossil Island/Mos Le Harmless",
 		description = "Show or hide this region.",
-		position = 29,
+		position = 30,
 		section = regionSection
 	)
 	default boolean fossil()
@@ -370,7 +382,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_FREMMENIK,
 		name = "Fremmenik/Lunar Isle",
 		description = "Show or hide this region.",
-		position = 30,
+		position = 31,
 		section = regionSection
 	)
 	default boolean fremmenik()
@@ -382,7 +394,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_KOUREND,
 		name = "Kourend",
 		description = "Show or hide this region.",
-		position = 31,
+		position = 32,
 		section = regionSection
 	)
 	default boolean kourend()
@@ -394,7 +406,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_KANDARIN,
 		name = "Kandarin",
 		description = "Show or hide this region.",
-		position = 32,
+		position = 33,
 		section = regionSection
 	)
 	default boolean kandarin()
@@ -406,7 +418,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_KEBOS,
 		name = "Kebos Lowlands",
 		description = "Show or hide this region.",
-		position = 33,
+		position = 34,
 		section = regionSection
 	)
 	default boolean kebos()
@@ -418,7 +430,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_DESERT,
 		name = "Desert",
 		description = "Show or hide this region.",
-		position = 34,
+		position = 35,
 		section = regionSection
 	)
 	default boolean desert()
@@ -430,7 +442,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_MISTHALIN,
 		name = "Misthalin",
 		description = "Show or hide this region.",
-		position = 35,
+		position = 36,
 		section = regionSection
 	)
 	default boolean misthalin()
@@ -442,7 +454,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_MORYTANIA,
 		name = "Morytania",
 		description = "Show or hide this region.",
-		position = 36,
+		position = 37,
 		section = regionSection
 	)
 	default boolean morytania()
@@ -454,7 +466,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_GNOME,
 		name = "Piscatoris/Gnome Stronghold",
 		description = "Show or hide this region.",
-		position = 37,
+		position = 38,
 		section = regionSection
 	)
 	default boolean gnome()
@@ -466,7 +478,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_TIRANNWN,
 		name = "Tirannwn",
 		description = "Show or hide this region.",
-		position = 38,
+		position = 39,
 		section = regionSection
 	)
 	default boolean tirannwn()
@@ -478,7 +490,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_WILDERNESS,
 		name = "Wilderness",
 		description = "Show or hide this region.",
-		position = 39,
+		position = 40,
 		section = regionSection
 	)
 	default boolean wilderness()
@@ -490,7 +502,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_UNKNOWN,
 		name = "Unknown / Unconfirmed",
 		description = "Show or hide stars that haven't been confirmed / mapped to a region yet.",
-		position = 40,
+		position = 41,
 		section = regionSection
 	)
 	default boolean unknown()

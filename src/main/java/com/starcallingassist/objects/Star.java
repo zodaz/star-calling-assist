@@ -28,12 +28,12 @@ public class Star
 		this.tier = tier;
 	}
 
-	public Star(Integer world, WorldPoint location, Integer tier)
+	public Star(Integer world, @Nonnull WorldPoint location, Integer tier)
 	{
 		this(world, new StarLocation(location), tier);
 	}
 
-	public Star(Integer world, WorldPoint location)
+	public Star(Integer world, @Nonnull WorldPoint location)
 	{
 		this(world, location, null);
 	}

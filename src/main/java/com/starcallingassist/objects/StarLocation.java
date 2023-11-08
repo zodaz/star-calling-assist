@@ -4,6 +4,7 @@ import com.starcallingassist.enums.Region;
 import java.awt.Point;
 import java.util.HashMap;
 import java.util.Map;
+import javax.annotation.Nonnull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import net.runelite.api.coords.WorldArea;
@@ -19,7 +20,7 @@ public class StarLocation
 		private Region region;
 	}
 
-	private static final Map<Point, StarLocationDetails> LOCATION_NAMES = new HashMap<Point, StarLocationDetails>()
+	public static final Map<Point, StarLocationDetails> LOCATIONS = new HashMap<Point, StarLocationDetails>()
 	{
 		{
 			put(new Point(2974, 3241), new StarLocationDetails("Rimmington mine", Region.ASGARNIA));
@@ -126,7 +127,7 @@ public class StarLocation
 		}
 
 		originalInputName = location;
-		point = LOCATION_NAMES.entrySet()
+		point = LOCATIONS.entrySet()
 			.stream()
 			.filter(entry -> entry.getValue().getName().equalsIgnoreCase(location))
 			.map(Map.Entry::getKey)
@@ -134,17 +135,14 @@ public class StarLocation
 			.orElse(null);
 	}
 
-	public StarLocation(WorldPoint location)
+	public StarLocation(Point point)
 	{
-		if (location == null)
-		{
-			return;
-		}
+		this.point = point;
+	}
 
-		point = new Point(
-			location.getX(),
-			location.getY()
-		);
+	public StarLocation(@Nonnull WorldPoint location)
+	{
+		this(new Point(location.getX(), location.getY()));
 	}
 
 	public WorldPoint getWorldPoint()
@@ -187,7 +185,7 @@ public class StarLocation
 			return null;
 		}
 
-		StarLocationDetails location = LOCATION_NAMES.get(point);
+		StarLocationDetails location = LOCATIONS.get(point);
 		if (location == null)
 		{
 			return this.point.x + "," + this.point.y;
@@ -203,7 +201,7 @@ public class StarLocation
 			return Region.UNKNOWN;
 		}
 
-		StarLocationDetails location = LOCATION_NAMES.get(point);
+		StarLocationDetails location = LOCATIONS.get(point);
 		if (location == null)
 		{
 			return Region.UNKNOWN;

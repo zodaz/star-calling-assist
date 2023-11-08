@@ -7,6 +7,7 @@ import com.starcallingassist.modules.callButton.CallButtonModule;
 import com.starcallingassist.modules.crowdsourcing.AnnouncementModule;
 import com.starcallingassist.modules.crowdsourcing.BroadcastModule;
 import com.starcallingassist.modules.logging.ChatLoggerModule;
+import com.starcallingassist.modules.scout.ScoutModule;
 import com.starcallingassist.modules.sidepanel.SidePanelModule;
 import com.starcallingassist.modules.starobserver.StarObserverModule;
 import com.starcallingassist.modules.worldhop.WorldHopModule;
@@ -48,6 +49,7 @@ public class StarCallingAssistPlugin extends Plugin
 		BroadcastModule.class,
 		AnnouncementModule.class,
 		ChatLoggerModule.class,
+		ScoutModule.class,
 		SidePanelModule.class,
 		StarObserverModule.class,
 		WorldHopModule.class

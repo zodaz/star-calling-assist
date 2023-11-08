@@ -6,10 +6,8 @@ import com.starcallingassist.objects.StarLocation;
 import javax.annotation.Nonnull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 
 @AllArgsConstructor
-@Slf4j
 public class AnnouncedStar
 {
 	@Getter
