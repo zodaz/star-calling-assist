@@ -112,15 +112,15 @@ public class StarObserverModule extends PluginModuleContract
 			return;
 		}
 
-		// When the player leaves the area, the updatedStar object will automatically despawn.
+		// When the player leaves the area, the star object will automatically despawn.
 		// We will ignore these objects, since we can't rely on them being accurate.
 		if (!isStarWithinRenderDistance(lastKnownStar))
 		{
 			return;
 		}
 
-		// When a spawn tier is exhausted, it despawns, and a updatedStar of the next tier spawns in its place.
-		// Only when the despawned updatedStar was a tier 1, we can consider this a depleted updatedStar.
+		// When a spawn tier is exhausted, it despawns, and a star of the next tier spawns in its place.
+		// Only when the despawned star was a tier 1, we can consider this a depleted star.
 		if (lastKnownStar.getTier() > 1)
 		{
 			return;
