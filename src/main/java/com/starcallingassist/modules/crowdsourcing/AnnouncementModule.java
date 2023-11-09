@@ -12,11 +12,13 @@ import com.starcallingassist.events.AnnouncementsRefreshed;
 import com.starcallingassist.events.NavButtonClicked;
 import com.starcallingassist.events.PluginConfigChanged;
 import com.starcallingassist.modules.crowdsourcing.objects.AnnouncedStar;
+import com.starcallingassist.objects.Star;
 import com.starcallingassist.services.HttpService;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import javax.swing.SwingUtilities;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.AnimationID;
@@ -210,6 +212,8 @@ public class AnnouncementModule extends PluginModuleContract
 						return;
 					}
 
+					List<Integer> outdatedWorlds = new ArrayList<>(stars.keySet());
+
 					try
 					{
 						JsonArray array = gson.fromJson(body.string(), JsonArray.class);
@@ -230,6 +234,7 @@ public class AnnouncementModule extends PluginModuleContract
 							}
 
 							Integer world = announcedStar.getStar().getWorld();
+							outdatedWorlds.remove(world);
 
 							AnnouncedStar existingAnnouncement = stars.get(world);
 							if (existingAnnouncement != null && !announcedStar.isSuccessorTo(existingAnnouncement))
@@ -238,7 +243,6 @@ public class AnnouncementModule extends PluginModuleContract
 							}
 
 							stars.put(world, announcedStar);
-							announcementsLastRefreshedAt = System.currentTimeMillis();
 							dispatch(new AnnouncementReceived(announcedStar));
 						}
 					}
@@ -250,6 +254,22 @@ public class AnnouncementModule extends PluginModuleContract
 						return;
 					}
 
+					outdatedWorlds.forEach(world -> {
+						AnnouncedStar outdated = stars.remove(world);
+						AnnouncedStar deadStarAnnouncement = new AnnouncedStar(
+							new Star(
+								outdated.getStar().getWorld(),
+								outdated.getStar().getLocation(),
+								null
+							),
+							System.currentTimeMillis() / 1000L,
+							outdated.getPlayerName()
+						);
+
+						dispatch(new AnnouncementReceived(deadStarAnnouncement));
+					});
+
+					announcementsLastRefreshedAt = System.currentTimeMillis();
 					dispatch(new AnnouncementsRefreshed(new ArrayList<>(stars.values())));
 					res.close();
 					isRefreshing = false;
