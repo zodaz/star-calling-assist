@@ -23,6 +23,10 @@ public class PluginColors
 	public static final Color STAR_LIST_GROUP_ENTRY_WORLBOX_BACKGROUND = new Color(41, 37, 36);
 	public static final Color STAR_LIST_GROUP_LABEL = new Color(168, 162, 158);
 
+	public static final Color SCOUT_BOUNDS_COLOR_UNSCOUTABLE = new Color(255, 0, 0);
+	public static final Color SCOUT_BOUNDS_COLOR_SCOUTABLE = new Color(2, 132, 199);
+	public static final Color SCOUT_BOUNDS_COLOR_SCOUTED = new Color(0, 255, 0);
+
 	public static final String STAR_DEAD = "#fca5a5";
 	public static final String STAR_EXPIRING = "#fde047";
 	public static final String STAR_HEALTHY = "#bef264";

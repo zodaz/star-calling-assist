@@ -2,26 +2,36 @@ package com.starcallingassist.modules.starobserver;
 
 import com.google.inject.Inject;
 import com.starcallingassist.PluginModuleContract;
+import com.starcallingassist.StarCallingAssistConfig;
+import com.starcallingassist.events.AnnouncementReceived;
 import com.starcallingassist.events.StarAbandoned;
 import com.starcallingassist.events.StarApproached;
 import com.starcallingassist.events.StarDepleted;
-import com.starcallingassist.events.StarDiscovered;
+import com.starcallingassist.events.StarMissing;
+import com.starcallingassist.events.StarRegionScouted;
+import com.starcallingassist.events.StarScouted;
 import com.starcallingassist.events.StarTierChanged;
+import com.starcallingassist.events.WorldStarUpdated;
 import com.starcallingassist.objects.Star;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nonnull;
-import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
 import net.runelite.api.ObjectID;
+import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.coords.WorldArea;
 import net.runelite.api.events.GameObjectDespawned;
 import net.runelite.api.events.GameObjectSpawned;
 import net.runelite.api.events.GameTick;
+import net.runelite.api.events.WorldChanged;
 import net.runelite.client.eventbus.Subscribe;
 
-@Slf4j
 public class StarObserverModule extends PluginModuleContract
 {
+	@Inject
+	private StarCallingAssistConfig config;
+
 	@Inject
 	private Client client;
 
@@ -37,13 +47,19 @@ public class StarObserverModule extends PluginModuleContract
 		ObjectID.CRASHED_STAR,
 	};
 
-	private Star trackedStar = null;
+	public final ConcurrentHashMap<Integer, Star> currentStars = new ConcurrentHashMap<>();
+
 	private boolean isNearStar = false;
+
+	@Override
+	public void startUp()
+	{
+		dispatch(new WorldStarUpdated(currentStars.get(client.getWorld())));
+	}
 
 	@Override
 	public void shutDown()
 	{
-		trackedStar = null;
 		isNearStar = false;
 	}
 
@@ -56,19 +72,22 @@ public class StarObserverModule extends PluginModuleContract
 			return;
 		}
 
-		Star nearbyStar = new Star(client.getWorld(), gameObject.getWorldLocation(), calculateStarTier(gameObject));
-		if (trackedStar == null || !nearbyStar.isSameAs(trackedStar))
+		Star observedStar = new Star(client.getWorld(), gameObject.getWorldLocation(), calculateStarTier(gameObject));
+		Star lastKnownStar = currentStars.get(observedStar.getWorld());
+
+		if (lastKnownStar == null || !observedStar.isSameAs(lastKnownStar))
 		{
-			trackedStar = nearbyStar;
-			isNearStar = false;
-			dispatch(new StarDiscovered(nearbyStar));
+			currentStars.put(observedStar.getWorld(), observedStar);
+			dispatch(new StarScouted(observedStar));
+			dispatch(new WorldStarUpdated(observedStar));
 			return;
 		}
 
-		if (!Objects.equals(nearbyStar.getTier(), trackedStar.getTier()))
+		if (!Objects.equals(observedStar.getTier(), lastKnownStar.getTier()))
 		{
-			trackedStar = nearbyStar;
-			dispatch(new StarTierChanged(nearbyStar));
+			currentStars.put(observedStar.getWorld(), observedStar);
+			dispatch(new StarTierChanged(observedStar));
+			dispatch(new WorldStarUpdated(observedStar));
 		}
 	}
 
@@ -76,50 +95,110 @@ public class StarObserverModule extends PluginModuleContract
 	public void onGameObjectDespawned(GameObjectDespawned event)
 	{
 		GameObject despawnedGameObject = event.getGameObject();
-		if (trackedStar == null || !isValidStarObject(despawnedGameObject))
+		if (!isValidStarObject(despawnedGameObject))
+		{
+			return;
+		}
+
+		Star lastKnownStar = currentStars.get(client.getWorld());
+		if (lastKnownStar == null)
 		{
 			return;
 		}
 
 		Star despawnedStar = new Star(client.getWorld(), despawnedGameObject.getWorldLocation());
-		if (!despawnedStar.isSameAs(trackedStar))
+		if (!despawnedStar.isSameAs(lastKnownStar))
 		{
 			return;
 		}
 
-		// When the player leaves the area, the star object will automatically despawn.
+		// When the player leaves the area, the updatedStar object will automatically despawn.
 		// We will ignore these objects, since we can't rely on them being accurate.
-		if (!isStarWithinRenderDistance(trackedStar))
+		if (!isStarWithinRenderDistance(lastKnownStar))
 		{
 			return;
 		}
 
-		// When a spawn tier is exhausted, it despawns, and a star of the next tier spawns in its place.
-		// Only when the despawned star was a tier 1, we can consider this a depleted star.
-		if (trackedStar.getTier() > 1)
+		// When a spawn tier is exhausted, it despawns, and a updatedStar of the next tier spawns in its place.
+		// Only when the despawned updatedStar was a tier 1, we can consider this a depleted updatedStar.
+		if (lastKnownStar.getTier() > 1)
 		{
 			return;
 		}
 
-		trackedStar = despawnedStar;
-		isNearStar = false;
+		currentStars.remove(lastKnownStar.getWorld());
 		dispatch(new StarDepleted(despawnedStar));
+		dispatch(new WorldStarUpdated(null));
+		isNearStar = false;
 	}
 
 	@Subscribe
-	protected void onGameTick(GameTick event)
+	public void onAnnouncementReceived(AnnouncementReceived event)
 	{
-		if (trackedStar == null || trackedStar.getTier() == null)
+		Star updatedStar = event.getAnnouncement().getStar();
+		if (client.getWorld() == updatedStar.getWorld())
+		{
+			updateCurrentStarForCurrentWorld(updatedStar);
+		}
+		else
+		{
+			updateCurrentStarForOtherWorlds(updatedStar);
+		}
+	}
+
+	@Subscribe
+	public void onStarRegionScouted(StarRegionScouted event)
+	{
+		Star star = currentStars.get(client.getWorld());
+		if (star == null)
 		{
 			return;
 		}
 
-		if (trackedStar.getWorld() == client.getWorld() && isStarWithinRenderDistance(trackedStar))
+		if (!Objects.equals(event.getLocation().getWorldPoint(), star.getLocation().getWorldPoint()))
+		{
+			return;
+		}
+
+		LocalPoint lp = LocalPoint.fromWorld(client, star.getLocation().getWorldPoint());
+		if (lp == null)
+		{
+			return;
+		}
+
+		GameObject[] objects = client.getScene().getTiles()[client.getPlane()][lp.getSceneX()][lp.getSceneY()].getGameObjects();
+		if (objects == null)
+		{
+			return;
+		}
+
+		for (GameObject object : objects)
+		{
+			if (isValidStarObject(object))
+			{
+				return;
+			}
+		}
+
+		dispatch(new StarMissing(star));
+		currentStars.remove(star.getWorld());
+	}
+
+	@Subscribe
+	public void onGameTick(GameTick event)
+	{
+		Star star = currentStars.get(client.getWorld());
+		if (star == null)
+		{
+			return;
+		}
+
+		if (isStarWithinRenderDistance(star))
 		{
 			if (!isNearStar)
 			{
 				isNearStar = true;
-				dispatch(new StarApproached(trackedStar));
+				dispatch(new StarApproached(star));
 			}
 
 			return;
@@ -128,7 +207,61 @@ public class StarObserverModule extends PluginModuleContract
 		if (isNearStar)
 		{
 			isNearStar = false;
-			dispatch(new StarAbandoned(trackedStar));
+			dispatch(new StarAbandoned(star));
+		}
+	}
+
+	@Subscribe
+	public void onWorldChanged(WorldChanged event)
+	{
+		dispatch(new WorldStarUpdated(currentStars.get(client.getWorld())));
+	}
+
+	private void updateCurrentStarForOtherWorlds(Star updatedStar)
+	{
+		if (updatedStar.getTier() == null)
+		{
+			currentStars.remove(updatedStar.getWorld());
+		}
+		else
+		{
+			currentStars.put(updatedStar.getWorld(), updatedStar);
+		}
+	}
+
+	private void updateCurrentStarForCurrentWorld(Star updatedStar)
+	{
+		Star existingStar = currentStars.get(client.getWorld());
+		if (existingStar == null && updatedStar.getTier() == null)
+		{
+			return;
+		}
+
+		if (existingStar == null)
+		{
+			currentStars.put(updatedStar.getWorld(), updatedStar);
+			dispatch(new WorldStarUpdated(updatedStar));
+			return;
+		}
+
+		if (!existingStar.isSameAs(updatedStar))
+		{
+			currentStars.put(updatedStar.getWorld(), updatedStar);
+			dispatch(new WorldStarUpdated(updatedStar));
+			return;
+		}
+
+		if (updatedStar.getTier() == null)
+		{
+			currentStars.remove(updatedStar.getWorld());
+			dispatch(new WorldStarUpdated(null));
+			return;
+		}
+
+		if (existingStar.getTier() > updatedStar.getTier())
+		{
+			currentStars.put(updatedStar.getWorld(), updatedStar);
+			dispatch(new WorldStarUpdated(updatedStar));
 		}
 	}
 
@@ -157,6 +290,13 @@ public class StarObserverModule extends PluginModuleContract
 
 	private boolean isStarWithinRenderDistance(@Nonnull Star star)
 	{
-		return star.getLocation().getWorldArea().distanceTo(client.getLocalPlayer().getWorldLocation()) <= 13;
+		WorldArea worldArea = star.getLocation().getWorldArea();
+
+		if (worldArea == null)
+		{
+			return false;
+		}
+
+		return worldArea.distanceTo(client.getLocalPlayer().getWorldLocation()) <= 13;
 	}
 }

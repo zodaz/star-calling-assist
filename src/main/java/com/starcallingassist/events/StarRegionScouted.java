@@ -1,13 +1,13 @@
 package com.starcallingassist.events;
 
 
-import com.starcallingassist.objects.Star;
+import com.starcallingassist.objects.StarLocation;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @AllArgsConstructor
-public class StarDiscovered
+public class StarRegionScouted
 {
 	@Getter
-	private final Star star;
+	private final StarLocation location;
 }

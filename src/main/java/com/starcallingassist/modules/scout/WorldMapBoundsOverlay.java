@@ -56,8 +56,8 @@ class WorldMapBoundsOverlay extends Overlay
 		Rectangle worldMapRect = map.getBounds();
 		graphics.setClip(worldMapRect);
 
-		module.getLocations().forEach(location -> {
-			WorldArea bounds = location.scoutableBounds();
+		module.getLocations().forEach((location, state) -> {
+			WorldArea bounds = location.getScoutableBounds();
 			if (bounds == null)
 			{
 				return;
@@ -83,7 +83,8 @@ class WorldMapBoundsOverlay extends Overlay
 			bottomLeft = bottomLeft == null ? new Point(mapRectX, mapRectY + mapRectHeight) : bottomLeft;
 			bottomRight = bottomRight == null ? new Point(mapRectX + mapRectWidth, mapRectY + mapRectHeight) : bottomRight;
 
-			graphics.setColor(new Color(2, 132, 199, (50 * 255 / 100)));
+			Color stateColor = state.getColor();
+			graphics.setColor(new Color(stateColor.getRed(), stateColor.getGreen(), stateColor.getBlue(), (50 * 255 / 100)));
 			graphics.fillRect(
 				bottomLeft.getX(),
 				bottomLeft.getY(),
@@ -91,7 +92,7 @@ class WorldMapBoundsOverlay extends Overlay
 				topRight.getY() - bottomLeft.getY()
 			);
 
-			graphics.setColor(new Color(2, 132, 199));
+			graphics.setColor(stateColor);
 			graphics.setStroke(new BasicStroke(2));
 			graphics.drawLine(topLeft.getX(), topLeft.getY(), topRight.getX(), topRight.getY());
 			graphics.drawLine(topLeft.getX(), topLeft.getY(), bottomLeft.getX(), bottomLeft.getY());

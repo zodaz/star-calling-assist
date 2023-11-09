@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import javax.swing.SwingUtilities;
-import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.AnimationID;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
@@ -32,7 +31,6 @@ import okhttp3.Callback;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
-@Slf4j
 public class AnnouncementModule extends PluginModuleContract
 {
 	@Inject
@@ -132,12 +130,6 @@ public class AnnouncementModule extends PluginModuleContract
 		{
 			SwingUtilities.invokeLater(this::refreshAnnouncements);
 		}
-	}
-
-	@Subscribe
-	public void onAnnouncementRefreshFailed(AnnouncementRefreshFailed event)
-	{
-		log.debug("Announcement refresh failed: {}", event.getMessage());
 	}
 
 	private void autoRefresh(int seconds)

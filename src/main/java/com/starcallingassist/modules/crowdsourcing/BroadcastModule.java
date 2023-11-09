@@ -12,7 +12,8 @@ import com.starcallingassist.events.PluginConfigChanged;
 import com.starcallingassist.events.StarAbandoned;
 import com.starcallingassist.events.StarApproached;
 import com.starcallingassist.events.StarDepleted;
-import com.starcallingassist.events.StarDiscovered;
+import com.starcallingassist.events.StarMissing;
+import com.starcallingassist.events.StarScouted;
 import com.starcallingassist.events.StarTierChanged;
 import com.starcallingassist.modules.crowdsourcing.objects.CallStarPayload;
 import com.starcallingassist.objects.Star;
@@ -80,7 +81,7 @@ public class BroadcastModule extends PluginModuleContract
 	}
 
 	@Subscribe
-	public void onStarDiscovered(StarDiscovered event)
+	public void onStarScouted(StarScouted event)
 	{
 		currentStar = event.getStar();
 		currentStarApproached = false;
@@ -135,6 +136,18 @@ public class BroadcastModule extends PluginModuleContract
 	}
 
 	@Subscribe
+	public void onStarMissing(StarMissing event)
+	{
+		if (config.autoCall())
+		{
+			attemptBroadcast(
+				new Star(event.getStar().getWorld(), event.getStar().getLocation().getWorldPoint()),
+				"dead"
+			);
+		}
+	}
+
+	@Subscribe
 	public void onManualStarPresenceBroadcastRequested(ManualStarPresenceBroadcastRequested event)
 	{
 		if (currentStar == null)
@@ -153,7 +166,6 @@ public class BroadcastModule extends PluginModuleContract
 			currentStar,
 			currentStar.getTier() == null ? "dead" : currentStar.getLocation().getName()
 		);
-
 	}
 
 	@Subscribe

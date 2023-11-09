@@ -7,10 +7,10 @@ import com.starcallingassist.modules.callButton.CallButtonModule;
 import com.starcallingassist.modules.crowdsourcing.AnnouncementModule;
 import com.starcallingassist.modules.crowdsourcing.BroadcastModule;
 import com.starcallingassist.modules.logging.ChatLoggerModule;
+import com.starcallingassist.modules.overlay.OverlayModule;
 import com.starcallingassist.modules.scout.ScoutModule;
 import com.starcallingassist.modules.sidepanel.SidePanelModule;
 import com.starcallingassist.modules.starobserver.StarObserverModule;
-import com.starcallingassist.modules.startracker.StarTrackerModule;
 import com.starcallingassist.modules.worldhop.WorldHopModule;
 import java.lang.reflect.InvocationTargetException;
 import java.time.temporal.ChronoUnit;
@@ -49,11 +49,11 @@ public class StarCallingAssistPlugin extends Plugin
 		CallButtonModule.class,
 		BroadcastModule.class,
 		AnnouncementModule.class,
+		OverlayModule.class,
 		ChatLoggerModule.class,
 		ScoutModule.class,
 		SidePanelModule.class,
 		StarObserverModule.class,
-		StarTrackerModule.class,
 		WorldHopModule.class
 	));
 

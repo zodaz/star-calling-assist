@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @AllArgsConstructor
-public class StarTierChanged
+public class StarMissing
 {
 	@Getter
 	private final Star star;

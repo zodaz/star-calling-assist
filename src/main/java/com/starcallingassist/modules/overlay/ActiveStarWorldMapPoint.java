@@ -1,12 +1,11 @@
-package com.starcallingassist.modules.startracker;
+package com.starcallingassist.modules.overlay;
 
 import com.starcallingassist.objects.Star;
-import com.starcallingassist.objects.StarLocation;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPoint;
 
 public class ActiveStarWorldMapPoint extends WorldMapPoint
 {
-	public ActiveStarWorldMapPoint(StarTrackerModule module, Star star)
+	public ActiveStarWorldMapPoint(OverlayModule module, Star star)
 	{
 		super(star.getLocation().getWorldPoint(), module.getStarActiveLocationImage());
 

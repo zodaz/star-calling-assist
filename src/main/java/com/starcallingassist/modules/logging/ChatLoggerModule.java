@@ -8,8 +8,11 @@ import com.starcallingassist.events.LogMessage;
 import com.starcallingassist.events.StarAbandoned;
 import com.starcallingassist.events.StarApproached;
 import com.starcallingassist.events.StarDepleted;
-import com.starcallingassist.events.StarDiscovered;
+import com.starcallingassist.events.StarMissing;
+import com.starcallingassist.events.StarRegionScouted;
+import com.starcallingassist.events.StarScouted;
 import com.starcallingassist.events.StarTierChanged;
+import com.starcallingassist.events.WorldStarUpdated;
 import net.runelite.api.ChatMessageType;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.chat.ChatColorType;
@@ -30,13 +33,9 @@ public class ChatLoggerModule extends PluginModuleContract
 	private StarCallingAssistConfig config;
 
 	@Subscribe
-	public void onStarDiscovered(StarDiscovered event)
+	public void onStarAbandoned(StarAbandoned event)
 	{
-		dispatch(new LogMessage(String.format(
-			"You've discovered a *T%d* star near *%s*!",
-			event.getStar().getTier(),
-			event.getStar().getLocation().getName()
-		), ChatLogLevel.VERBOSE));
+		dispatch(new LogMessage("You've moved away from the star..", ChatLogLevel.DEBUG));
 	}
 
 	@Subscribe
@@ -46,9 +45,31 @@ public class ChatLoggerModule extends PluginModuleContract
 	}
 
 	@Subscribe
-	public void onStarAbandoned(StarAbandoned event)
+	public void onStarDepleted(StarDepleted event)
 	{
-		dispatch(new LogMessage("You've moved away from the star..", ChatLogLevel.DEBUG));
+		dispatch(new LogMessage("The star has fully depleted.", ChatLogLevel.VERBOSE));
+	}
+
+	@Subscribe
+	public void onStarMissing(StarMissing event)
+	{
+		dispatch(new LogMessage("The star you are looking for seems to be missing.", ChatLogLevel.VERBOSE));
+	}
+
+	@Subscribe
+	public void onStarRegionScouted(StarRegionScouted event)
+	{
+		dispatch(new LogMessage(String.format("You've scouted the star landing area for *%s*", event.getLocation().getName()), ChatLogLevel.DEBUG));
+	}
+
+	@Subscribe
+	public void onStarScouted(StarScouted event)
+	{
+		dispatch(new LogMessage(String.format(
+			"You've discovered a previously-unknown *T%d* star near *%s*!",
+			event.getStar().getTier(),
+			event.getStar().getLocation().getName()
+		), ChatLogLevel.NORMAL));
 	}
 
 	@Subscribe
@@ -58,9 +79,19 @@ public class ChatLoggerModule extends PluginModuleContract
 	}
 
 	@Subscribe
-	public void onStarDepleted(StarDepleted event)
+	public void onWorldStarUpdated(WorldStarUpdated event)
 	{
-		dispatch(new LogMessage("The star has fully depleted.", ChatLogLevel.VERBOSE));
+		if (event.getStar() == null)
+		{
+			return;
+		}
+
+		dispatch(new LogMessage(String.format(
+			"Star Update (world *%d*): Star near *%s* is now a *T%d*.",
+			event.getStar().getWorld(),
+			event.getStar().getLocation().getName(),
+			event.getStar().getTier()
+		), ChatLogLevel.DEBUG));
 	}
 
 	@Subscribe

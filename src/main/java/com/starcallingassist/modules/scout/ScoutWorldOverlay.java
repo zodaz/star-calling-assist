@@ -1,7 +1,6 @@
 package com.starcallingassist.modules.scout;
 
 import java.awt.BasicStroke;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.geom.GeneralPath;
@@ -41,34 +40,19 @@ public class ScoutWorldOverlay extends Overlay
 	{
 		WorldPoint playerLocation = client.getLocalPlayer().getWorldLocation();
 
-		module.getLocations().forEach(location -> {
+		module.getLocations().forEach((location, state) -> {
 			if (location.getWorldPoint().distanceTo(playerLocation) >= Perspective.SCENE_SIZE)
 			{
 				return;
 			}
 
 			graphics.setStroke(new BasicStroke(2));
-			graphics.setColor(getStatusColor(location));
+			graphics.setColor(state.getColor());
 
-			renderScoutableBounds(graphics, location.scoutableBounds());
+			renderScoutableBounds(graphics, location.getScoutableBounds());
 		});
 
 		return null;
-	}
-
-	private Color getStatusColor(ScoutLocation location)
-	{
-		if (!location.isRegionLoaded())
-		{
-			return Color.RED;
-		}
-
-		if (location.getLastSeen() <= System.currentTimeMillis() - 60000)
-		{
-			return Color.BLUE;
-		}
-
-		return Color.GREEN;
 	}
 
 	private void renderScoutableBounds(Graphics2D graphics, WorldArea bounds)

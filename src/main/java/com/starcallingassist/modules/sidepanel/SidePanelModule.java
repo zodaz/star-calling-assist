@@ -8,6 +8,7 @@ import com.starcallingassist.events.AnnouncementsRefreshed;
 import com.starcallingassist.events.NavButtonClicked;
 import com.starcallingassist.events.PluginConfigChanged;
 import com.starcallingassist.events.StarDepleted;
+import com.starcallingassist.events.StarScouted;
 import com.starcallingassist.events.StarTierChanged;
 import com.starcallingassist.modules.crowdsourcing.objects.AnnouncedStar;
 import com.starcallingassist.objects.Star;
@@ -134,6 +135,12 @@ public class SidePanelModule extends PluginModuleContract
 			announcement.getUpdatedAt(),
 			announcement.getPlayerName()
 		);
+	}
+
+	@Subscribe
+	public void onStarScouted(StarScouted event)
+	{
+		updateStarFromLocalStateChange(event.getStar());
 	}
 
 	@Subscribe

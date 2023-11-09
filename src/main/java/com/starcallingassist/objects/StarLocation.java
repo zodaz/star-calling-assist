@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import static net.runelite.api.Constants.CHUNK_SIZE;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 
@@ -170,6 +171,23 @@ public class StarLocation
 			getWorldPoint(),
 			2,
 			2
+		);
+	}
+
+	public WorldArea getScoutableBounds()
+	{
+		WorldPoint worldPoint = getWorldPoint();
+		if (worldPoint == null)
+		{
+			return null;
+		}
+
+		return new WorldArea(
+			(worldPoint.getX() & ~(CHUNK_SIZE - 1)) - (3 * CHUNK_SIZE),
+			(worldPoint.getY() & ~(CHUNK_SIZE - 1)) - (3 * CHUNK_SIZE),
+			CHUNK_SIZE * 7,
+			CHUNK_SIZE * 7,
+			0
 		);
 	}
 
