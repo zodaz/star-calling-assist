@@ -2,8 +2,12 @@ package com.starcallingassist.modules.sidepanel.panels;
 
 import com.starcallingassist.constants.PluginColors;
 import com.starcallingassist.modules.sidepanel.decorators.StarListGroupDecorator;
+import com.starcallingassist.modules.sidepanel.enums.OrderBy;
+import com.starcallingassist.modules.sidepanel.objects.StarListEntryAttributes;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -19,14 +23,19 @@ public class StarListGroupPanel extends JPanel
 
 	@Getter
 	private final String title;
+	private final OrderBy orderByColumn;
+	private final boolean isSortAscending;
 	private boolean hasCurrentWorldEntry = false;
 	private boolean hasCurrentLocationEntry = false;
 	private boolean isUnverified = false;
 	private boolean isDangerousArea = false;
+	private final List<StarListGroupEntryPanel> entries = new ArrayList<>();
 
-	public StarListGroupPanel(String title)
+	public StarListGroupPanel(String title, OrderBy orderByColumn, boolean isSortAscending)
 	{
 		this.title = title;
+		this.orderByColumn = orderByColumn;
+		this.isSortAscending = isSortAscending;
 
 		setOpaque(false);
 		setLayout(new BorderLayout());
@@ -131,7 +140,7 @@ public class StarListGroupPanel extends JPanel
 		});
 
 		updateGroupState(entry);
-		innerPanel.add(entry);
+		entries.add(entry);
 
 		setPanelDefaultColor();
 		setTitleColor(PluginColors.STAR_LIST_GROUP_LABEL);
@@ -158,5 +167,36 @@ public class StarListGroupPanel extends JPanel
 		{
 			isDangerousArea = entry.getAttributes().isDangerousArea();
 		}
+	}
+
+	public void commit()
+	{
+
+		entries.sort(this::sorter);
+
+		for (StarListGroupEntryPanel entry : entries)
+		{
+			innerPanel.add(entry);
+		}
+	}
+
+	private int sorter(StarListGroupEntryPanel panelA, StarListGroupEntryPanel panelB)
+	{
+		StarListEntryAttributes a1 = panelA.getAttributes();
+		StarListEntryAttributes a2 = panelB.getAttributes();
+
+		// We only want to re-sort the location order within the location group, because
+		// the entries are already added in a pre-sorted order by the StarListPanel.
+		if (orderByColumn == OrderBy.LOCATION)
+		{
+			int deadTime1 = a1.getDeadTime();
+			int deadTime2 = a2.getDeadTime();
+
+			return !isSortAscending
+				? Integer.compare(deadTime2, deadTime1)
+				: Integer.compare(deadTime1, deadTime2);
+		}
+
+		return 0;
 	}
 }
