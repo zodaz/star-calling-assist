@@ -7,6 +7,7 @@ import com.starcallingassist.modules.sidepanel.enums.TotalLevelType;
 import com.starcallingassist.objects.Star;
 import java.awt.Color;
 import java.util.EnumSet;
+import java.util.Objects;
 import javax.annotation.Nonnull;
 import lombok.Getter;
 import net.runelite.http.api.worlds.World;
@@ -56,10 +57,10 @@ public class StarListEntryAttributes
 		return getTier(decorator.shouldEstimateTier());
 	}
 
-	public int getTier(boolean estimate)
+	public int getTier(boolean useEstimated)
 	{
 		int tier = star.getTier() == null ? 0 : star.getTier();
-		if (!estimate)
+		if (!useEstimated)
 		{
 			return tier;
 		}
@@ -99,6 +100,13 @@ public class StarListEntryAttributes
 	public boolean isCurrentWorld()
 	{
 		return decorator.getCurrentWorldId() == world.getId();
+	}
+
+	public boolean isCurrentLocation()
+	{
+		return decorator.getCurrentPlayerLocations()
+			.stream()
+			.anyMatch(location -> Objects.equals(location.getWorldPoint(), star.getLocation().getWorldPoint()));
 	}
 
 	public boolean isWilderness()

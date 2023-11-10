@@ -20,6 +20,7 @@ public class StarListGroupPanel extends JPanel
 	@Getter
 	private final String title;
 	private boolean hasCurrentWorldEntry = false;
+	private boolean hasCurrentLocationEntry = false;
 	private boolean isUnverified = false;
 	private boolean isDangerousArea = false;
 
@@ -42,23 +43,50 @@ public class StarListGroupPanel extends JPanel
 		innerPanel.setBorder(new EmptyBorder(2, 2, 2, 2));
 		add(innerPanel, BorderLayout.SOUTH);
 
-		updatePanelColor(PluginColors.STAR_LIST_GROUP_BORDER);
+		setPanelDefaultColor();
 	}
 
-	public void updatePanelColor(Color borderColor)
+	private Color getCurrentPanelColor()
+	{
+		return titleLabel.getBackground();
+	}
+
+	private void setPanelColor(Color color)
+	{
+		setBorder(new MatteBorder(2, 2, 2, 2, color));
+		titleLabel.setBackground(color);
+		titleLabel.setBorder(new MatteBorder(0, 1, 0, 0, color));
+	}
+
+	private void setPanelHoverColor()
+	{
+		if (hasCurrentWorldEntry || hasCurrentLocationEntry)
+		{
+			setPanelColor(getCurrentPanelColor().brighter());
+			return;
+		}
+
+		setPanelColor(PluginColors.STAR_LIST_GROUP_BORDER_HOVER);
+	}
+
+	private void setPanelDefaultColor()
 	{
 		if (hasCurrentWorldEntry)
 		{
-			borderColor = PluginColors.STAR_LIST_GROUP_BORDER_CURRENT_WORLD;
+			setPanelColor(PluginColors.STAR_LIST_GROUP_BORDER_CURRENT_WORLD);
+			return;
 		}
 
-		setBorder(new MatteBorder(2, 2, 2, 2, borderColor));
-		titleLabel.setBackground(borderColor);
-		titleLabel.setBorder(new MatteBorder(0, 1, 0, 0, borderColor));
+		if (hasCurrentLocationEntry)
+		{
+			setPanelColor(PluginColors.STAR_LIST_GROUP_BORDER_CURRENT_LOCATION);
+			return;
+		}
+
+		setPanelColor(PluginColors.STAR_LIST_GROUP_BORDER);
 	}
 
-
-	private void updateTitleColor(Color color)
+	private void setTitleColor(Color color)
 	{
 		if (isDangerousArea)
 		{
@@ -80,41 +108,45 @@ public class StarListGroupPanel extends JPanel
 			@Override
 			public void onMousePressed()
 			{
-				updatePanelColor(titleLabel.getBackground().brighter());
+				setPanelColor(titleLabel.getBackground().brighter());
 			}
 
 			@Override
 			public void onMouseReleased()
 			{
-				updatePanelColor(titleLabel.getBackground().darker());
+				setPanelColor(getCurrentPanelColor().darker());
 			}
 
 			@Override
 			public void onMouseEntered()
 			{
-				updatePanelColor(PluginColors.STAR_LIST_GROUP_BORDER_HOVER);
+				setPanelHoverColor();
 			}
 
 			@Override
 			public void onMouseExited()
 			{
-				updatePanelColor(PluginColors.STAR_LIST_GROUP_BORDER);
+				setPanelDefaultColor();
 			}
 		});
 
 		updateGroupState(entry);
 		innerPanel.add(entry);
 
-		updatePanelColor(PluginColors.STAR_LIST_GROUP_BORDER);
-		updateTitleColor(PluginColors.STAR_LIST_GROUP_LABEL);
+		setPanelDefaultColor();
+		setTitleColor(PluginColors.STAR_LIST_GROUP_LABEL);
 	}
-
 
 	private void updateGroupState(StarListGroupEntryPanel entry)
 	{
 		if (!hasCurrentWorldEntry)
 		{
 			hasCurrentWorldEntry = entry.getAttributes().isCurrentWorld();
+		}
+
+		if (!hasCurrentLocationEntry)
+		{
+			hasCurrentLocationEntry = entry.getAttributes().isCurrentLocation();
 		}
 
 		if (!isUnverified)

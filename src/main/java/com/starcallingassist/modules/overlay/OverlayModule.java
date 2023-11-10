@@ -24,15 +24,10 @@ public class OverlayModule extends PluginModuleContract
 	private Star currentStar = null;
 
 	@Override
-	public void startUp()
-	{
-		updateWorldMapPoint();
-	}
-
-	@Override
 	public void shutDown()
 	{
 		worldMapPointManager.removeIf(ActiveStarWorldMapPoint.class::isInstance);
+		currentStar = null;
 	}
 
 	@Subscribe

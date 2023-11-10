@@ -14,10 +14,11 @@ public class PluginColors
 	public static final Color DROPDOWN_ARROW = new Color(82, 82, 82);
 
 	public static final Color STAR_LIST_GROUP_BORDER = new Color(21, 21, 21);
-	public static final Color STAR_LIST_GROUP_BORDER_HOVER = new Color(22, 78, 99);
+	public static final Color STAR_LIST_GROUP_BORDER_HOVER = new Color(55, 55, 55);
 	public static final Color STAR_LIST_GROUP_BORDER_CURRENT_WORLD = new Color(20, 83, 45);
+	public static final Color STAR_LIST_GROUP_BORDER_CURRENT_LOCATION = new Color(22, 78, 99);
 	public static final Color STAR_LIST_GROUP_ENTRY_BACKGROUND = new Color(30, 30, 30);
-	public static final Color STAR_LIST_GROUP_ENTRY_BACKGROUND_HOVER = new Color(21, 29, 36);
+	public static final Color STAR_LIST_GROUP_ENTRY_BACKGROUND_EXPIRED = new Color(69, 10, 10);
 	public static final Color SCROLLBOX_BACKGROUND = new Color(38, 38, 38);
 	public static final Color ENTRY_IRRELEVANT_AREA = new Color(48, 48, 48);
 	public static final Color STAR_LIST_GROUP_ENTRY_WORLBOX_BACKGROUND = new Color(41, 37, 36);

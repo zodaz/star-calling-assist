@@ -3,23 +3,27 @@ package com.starcallingassist.modules.scout;
 import com.starcallingassist.PluginModuleContract;
 import com.starcallingassist.StarCallingAssistConfig;
 import com.starcallingassist.events.PluginConfigChanged;
-import com.starcallingassist.events.StarRegionScouted;
+import com.starcallingassist.events.StarLocationRegionEntered;
+import com.starcallingassist.events.StarLocationRegionExited;
+import com.starcallingassist.events.StarLocationScouted;
 import com.starcallingassist.objects.StarLocation;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.HashMap;
 import javax.inject.Inject;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
-import net.runelite.api.events.WorldChanged;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPointManager;
 import net.runelite.client.util.ImageUtil;
 
+@Slf4j
 public class ScoutModule extends PluginModuleContract
 {
 	@Inject
@@ -66,6 +70,7 @@ public class ScoutModule extends PluginModuleContract
 	public void shutDown()
 	{
 		removeOverlay();
+		resetLocationState();
 	}
 
 	@Subscribe
@@ -87,11 +92,19 @@ public class ScoutModule extends PluginModuleContract
 	}
 
 	@Subscribe
-	public void onWorldChanged(WorldChanged event)
+	public void onGameStateChanged(GameStateChanged event)
+	{
+		if (event.getGameState() == GameState.LOGIN_SCREEN)
+		{
+			resetLocationState();
+		}
+	}
+
+	private void resetLocationState()
 	{
 		locations.values().forEach(entry -> {
 			entry.setRegionLoaded(false);
-			entry.setPlayerAlreadyScouting(false);
+			entry.setPlayerWithinBounds(false);
 			entry.setLastScoutedAt(0L);
 		});
 	}
@@ -111,27 +124,39 @@ public class ScoutModule extends PluginModuleContract
 		}
 
 		locations.forEach((location, state) -> {
-			if (Arrays.stream(client.getMapRegions()).noneMatch(region -> region == location.getWorldPoint().getRegionID()))
+			boolean isPlayerWithinBounds = location.getScoutableBounds().contains(playerLocation);
+			boolean isRegionLoaded = Arrays.stream(client.getMapRegions()).anyMatch(region -> region == location.getWorldPoint().getRegionID());
+
+			boolean wasPlayerWithinBounds = state.isPlayerWithinBounds();
+			boolean wasRegionLoaded = state.isRegionLoaded();
+
+			if (wasPlayerWithinBounds && !isPlayerWithinBounds)
+			{
+				state.setPlayerWithinBounds(false);
+				dispatch(new StarLocationRegionExited(location));
+			}
+
+			if (!wasPlayerWithinBounds && isPlayerWithinBounds)
+			{
+				state.setPlayerWithinBounds(true);
+				dispatch(new StarLocationRegionEntered(location));
+			}
+
+			if ((isPlayerWithinBounds && isRegionLoaded && !wasRegionLoaded) || (isPlayerWithinBounds && !wasPlayerWithinBounds && isRegionLoaded))
+			{
+				state.setRegionLoaded(true);
+				state.setPlayerWithinBounds(true);
+				dispatch(new StarLocationScouted(location));
+			}
+
+			if (wasRegionLoaded && !isRegionLoaded)
 			{
 				state.setRegionLoaded(false);
-				state.setPlayerAlreadyScouting(false);
-				return;
 			}
 
-			state.setRegionLoaded(true);
-
-			if (!location.getScoutableBounds().contains(playerLocation))
+			if (isPlayerWithinBounds && isRegionLoaded)
 			{
-				state.setPlayerAlreadyScouting(false);
-				return;
-			}
-
-			state.setLastScoutedAt(System.currentTimeMillis());
-
-			if (!state.isPlayerAlreadyScouting())
-			{
-				state.setPlayerAlreadyScouting(true);
-				dispatch(new StarRegionScouted(location));
+				state.setLastScoutedAt(System.currentTimeMillis());
 			}
 		});
 	}

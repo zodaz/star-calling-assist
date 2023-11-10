@@ -9,19 +9,21 @@ import lombok.Setter;
 @AllArgsConstructor
 public class StarLocationState
 {
+	@Getter
 	@Setter
 	private boolean regionLoaded;
+
+	@Getter
+	@Setter
+	private boolean playerWithinBounds;
 
 	@Setter
 	private Long lastScoutedAt;
 
-	@Getter
-	@Setter
-	private boolean playerAlreadyScouting = false;
-
 	public StarLocationState()
 	{
 		this.regionLoaded = false;
+		this.playerWithinBounds = false;
 		this.lastScoutedAt = 0L;
 	}
 

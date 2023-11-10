@@ -37,16 +37,17 @@ public class StarListGroupEntryPanel extends JPanel
 		setLayout(new BorderLayout());
 
 		mainContentPanel = createMainContentPanel();
-		mainContentPanel.setBackground(PluginColors.STAR_LIST_GROUP_ENTRY_BACKGROUND);
 		add(mainContentPanel);
 	}
-
 
 	private JPanel createMainContentPanel()
 	{
 		JPanel mainContentPanel = new JPanel(new BorderLayout());
-		mainContentPanel.setBackground(PluginColors.STAR_LIST_GROUP_ENTRY_BACKGROUND);
 		mainContentPanel.setBorder(new EmptyBorder(2, 2, 2, 2));
+		mainContentPanel.setBackground(attributes.getDeadTime() < 0
+			? PluginColors.STAR_LIST_GROUP_ENTRY_BACKGROUND_EXPIRED
+			: PluginColors.STAR_LIST_GROUP_ENTRY_BACKGROUND
+		);
 
 		mainContentPanel.add(createWestPanel(), BorderLayout.WEST);
 		mainContentPanel.add(createCenterPanel(), BorderLayout.CENTER);
@@ -86,17 +87,16 @@ public class StarListGroupEntryPanel extends JPanel
 			public void mouseEntered(MouseEvent mouseEvent)
 			{
 				group.onMouseEntered();
-				mainContentPanel.setBackground(PluginColors.STAR_LIST_GROUP_ENTRY_BACKGROUND_HOVER);
+				mainContentPanel.setBackground(mainContentPanel.getBackground().brighter());
 			}
 
 			@Override
 			public void mouseExited(MouseEvent mouseEvent)
 			{
 				group.onMouseExited();
-				mainContentPanel.setBackground(PluginColors.STAR_LIST_GROUP_ENTRY_BACKGROUND);
+				mainContentPanel.setBackground(mainContentPanel.getBackground().darker());
 			}
 		});
-
 
 		return mainContentPanel;
 	}

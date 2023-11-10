@@ -8,15 +8,19 @@ import com.starcallingassist.events.AnnouncementsRefreshed;
 import com.starcallingassist.events.NavButtonClicked;
 import com.starcallingassist.events.PluginConfigChanged;
 import com.starcallingassist.events.StarDepleted;
+import com.starcallingassist.events.StarLocationRegionEntered;
+import com.starcallingassist.events.StarLocationRegionExited;
 import com.starcallingassist.events.StarMissing;
 import com.starcallingassist.events.StarScouted;
 import com.starcallingassist.events.StarTierChanged;
+import com.starcallingassist.events.WorldHopRequest;
 import com.starcallingassist.modules.crowdsourcing.objects.AnnouncedStar;
+import com.starcallingassist.modules.sidepanel.decorators.MasterPanelDecorator;
 import com.starcallingassist.objects.Star;
+import com.starcallingassist.objects.StarLocation;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.SwingUtilities;
-import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.events.GameStateChanged;
@@ -29,7 +33,6 @@ import net.runelite.client.util.ImageUtil;
 import net.runelite.http.api.worlds.World;
 import net.runelite.http.api.worlds.WorldResult;
 
-@Slf4j
 public class SidePanelModule extends PluginModuleContract
 {
 	@Inject
@@ -47,12 +50,27 @@ public class SidePanelModule extends PluginModuleContract
 
 	private List<World> worldList = new ArrayList<>();
 
+	private final List<StarLocation> currentPlayerRegions = new ArrayList<>();
+
 	@Override
 	public void startUp()
 	{
 		if (sidePanel == null)
 		{
-			sidePanel = new SidePanel(this::dispatch);
+			sidePanel = new SidePanel(new MasterPanelDecorator()
+			{
+				@Override
+				public void onWorldHopRequest(WorldHopRequest worldHopRequest)
+				{
+					dispatch(worldHopRequest);
+				}
+
+				@Override
+				public List<StarLocation> getCurrentPlayerRegions()
+				{
+					return currentPlayerRegions;
+				}
+			});
 			sidePanel.setInjector(injector);
 			injector.injectMembers(sidePanel);
 		}
@@ -76,6 +94,7 @@ public class SidePanelModule extends PluginModuleContract
 	public void shutDown()
 	{
 		sidePanel.shutDown();
+		currentPlayerRegions.clear();
 		clientToolbar.removeNavigation(navButton);
 	}
 
@@ -91,6 +110,7 @@ public class SidePanelModule extends PluginModuleContract
 	@Subscribe
 	public void onWorldChanged(WorldChanged event)
 	{
+		currentPlayerRegions.clear();
 		sidePanel.setCurrentWorld(client.getWorld());
 		SwingUtilities.invokeLater(sidePanel::rebuild);
 	}
@@ -160,6 +180,23 @@ public class SidePanelModule extends PluginModuleContract
 	public void onStarMissing(StarMissing event)
 	{
 		updateStarFromLocalStateChange(event.getStar());
+	}
+
+	@Subscribe
+	public void onStarLocationRegionEntered(StarLocationRegionEntered event)
+	{
+		if (!currentPlayerRegions.contains(event.getLocation()))
+		{
+			currentPlayerRegions.add(event.getLocation());
+			SwingUtilities.invokeLater(sidePanel::rebuild);
+		}
+	}
+
+	@Subscribe
+	public void onStarLocationRegionExited(StarLocationRegionExited event)
+	{
+		currentPlayerRegions.remove(event.getLocation());
+		SwingUtilities.invokeLater(sidePanel::rebuild);
 	}
 
 	@Override

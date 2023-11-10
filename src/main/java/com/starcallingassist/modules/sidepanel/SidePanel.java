@@ -14,6 +14,7 @@ import com.starcallingassist.modules.sidepanel.enums.TotalLevelType;
 import com.starcallingassist.modules.sidepanel.panels.HeaderPanel;
 import com.starcallingassist.modules.sidepanel.panels.StarListPanel;
 import com.starcallingassist.objects.Star;
+import com.starcallingassist.objects.StarLocation;
 import java.awt.BorderLayout;
 import java.util.Arrays;
 import java.util.List;
@@ -141,6 +142,12 @@ public class SidePanel extends PluginPanel
 			public Boolean showFoundByColumn()
 			{
 				return config.showFoundBy();
+			}
+
+			@Override
+			public List<StarLocation> getCurrentPlayerLocations()
+			{
+				return decorator.getCurrentPlayerRegions();
 			}
 
 			@Override

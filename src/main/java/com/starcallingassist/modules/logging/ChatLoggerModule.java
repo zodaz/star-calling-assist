@@ -8,12 +8,16 @@ import com.starcallingassist.events.LogMessage;
 import com.starcallingassist.events.StarAbandoned;
 import com.starcallingassist.events.StarApproached;
 import com.starcallingassist.events.StarDepleted;
+import com.starcallingassist.events.StarLocationRegionEntered;
+import com.starcallingassist.events.StarLocationRegionExited;
+import com.starcallingassist.events.StarLocationScouted;
 import com.starcallingassist.events.StarMissing;
-import com.starcallingassist.events.StarRegionScouted;
 import com.starcallingassist.events.StarScouted;
 import com.starcallingassist.events.StarTierChanged;
 import com.starcallingassist.events.WorldStarUpdated;
 import net.runelite.api.ChatMessageType;
+import net.runelite.api.Client;
+import net.runelite.api.GameState;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.chat.ChatColorType;
 import net.runelite.client.chat.ChatMessageBuilder;
@@ -25,6 +29,9 @@ public class ChatLoggerModule extends PluginModuleContract
 {
 	@Inject
 	private ChatMessageManager chatMessageManager;
+
+	@Inject
+	private Client client;
 
 	@Inject
 	private ClientThread clientThread;
@@ -51,13 +58,25 @@ public class ChatLoggerModule extends PluginModuleContract
 	}
 
 	@Subscribe
+	public void onStarLocationRegionEntered(StarLocationRegionEntered event)
+	{
+		dispatch(new LogMessage(String.format("You've entered the star region for *%s*.", event.getLocation().getName()), ChatLogLevel.DEBUG));
+	}
+
+	@Subscribe
+	public void onStarLocationRegionExited(StarLocationRegionExited event)
+	{
+		dispatch(new LogMessage(String.format("You've left the star region for *%s*.", event.getLocation().getName()), ChatLogLevel.DEBUG));
+	}
+
+	@Subscribe
 	public void onStarMissing(StarMissing event)
 	{
 		dispatch(new LogMessage("The star you are looking for seems to be missing.", ChatLogLevel.VERBOSE));
 	}
 
 	@Subscribe
-	public void onStarRegionScouted(StarRegionScouted event)
+	public void onStarLocationScouted(StarLocationScouted event)
 	{
 		dispatch(new LogMessage(String.format("You've scouted the star landing area for *%s*", event.getLocation().getName()), ChatLogLevel.DEBUG));
 	}
@@ -81,7 +100,7 @@ public class ChatLoggerModule extends PluginModuleContract
 	@Subscribe
 	public void onWorldStarUpdated(WorldStarUpdated event)
 	{
-		if (event.getStar() == null)
+		if (event.getStar() == null || client.getGameState() != GameState.LOGGED_IN)
 		{
 			return;
 		}

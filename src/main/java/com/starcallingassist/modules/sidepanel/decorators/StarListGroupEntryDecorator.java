@@ -3,6 +3,7 @@ package com.starcallingassist.modules.sidepanel.decorators;
 import com.starcallingassist.enums.Region;
 import com.starcallingassist.events.WorldHopRequest;
 import com.starcallingassist.modules.sidepanel.enums.TotalLevelType;
+import com.starcallingassist.objects.StarLocation;
 import java.util.List;
 
 public interface StarListGroupEntryDecorator
@@ -29,7 +30,6 @@ public interface StarListGroupEntryDecorator
 
 	List<Region> visibleRegions();
 
-
 	Boolean showWorldTypeColumn();
 
 	Boolean showTierColumn();
@@ -37,6 +37,8 @@ public interface StarListGroupEntryDecorator
 	Boolean showDeadTimeColumn();
 
 	Boolean showFoundByColumn();
+
+	List<StarLocation> getCurrentPlayerLocations();
 
 	int getCurrentWorldId();
 

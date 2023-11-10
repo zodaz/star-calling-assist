@@ -7,8 +7,8 @@ import com.starcallingassist.events.AnnouncementReceived;
 import com.starcallingassist.events.StarAbandoned;
 import com.starcallingassist.events.StarApproached;
 import com.starcallingassist.events.StarDepleted;
+import com.starcallingassist.events.StarLocationScouted;
 import com.starcallingassist.events.StarMissing;
-import com.starcallingassist.events.StarRegionScouted;
 import com.starcallingassist.events.StarScouted;
 import com.starcallingassist.events.StarTierChanged;
 import com.starcallingassist.events.WorldStarUpdated;
@@ -147,7 +147,7 @@ public class StarObserverModule extends PluginModuleContract
 	}
 
 	@Subscribe
-	public void onStarRegionScouted(StarRegionScouted event)
+	public void onStarLocationScouted(StarLocationScouted event)
 	{
 		Star star = currentStars.get(client.getWorld());
 		if (star == null)
@@ -180,11 +180,7 @@ public class StarObserverModule extends PluginModuleContract
 			}
 		}
 
-		dispatch(new StarMissing(new Star(
-			star.getWorld(),
-			star.getLocation().getWorldPoint(),
-			null
-		)));
+		dispatch(new StarMissing(new Star(star.getWorld(), star.getLocation().getWorldPoint(), null)));
 		currentStars.remove(star.getWorld());
 	}
 
@@ -218,6 +214,7 @@ public class StarObserverModule extends PluginModuleContract
 	@Subscribe
 	public void onWorldChanged(WorldChanged event)
 	{
+		isNearStar = false;
 		dispatch(new WorldStarUpdated(currentStars.get(client.getWorld())));
 	}
 
