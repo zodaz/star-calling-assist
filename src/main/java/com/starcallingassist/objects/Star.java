@@ -33,11 +33,6 @@ public class Star
 		this(world, new StarLocation(location), tier);
 	}
 
-	public Star(Integer world, @Nonnull WorldPoint location)
-	{
-		this(world, location, null);
-	}
-
 	public boolean isSameAs(@Nonnull Star star)
 	{
 		return Objects.equals(world, star.world)

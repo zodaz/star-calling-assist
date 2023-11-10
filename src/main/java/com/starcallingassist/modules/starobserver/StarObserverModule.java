@@ -78,16 +78,16 @@ public class StarObserverModule extends PluginModuleContract
 		if (lastKnownStar == null || !observedStar.isSameAs(lastKnownStar))
 		{
 			currentStars.put(observedStar.getWorld(), observedStar);
-			dispatch(new StarScouted(observedStar));
 			dispatch(new WorldStarUpdated(observedStar));
+			dispatch(new StarScouted(observedStar));
 			return;
 		}
 
 		if (!Objects.equals(observedStar.getTier(), lastKnownStar.getTier()))
 		{
 			currentStars.put(observedStar.getWorld(), observedStar);
-			dispatch(new StarTierChanged(observedStar));
 			dispatch(new WorldStarUpdated(observedStar));
+			dispatch(new StarTierChanged(observedStar));
 		}
 	}
 
@@ -106,7 +106,7 @@ public class StarObserverModule extends PluginModuleContract
 			return;
 		}
 
-		Star despawnedStar = new Star(client.getWorld(), despawnedGameObject.getWorldLocation());
+		Star despawnedStar = new Star(client.getWorld(), despawnedGameObject.getWorldLocation(), null);
 		if (!despawnedStar.isSameAs(lastKnownStar))
 		{
 			return;
@@ -180,7 +180,11 @@ public class StarObserverModule extends PluginModuleContract
 			}
 		}
 
-		dispatch(new StarMissing(star));
+		dispatch(new StarMissing(new Star(
+			star.getWorld(),
+			star.getLocation().getWorldPoint(),
+			null
+		)));
 		currentStars.remove(star.getWorld());
 	}
 

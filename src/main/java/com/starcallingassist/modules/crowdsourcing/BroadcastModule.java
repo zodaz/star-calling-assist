@@ -140,10 +140,11 @@ public class BroadcastModule extends PluginModuleContract
 	{
 		if (config.autoCall())
 		{
-			attemptBroadcast(
-				new Star(event.getStar().getWorld(), event.getStar().getLocation().getWorldPoint()),
-				"dead"
-			);
+			attemptBroadcast(new Star(
+				event.getStar().getWorld(),
+				event.getStar().getLocation().getWorldPoint(),
+				null
+			));
 		}
 	}
 
@@ -177,7 +178,7 @@ public class BroadcastModule extends PluginModuleContract
 		}
 
 		attemptBroadcast(
-			new Star(currentStar.getWorld(), currentStar.getLocation().getWorldPoint()),
+			new Star(currentStar.getWorld(), currentStar.getLocation().getWorldPoint(), null),
 			event.getIsPublicCall() ? "dead" : "pdead"
 		);
 	}
@@ -219,6 +220,11 @@ public class BroadcastModule extends PluginModuleContract
 			return;
 		}
 
+		attemptBroadcast(star);
+	}
+
+	private void attemptBroadcast(@Nonnull Star star)
+	{
 		attemptBroadcast(star, star.getLocation().getName());
 	}
 
