@@ -189,7 +189,7 @@ public class StarListPanel extends JPanel
 			int tier1 = a1.getTier();
 			int tier2 = a2.getTier();
 
-			return ! isSortAscending
+			return !isSortAscending
 				? Integer.compare(tier2, tier1)
 				: Integer.compare(tier1, tier2);
 		}
@@ -209,7 +209,7 @@ public class StarListPanel extends JPanel
 			int deadTime1 = a1.getDeadTime();
 			int deadTime2 = a2.getDeadTime();
 
-			return ! isSortAscending
+			return !isSortAscending
 				? Integer.compare(deadTime2, deadTime1)
 				: Integer.compare(deadTime1, deadTime2);
 		}

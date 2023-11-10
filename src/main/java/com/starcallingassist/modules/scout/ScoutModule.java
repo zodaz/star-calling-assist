@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import javax.inject.Inject;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.coords.WorldPoint;
@@ -23,7 +22,6 @@ import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPointManager;
 import net.runelite.client.util.ImageUtil;
 
-@Slf4j
 public class ScoutModule extends PluginModuleContract
 {
 	@Inject

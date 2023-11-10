@@ -7,12 +7,10 @@ import com.starcallingassist.events.PluginConfigChanged;
 import com.starcallingassist.events.WorldStarUpdated;
 import com.starcallingassist.objects.Star;
 import java.awt.image.BufferedImage;
-import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPointManager;
 import net.runelite.client.util.ImageUtil;
 
-@Slf4j
 public class OverlayModule extends PluginModuleContract
 {
 	@Inject
