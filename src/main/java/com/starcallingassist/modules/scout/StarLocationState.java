@@ -17,14 +17,16 @@ public class StarLocationState
 	@Setter
 	private boolean playerWithinBounds;
 
+	@Getter
+	@Setter
+	private boolean worldPointLoaded;
+
 	@Setter
 	private Long lastScoutedAt;
 
 	public StarLocationState()
 	{
-		this.regionLoaded = false;
-		this.playerWithinBounds = false;
-		this.lastScoutedAt = 0L;
+		reset();
 	}
 
 	public Color getColor()
@@ -34,11 +36,19 @@ public class StarLocationState
 			return PluginColors.SCOUT_BOUNDS_COLOR_SCOUTED;
 		}
 
-		if (!regionLoaded)
+		if (!regionLoaded || !worldPointLoaded)
 		{
 			return PluginColors.SCOUT_BOUNDS_COLOR_UNSCOUTABLE;
 		}
 
 		return PluginColors.SCOUT_BOUNDS_COLOR_SCOUTABLE;
+	}
+
+	public void reset()
+	{
+		this.regionLoaded = false;
+		this.playerWithinBounds = false;
+		this.worldPointLoaded = false;
+		this.lastScoutedAt = 0L;
 	}
 }

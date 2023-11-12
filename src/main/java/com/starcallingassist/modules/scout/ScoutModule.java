@@ -14,6 +14,9 @@ import javax.inject.Inject;
 import lombok.Getter;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
+import net.runelite.api.Perspective;
+import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
@@ -100,11 +103,7 @@ public class ScoutModule extends PluginModuleContract
 
 	private void resetLocationState()
 	{
-		locations.values().forEach(entry -> {
-			entry.setRegionLoaded(false);
-			entry.setPlayerWithinBounds(false);
-			entry.setLastScoutedAt(0L);
-		});
+		locations.values().forEach(StarLocationState::reset);
 	}
 
 	@Subscribe
@@ -124,9 +123,11 @@ public class ScoutModule extends PluginModuleContract
 		locations.forEach((location, state) -> {
 			boolean isPlayerWithinBounds = location.getScoutableBounds().contains(playerLocation);
 			boolean isRegionLoaded = Arrays.stream(client.getMapRegions()).anyMatch(region -> region == location.getWorldPoint().getRegionID());
+			boolean isWorldPointLoaded = currentLoadingLines().contains(location.getWorldPoint());
 
 			boolean wasPlayerWithinBounds = state.isPlayerWithinBounds();
 			boolean wasRegionLoaded = state.isRegionLoaded();
+			boolean wasWorldPointLoaded = state.isWorldPointLoaded();
 
 			if (wasPlayerWithinBounds && !isPlayerWithinBounds)
 			{
@@ -140,11 +141,18 @@ public class ScoutModule extends PluginModuleContract
 				dispatch(new StarLocationRegionEntered(location));
 			}
 
-			if ((isPlayerWithinBounds && isRegionLoaded && !wasRegionLoaded) || (isPlayerWithinBounds && !wasPlayerWithinBounds && isRegionLoaded))
+			if ((isPlayerWithinBounds && isRegionLoaded && isWorldPointLoaded) &&
+				(!wasPlayerWithinBounds || !wasRegionLoaded || !wasWorldPointLoaded))
 			{
 				state.setRegionLoaded(true);
+				state.setWorldPointLoaded(true);
 				state.setPlayerWithinBounds(true);
 				dispatch(new StarLocationScouted(location));
+			}
+
+			if (wasWorldPointLoaded && !isWorldPointLoaded)
+			{
+				state.setWorldPointLoaded(false);
 			}
 
 			if (wasRegionLoaded && !isRegionLoaded)
@@ -152,7 +160,7 @@ public class ScoutModule extends PluginModuleContract
 				state.setRegionLoaded(false);
 			}
 
-			if (isPlayerWithinBounds && isRegionLoaded)
+			if (isPlayerWithinBounds && isRegionLoaded && isWorldPointLoaded)
 			{
 				state.setLastScoutedAt(System.currentTimeMillis());
 			}
@@ -184,5 +192,21 @@ public class ScoutModule extends PluginModuleContract
 	public BufferedImage getStarScoutLocationImage()
 	{
 		return ImageUtil.loadImageResource(getClass(), "/star_scoutloc.png");
+	}
+
+	private WorldArea currentLoadingLines()
+	{
+		int offset = 16;
+
+		LocalPoint topLeft = new LocalPoint(
+			offset * Perspective.LOCAL_TILE_SIZE,
+			offset * Perspective.LOCAL_TILE_SIZE
+		);
+
+		return new WorldArea(
+			WorldPoint.fromLocal(client, topLeft),
+			Perspective.SCENE_SIZE - (2 * offset),
+			Perspective.SCENE_SIZE - (2 * offset)
+		);
 	}
 }
