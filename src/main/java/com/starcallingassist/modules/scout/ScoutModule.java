@@ -14,9 +14,7 @@ import javax.inject.Inject;
 import lombok.Getter;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
-import net.runelite.api.Perspective;
 import net.runelite.api.coords.LocalPoint;
-import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
@@ -123,7 +121,7 @@ public class ScoutModule extends PluginModuleContract
 		locations.forEach((location, state) -> {
 			boolean isPlayerWithinBounds = location.getScoutableBounds().contains(playerLocation);
 			boolean isRegionLoaded = Arrays.stream(client.getMapRegions()).anyMatch(region -> region == location.getWorldPoint().getRegionID());
-			boolean isWorldPointLoaded = currentLoadingLines().contains(location.getWorldPoint());
+			boolean isWorldPointLoaded = location.getWorldPoint().isInScene(client);
 
 			boolean wasPlayerWithinBounds = state.isPlayerWithinBounds();
 			boolean wasRegionLoaded = state.isRegionLoaded();
@@ -192,21 +190,5 @@ public class ScoutModule extends PluginModuleContract
 	public BufferedImage getStarScoutLocationImage()
 	{
 		return ImageUtil.loadImageResource(getClass(), "/star_scoutloc.png");
-	}
-
-	private WorldArea currentLoadingLines()
-	{
-		int offset = 16;
-
-		LocalPoint topLeft = new LocalPoint(
-			offset * Perspective.LOCAL_TILE_SIZE,
-			offset * Perspective.LOCAL_TILE_SIZE
-		);
-
-		return new WorldArea(
-			WorldPoint.fromLocal(client, topLeft),
-			Perspective.SCENE_SIZE - (2 * offset),
-			Perspective.SCENE_SIZE - (2 * offset)
-		);
 	}
 }
