@@ -16,11 +16,13 @@ import com.starcallingassist.objects.Star;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nonnull;
+import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
+import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.GameObjectDespawned;
 import net.runelite.api.events.GameObjectSpawned;
 import net.runelite.api.events.GameTick;
@@ -120,13 +122,51 @@ public class StarObserverModule extends PluginModuleContract
 		}
 
 		// When a spawn tier is exhausted, it despawns, and a star of the next tier spawns in its place.
-		// Only when the despawned star was a tier 1, we can consider this a depleted star.
+		// Only when players mine-down a tier-1 star, we can consider the star fully depleted.
 		if (lastKnownStar.getTier() > 1)
 		{
 			return;
 		}
 
 		currentStars.remove(lastKnownStar.getWorld());
+		dispatch(new StarDepleted(despawnedStar));
+		dispatch(new WorldStarUpdated(null));
+		isNearStar = false;
+	}
+
+	@Subscribe
+	public void onChatMessage(ChatMessage event)
+	{
+		if (event.getType() != ChatMessageType.GAMEMESSAGE || !event.getMessage().equals("The star disintegrates into dust."))
+		{
+			return;
+		}
+
+		Star lastKnownStar = currentStars.get(client.getWorld());
+		if (lastKnownStar == null)
+		{
+			return;
+		}
+
+		// Since for this 'despawn event' we won't have a game-object to check against, we'll want to
+		// make sure we're close to the area that the current world's star was indicated to be.
+		if (!isStarWithinRenderDistance(lastKnownStar))
+		{
+			return;
+		}
+
+		// Finally, we'll want to make sure that we're only handling despawns here that are the result
+		// of the star's spawn timer elapsing, and not those that are the result of mining down a T1
+		// We could rely on this chat-based logic alone, but this won't get triggered when you're
+		// not actively mining the star when it despawns, meaning having both checks is better.
+		if (lastKnownStar.getTier() == 1)
+		{
+			return;
+		}
+
+		Star despawnedStar = new Star(lastKnownStar.getWorld(), lastKnownStar.getLocation(), null);
+		currentStars.remove(despawnedStar.getWorld());
+
 		dispatch(new StarDepleted(despawnedStar));
 		dispatch(new WorldStarUpdated(null));
 		isNearStar = false;
