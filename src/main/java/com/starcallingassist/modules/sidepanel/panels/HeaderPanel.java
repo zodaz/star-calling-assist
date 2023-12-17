@@ -11,7 +11,6 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import net.runelite.client.ui.components.ComboBoxListRenderer;
 
 public class HeaderPanel extends JPanel
 {
@@ -46,7 +45,6 @@ public class HeaderPanel extends JPanel
 		dropdown.setBackground(PluginColors.DROPDOWN_BACKGROUND);
 		dropdown.setForeground(PluginColors.DROPDOWN_ARROW);
 		dropdown.setFocusable(false);
-		dropdown.setRenderer(new ComboBoxListRenderer());
 		dropdown.setToolTipText("Change the sorting order of the star list");
 		dropdown.addItemListener(event ->
 		{
