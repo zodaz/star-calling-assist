@@ -72,15 +72,9 @@ public class SidePanelModule extends PluginModuleContract
 				}
 
 			    	@Override
-				public void onPanelActivated()
+				public void onPanelActiveChanged(boolean active)
 				{
-					dispatch(new SidePanelOpenChanged(true));
-				}
-
-			    	@Override
-				public void onPanelDeactivated()
-				{
-				    	dispatch(new SidePanelOpenChanged(false));
+					dispatch(new SidePanelOpenChanged(active));
 				}
 			});
 			sidePanel.setInjector(injector);

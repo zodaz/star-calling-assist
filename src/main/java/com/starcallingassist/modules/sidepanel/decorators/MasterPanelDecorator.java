@@ -8,9 +8,7 @@ public interface MasterPanelDecorator
 {
 	void onWorldHopRequest(WorldHopRequest worldHopRequest);
 
-	void onPanelActivated();
-
-	void onPanelDeactivated();
+	void onPanelActiveChanged(boolean active);
 
 	List<StarLocation> getCurrentPlayerRegions();
 }

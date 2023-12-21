@@ -204,8 +204,7 @@ public class SidePanel extends PluginPanel
 		    return;
 		}
 
-		sidePanelOpened = true;
-	    	decorator.onPanelActivated();
+	    	decorator.onPanelActiveChanged(sidePanelOpened = true);
 	}
 
     	@Override
@@ -216,8 +215,7 @@ public class SidePanel extends PluginPanel
 		    return;
 		}
 
-		sidePanelOpened = false;
-		decorator.onPanelDeactivated();
+		decorator.onPanelActiveChanged(sidePanelOpened = false);
 	}
 
 	private boolean hasAuthorization()
