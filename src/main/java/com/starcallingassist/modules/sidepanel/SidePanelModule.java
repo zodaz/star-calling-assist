@@ -5,8 +5,8 @@ import com.starcallingassist.PluginModuleContract;
 import com.starcallingassist.events.AnnouncementReceived;
 import com.starcallingassist.events.AnnouncementRefreshFailed;
 import com.starcallingassist.events.AnnouncementsRefreshed;
-import com.starcallingassist.events.NavButtonClicked;
 import com.starcallingassist.events.PluginConfigChanged;
+import com.starcallingassist.events.SidePanelOpenChanged;
 import com.starcallingassist.events.StarDepleted;
 import com.starcallingassist.events.StarLocationRegionEntered;
 import com.starcallingassist.events.StarLocationRegionExited;
@@ -70,6 +70,18 @@ public class SidePanelModule extends PluginModuleContract
 				{
 					return currentPlayerRegions;
 				}
+
+			    	@Override
+				public void onPanelActivated()
+				{
+					dispatch(new SidePanelOpenChanged(true));
+				}
+
+			    	@Override
+				public void onPanelDeactivated()
+				{
+				    	dispatch(new SidePanelOpenChanged(false));
+				}
 			});
 			sidePanel.setInjector(injector);
 			injector.injectMembers(sidePanel);
@@ -81,7 +93,6 @@ public class SidePanelModule extends PluginModuleContract
 			.tooltip("Star Miners")
 			.icon(ImageUtil.loadImageResource(getClass(), "/sminers.png"))
 			.panel(sidePanel)
-			.onClick(() -> dispatch(new NavButtonClicked(navButton)))
 			.build();
 
 		clientToolbar.addNavigation(navButton);

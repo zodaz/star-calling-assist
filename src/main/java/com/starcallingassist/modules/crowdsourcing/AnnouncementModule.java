@@ -9,8 +9,8 @@ import com.starcallingassist.StarCallingAssistConfig;
 import com.starcallingassist.events.AnnouncementReceived;
 import com.starcallingassist.events.AnnouncementRefreshFailed;
 import com.starcallingassist.events.AnnouncementsRefreshed;
-import com.starcallingassist.events.NavButtonClicked;
 import com.starcallingassist.events.PluginConfigChanged;
+import com.starcallingassist.events.SidePanelOpenChanged;
 import com.starcallingassist.modules.crowdsourcing.objects.AnnouncedStar;
 import com.starcallingassist.objects.Star;
 import com.starcallingassist.services.HttpService;
@@ -122,9 +122,9 @@ public class AnnouncementModule extends PluginModuleContract
 	}
 
 	@Subscribe
-	public void onNavButtonClicked(NavButtonClicked event)
+	public void onSidePanelOpenChanged(SidePanelOpenChanged event)
 	{
-		//sidePanelOpened = event.getButton().isSelected();
+		sidePanelOpened = event.isSidePanelOpen();
 
 		if (sidePanelOpened)
 		{

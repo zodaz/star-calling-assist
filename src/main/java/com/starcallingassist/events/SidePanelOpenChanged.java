@@ -2,11 +2,10 @@ package com.starcallingassist.events;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.runelite.client.ui.NavigationButton;
 
 @AllArgsConstructor
-public class NavButtonClicked
+public class SidePanelOpenChanged
 {
 	@Getter
-	private NavigationButton button;
+	private final boolean sidePanelOpen;
 }

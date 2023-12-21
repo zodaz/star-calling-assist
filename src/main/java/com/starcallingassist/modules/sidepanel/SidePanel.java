@@ -43,9 +43,16 @@ public class SidePanel extends PluginPanel
 
 	private final StarListPanel starListPanel;
 
+	private final MasterPanelDecorator decorator;
+
+	private boolean sidePanelOpened;
+
 	public SidePanel(MasterPanelDecorator decorator)
 	{
 		super(false);
+
+		this.decorator = decorator;
+
 		setLayout(new BorderLayout());
 		setBackground(PluginColors.SCROLLBOX_BACKGROUND);
 
@@ -187,6 +194,30 @@ public class SidePanel extends PluginPanel
 
 		add(headerPanel, BorderLayout.NORTH);
 		add(starListPanel, BorderLayout.CENTER);
+	}
+
+	@Override
+	public void onActivate()
+	{
+	    	if(sidePanelOpened)
+		{
+		    return;
+		}
+
+		sidePanelOpened = true;
+	    	decorator.onPanelActivated();
+	}
+
+    	@Override
+	public void onDeactivate()
+	{
+		if(!sidePanelOpened)
+		{
+		    return;
+		}
+
+		sidePanelOpened = false;
+		decorator.onPanelDeactivated();
 	}
 
 	private boolean hasAuthorization()
