@@ -18,10 +18,10 @@ import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ResizeableChanged;
 import net.runelite.api.events.WidgetLoaded;
+import net.runelite.api.widgets.ComponentID;
+import net.runelite.api.widgets.InterfaceID;
 import net.runelite.api.widgets.JavaScriptCallback;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetID;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.api.widgets.WidgetType;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.chat.ChatColorType;
@@ -90,7 +90,7 @@ public class StarCallingAssistPlugin extends Plugin
     @Override protected void startUp() throws Exception
     {
 	lastCalledStar = null;
-	parent = client.getWidget(WidgetInfo.MINIMAP_ORBS);
+	parent = client.getWidget(ComponentID.MINIMAP_CONTAINER);
 	clientThread.invokeLater(this::createCallButton);
 
 	sidePanel = injector.getInstance(SidePanel.class);
@@ -203,7 +203,7 @@ public class StarCallingAssistPlugin extends Plugin
 	else if (event.getKey().equals("callHorn"))
 	{
 	    removeCallButton();
-	    parent = client.getWidget(WidgetInfo.MINIMAP_ORBS);
+	    parent = client.getWidget(ComponentID.MINIMAP_CONTAINER);
 	    clientThread.invokeLater(this::createCallButton);
 	    return;
 	}
@@ -229,10 +229,10 @@ public class StarCallingAssistPlugin extends Plugin
     @Subscribe
     public void onWidgetLoaded(WidgetLoaded event)
     {
-	if(event.getGroupId() == WidgetID.MINIMAP_GROUP_ID && (callButton == null || parent == null))
+	if(event.getGroupId() == InterfaceID.MINIMAP && (callButton == null || parent == null))
 	{
 	    removeCallButton();
-	    parent = client.getWidget(WidgetInfo.MINIMAP_ORBS);
+	    parent = client.getWidget(ComponentID.MINIMAP_CONTAINER);
 	    createCallButton();
 	}
     }
@@ -241,7 +241,7 @@ public class StarCallingAssistPlugin extends Plugin
     public void onResizeableChanged(ResizeableChanged event)
     {
 	removeCallButton();
-	parent = client.getWidget(WidgetInfo.MINIMAP_ORBS);
+	parent = client.getWidget(ComponentID.MINIMAP_CONTAINER);
 	createCallButton();
     }
 
@@ -293,7 +293,7 @@ public class StarCallingAssistPlugin extends Plugin
 	    return;
 	}
 
-	if (client.getWidget(WidgetInfo.WORLD_SWITCHER_LIST) == null)
+	if (client.getWidget(ComponentID.WORLD_SWITCHER_WORLD_LIST) == null)
 	{
 	    client.openWorldHopper();
 	    return;
