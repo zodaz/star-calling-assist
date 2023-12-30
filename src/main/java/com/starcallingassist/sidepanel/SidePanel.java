@@ -73,6 +73,8 @@ public class SidePanel extends PluginPanel
     @Setter
     private boolean ascendingOrder = true;
 
+    private boolean sidePanelOpened = true;
+
     private final List<TableRow> tableRows = new ArrayList<>();
     private List<StarData> starData = new ArrayList<>();
     private List<World> worldList = new ArrayList<>();
@@ -112,6 +114,24 @@ public class SidePanel extends PluginPanel
 
 	fetchWorldData();
 	fetchStarData();
+    }
+
+    @Override
+    public void onActivate()
+    {
+	sidePanelOpened = true;
+	fetchStarData();
+    }
+
+    @Override
+    public void onDeactivate()
+    {
+	sidePanelOpened = false;
+    }
+
+    public boolean isOpen()
+    {
+	return sidePanelOpened;
     }
 
     public void updateInfoPanel()
@@ -293,6 +313,10 @@ public class SidePanel extends PluginPanel
 
     public void fetchStarData()
     {
+	// Never fetch data if sidepanel is closed
+	if(!sidePanelOpened)
+	    return;
+
 	// Don't fetch if less than 10s since last
 	if(nextFetch > System.currentTimeMillis())
 	    return;

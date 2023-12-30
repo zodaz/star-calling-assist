@@ -102,7 +102,6 @@ public class StarCallingAssistPlugin extends Plugin
 		.panel(sidePanel)
 		.build();
 	clientToolbar.addNavigation(navButton);
-	navButton.setOnClick(this::fetchStarData);
     }
 
     @Override protected void shutDown() throws Exception
@@ -208,7 +207,7 @@ public class StarCallingAssistPlugin extends Plugin
 	    clientThread.invokeLater(this::createCallButton);
 	    return;
 	}
-	else if (event.equals("endpoint"))
+	else if (event.getKey().equals("endpoint"))
 	{
 	    fetchStarData();
 	    return;
@@ -252,7 +251,7 @@ public class StarCallingAssistPlugin extends Plugin
     )
     public void fetchStarData()
     {
-	if(navButton.isSelected())
+	if(sidePanel.isOpen())
 	    sidePanel.fetchStarData();
     }
 
