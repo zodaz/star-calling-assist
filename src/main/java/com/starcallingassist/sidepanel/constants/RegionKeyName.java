@@ -17,4 +17,5 @@ public class RegionKeyName
     public static final String KEY_TIRANNWN = "tirannwn";
     public static final String KEY_WILDERNESS = "wilderness";
     public static final String KEY_UNKNOWN = "unknown";
+    public static final String KEY_VARLAMORE = "varlamore";
 }

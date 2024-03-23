@@ -179,6 +179,12 @@ public class Star
 	    put(new Point(3049, 3940), "Pirates' Hideout (lvl 53 Wildy)");
 	    put(new Point(3091, 3962), "Mage Arena bank (lvl 56 Wildy)");
 	    put(new Point(3188, 3932), "Wilderness Resource Area");
+	    /*
+	    VARLAMORE
+	     */
+	    put(new Point(1742, 2954), "Varlamore South East mine");
+	    put(new Point(1771, 3102), "Varlamore colosseum entrance bank");
+	    put(new Point(1486, 3089), "Mine north-west of hunter guild");
 	}
     };
 }

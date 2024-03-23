@@ -16,7 +16,8 @@ public enum Region
     GNOME(RegionKeyName.KEY_GNOME),
     TIRANNWN(RegionKeyName.KEY_TIRANNWN),
     WILDERNESS(RegionKeyName.KEY_WILDERNESS),
-    UNKNOWN(RegionKeyName.KEY_UNKNOWN);
+    UNKNOWN(RegionKeyName.KEY_UNKNOWN),
+    VARLAMORE(RegionKeyName.KEY_VARLAMORE);
 
     public final String keyName;
 

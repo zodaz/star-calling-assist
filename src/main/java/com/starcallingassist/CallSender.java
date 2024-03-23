@@ -38,8 +38,8 @@ public class CallSender
     public void sendCall(String username, int world, int tier, String location, int miners, Callback callback) throws IllegalArgumentException
     {
 	Request request = new Request.Builder()
-		.url(starConfig.getEndpoint())
-		.addHeader("authorization", starConfig.getAuthorization())
+		.url(starConfig.getEndpoint().replaceAll("\\s+", ""))
+		.addHeader("authorization", starConfig.getAuthorization().replaceAll("\\s+", ""))
 		.post(RequestBody.create(
 			MediaType.parse("application/json"),
 			// Doesn't include in-game name unless toggled on (default value is off)

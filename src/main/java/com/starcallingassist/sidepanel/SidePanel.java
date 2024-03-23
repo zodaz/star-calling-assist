@@ -338,9 +338,10 @@ public class SidePanel extends PluginPanel
 	try
 	{
 	    Request request = new Builder()
-		    .url(plugin.getConfig().getEndpoint())
-		    .addHeader("authorization", plugin.getConfig().getAuthorization())
+		    .url(plugin.getConfig().getEndpoint().replaceAll("\\s+", ""))
+		    .addHeader("authorization", plugin.getConfig().getAuthorization().replaceAll("\\s+", ""))
 		    .addHeader("plugin", plugin.getName())
+		    .addHeader("crowdsourcing", String.valueOf(plugin.getConfig().autoCall() && plugin.getConfig().updateStar()))
 		    .get()
 		    .build();
 
