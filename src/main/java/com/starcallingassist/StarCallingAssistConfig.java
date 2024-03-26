@@ -111,6 +111,18 @@ public interface StarCallingAssistConfig extends Config
 	String generalSection = "General Settings";
 
 	@ConfigItem(
+		keyName = "tierDepletionEstimation",
+		name = "Show tier depletion estimation",
+		description = "Whether or not to display an estimation of the time until the star's tier is depleted.",
+		position = 9,
+		section = generalSection
+	)
+	default boolean tierDepletionEstimation()
+	{
+		return false;
+	}
+
+	@ConfigItem(
 		keyName = "starOnWorldMap",
 		name = "Show active star on world map",
 		description = "Whether or not to display any active star on the world map.",

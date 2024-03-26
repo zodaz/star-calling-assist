@@ -31,6 +31,7 @@ import net.runelite.api.events.GameTick;
 import net.runelite.api.events.NpcDespawned;
 import net.runelite.api.events.NpcSpawned;
 import net.runelite.api.events.WorldChanged;
+import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
 
 public class StarObserverModule extends PluginModuleContract
@@ -41,6 +42,9 @@ public class StarObserverModule extends PluginModuleContract
 
 	@Inject
 	private Client client;
+
+	@Inject
+	private ClientThread clientThread;
 
 	private static final int[] STAR_TIER_IDS = new int[]{
 		ObjectID.CRASHED_STAR_41229,
@@ -64,7 +68,7 @@ public class StarObserverModule extends PluginModuleContract
 	public void startUp()
 	{
 		detectExistingStarNpc();
-		dispatch(new WorldStarUpdated(currentStars.get(client.getWorld())));
+		clientThread.invokeLater(() -> dispatch(new WorldStarUpdated(currentStars.get(client.getWorld()))));
 	}
 
 	@Override
