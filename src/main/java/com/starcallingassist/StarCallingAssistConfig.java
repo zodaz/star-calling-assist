@@ -506,10 +506,22 @@ public interface StarCallingAssistConfig extends Config
 	}
 
 	@ConfigItem(
+		keyName = RegionKeyName.KEY_VARLAMORE,
+		name = "Varlamore",
+		description = "Show or hide this region.",
+		position = 42,
+		section = regionFilterSection
+	)
+	default boolean varlamore()
+	{
+		return true;
+	}
+
+	@ConfigItem(
 		keyName = RegionKeyName.KEY_WILDERNESS,
 		name = "Wilderness",
 		description = "Show or hide this region.",
-		position = 42,
+		position = 43,
 		section = regionFilterSection
 	)
 	default boolean wilderness()
@@ -521,7 +533,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_UNKNOWN,
 		name = "Unknown / Unconfirmed",
 		description = "Show or hide stars that haven't been confirmed / mapped to a region yet.",
-		position = 43,
+		position = 44,
 		section = regionFilterSection
 	)
 	default boolean unknown()

@@ -25,8 +25,8 @@ public class HttpService
 	public void post(CallStarPayload payload, Callback callback) throws IllegalArgumentException
 	{
 		Request request = new Request.Builder()
-			.url(starConfig.getEndpoint())
-			.addHeader("authorization", starConfig.getAuthorization())
+			.url(starConfig.getEndpoint().replaceAll("\\s", ""))
+			.addHeader("authorization", starConfig.getAuthorization().replaceAll("\\s", ""))
 			.post(RequestBody.create(MediaType.parse("application/json"), GSON.toJson(payload)))
 			.build();
 
