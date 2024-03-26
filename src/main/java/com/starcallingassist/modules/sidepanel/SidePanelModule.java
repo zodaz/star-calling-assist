@@ -70,6 +70,12 @@ public class SidePanelModule extends PluginModuleContract
 				{
 					return currentPlayerRegions;
 				}
+
+				@Override
+				public void onSidePanelVisibilityChanged(boolean isVisible)
+				{
+					dispatch(new NavButtonClicked(isVisible));
+				}
 			});
 			sidePanel.setInjector(injector);
 			injector.injectMembers(sidePanel);
@@ -81,7 +87,6 @@ public class SidePanelModule extends PluginModuleContract
 			.tooltip("Star Miners")
 			.icon(ImageUtil.loadImageResource(getClass(), "/sminers.png"))
 			.panel(sidePanel)
-			.onClick(() -> dispatch(new NavButtonClicked(navButton)))
 			.build();
 
 		clientToolbar.addNavigation(navButton);

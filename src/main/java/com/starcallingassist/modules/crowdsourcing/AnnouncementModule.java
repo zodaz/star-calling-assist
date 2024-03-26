@@ -124,7 +124,7 @@ public class AnnouncementModule extends PluginModuleContract
 	@Subscribe
 	public void onNavButtonClicked(NavButtonClicked event)
 	{
-		sidePanelShowing = event.isSidePanelShowing();
+		sidePanelShowing = event.isVisible();
 
 		if (sidePanelShowing)
 		{

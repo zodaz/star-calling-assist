@@ -22,10 +22,11 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import lombok.Setter;
 import net.runelite.client.config.ConfigManager;
+import net.runelite.client.ui.Activatable;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.http.api.worlds.World;
 
-public class SidePanel extends PluginPanel
+public class SidePanel extends PluginPanel implements Activatable
 {
 	@Setter
 	protected Injector injector;
@@ -35,6 +36,8 @@ public class SidePanel extends PluginPanel
 
 	@Inject
 	private ConfigManager configManager;
+
+	private final MasterPanelDecorator decorator;
 
 	@Setter
 	private int currentWorld = 0;
@@ -46,6 +49,7 @@ public class SidePanel extends PluginPanel
 	public SidePanel(MasterPanelDecorator decorator)
 	{
 		super(false);
+		this.decorator = decorator;
 		setLayout(new BorderLayout());
 		setBackground(PluginColors.SCROLLBOX_BACKGROUND);
 
@@ -223,5 +227,17 @@ public class SidePanel extends PluginPanel
 
 		revalidate();
 		repaint();
+	}
+
+	@Override
+	public void onActivate()
+	{
+		decorator.onSidePanelVisibilityChanged(true);
+	}
+
+	@Override
+	public void onDeactivate()
+	{
+		decorator.onSidePanelVisibilityChanged(false);
 	}
 }
