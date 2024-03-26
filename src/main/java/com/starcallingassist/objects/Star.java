@@ -2,8 +2,10 @@ package com.starcallingassist.objects;
 
 import java.util.Objects;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import lombok.Getter;
 import lombok.Setter;
+import net.runelite.api.NPC;
 import net.runelite.api.coords.WorldPoint;
 
 public class Star
@@ -20,6 +22,11 @@ public class Star
 	@Getter
 	@Setter
 	private Integer currentMiners;
+
+	@Setter
+	@Getter
+	@Nullable
+	private NPC npc;
 
 	public Star(Integer world, StarLocation location, Integer tier)
 	{
