@@ -81,10 +81,10 @@ public class SidePanelModule extends PluginModuleContract
 			.tooltip("Star Miners")
 			.icon(ImageUtil.loadImageResource(getClass(), "/sminers.png"))
 			.panel(sidePanel)
+			.onClick(() -> dispatch(new NavButtonClicked(navButton)))
 			.build();
 
 		clientToolbar.addNavigation(navButton);
-		navButton.setOnClick(() -> dispatch(new NavButtonClicked(navButton)));
 
 		fetchWorldData();
 		sidePanel.setCurrentWorld(client.getWorld());
