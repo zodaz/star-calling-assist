@@ -1,12 +1,17 @@
 package com.starcallingassist.events;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.runelite.client.ui.NavigationButton;
 
-@AllArgsConstructor
+@Getter
 public class NavButtonClicked
 {
-	@Getter
-	private NavigationButton button;
+	private final boolean sidePanelShowing;
+	private final NavigationButton button;
+
+	public NavButtonClicked(NavigationButton button)
+	{
+		this.button = button;
+		this.sidePanelShowing = button.getPanel().isShowing();
+	}
 }
