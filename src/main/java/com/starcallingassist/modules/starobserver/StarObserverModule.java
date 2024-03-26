@@ -63,6 +63,7 @@ public class StarObserverModule extends PluginModuleContract
 	@Override
 	public void startUp()
 	{
+		detectExistingStarNpc();
 		dispatch(new WorldStarUpdated(currentStars.get(client.getWorld())));
 	}
 
@@ -331,6 +332,17 @@ public class StarObserverModule extends PluginModuleContract
 		}
 
 		return null;
+	}
+
+	private void detectExistingStarNpc()
+	{
+		client.getNpcs().forEach(npc ->
+		{
+			if (npc.getId() == STAR_NPC_ID)
+			{
+				currentStarNpc = npc;
+			}
+		});
 	}
 
 	@Subscribe
