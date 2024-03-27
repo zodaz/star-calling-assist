@@ -15,10 +15,10 @@ import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.ResizeableChanged;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.events.WidgetLoaded;
+import net.runelite.api.widgets.ComponentID;
+import net.runelite.api.widgets.InterfaceID;
 import net.runelite.api.widgets.JavaScriptCallback;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetID;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.api.widgets.WidgetType;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
@@ -34,12 +34,12 @@ public class CallButtonModule extends PluginModuleContract
 	@Inject
 	private StarCallingAssistConfig config;
 
-	private Widget minimapOrbsWidget = null;
+	private Widget minimapContainerWidget = null;
 
 	@Override
 	public void startUp()
 	{
-		minimapOrbsWidget = client.getWidget(WidgetInfo.MINIMAP_ORBS);
+		minimapContainerWidget = client.getWidget(ComponentID.MINIMAP_CONTAINER);
 		clientThread.invokeLater(this::createCallButton);
 	}
 
@@ -76,7 +76,7 @@ public class CallButtonModule extends PluginModuleContract
 	@Subscribe
 	public void onWidgetLoaded(WidgetLoaded event)
 	{
-		if (event.getGroupId() == WidgetID.MINIMAP_GROUP_ID && minimapOrbsWidget == null)
+		if (event.getGroupId() == InterfaceID.MINIMAP && minimapContainerWidget == null)
 		{
 			redrawCallButton();
 		}
@@ -91,7 +91,7 @@ public class CallButtonModule extends PluginModuleContract
 	private void redrawCallButton()
 	{
 		removeCallButton();
-		minimapOrbsWidget = client.getWidget(WidgetInfo.MINIMAP_ORBS);
+		minimapContainerWidget = client.getWidget(ComponentID.MINIMAP_CONTAINER);
 		clientThread.invokeLater(this::createCallButton);
 	}
 
@@ -118,12 +118,12 @@ public class CallButtonModule extends PluginModuleContract
 
 	private void createCallButton()
 	{
-		if (minimapOrbsWidget == null || !config.callHorn())
+		if (minimapContainerWidget == null || !config.callHorn())
 		{
 			return;
 		}
 
-		Widget callButtonContainer = minimapOrbsWidget.createChild(-1, WidgetType.GRAPHIC);
+		Widget callButtonContainer = minimapContainerWidget.createChild(-1, WidgetType.GRAPHIC);
 		callButtonContainer.setSpriteId(2138);
 		callButtonContainer.setOriginalWidth(34);
 		callButtonContainer.setOriginalHeight(34);
@@ -133,7 +133,7 @@ public class CallButtonModule extends PluginModuleContract
 		setWidgetLocation(callButtonContainer, 0, 0);
 		callButtonContainer.revalidate();
 
-		Widget callButtonBackground = minimapOrbsWidget.createChild(-1, WidgetType.GRAPHIC);
+		Widget callButtonBackground = minimapContainerWidget.createChild(-1, WidgetType.GRAPHIC);
 		callButtonBackground.setSpriteId(1061);
 		callButtonBackground.setOriginalWidth(26);
 		callButtonBackground.setOriginalHeight(26);
@@ -146,7 +146,7 @@ public class CallButtonModule extends PluginModuleContract
 		callButtonBackground.setOnOpListener((JavaScriptCallback) this::callButtonClicked);
 		callButtonBackground.revalidate();
 
-		Widget callButtonIcon = minimapOrbsWidget.createChild(WidgetType.GRAPHIC);
+		Widget callButtonIcon = minimapContainerWidget.createChild(WidgetType.GRAPHIC);
 		callButtonIcon.setSpriteId(SpriteID.BARBARIAN_ASSAULT_HORN_FOR_ATTACKER_ICON);
 		callButtonIcon.setOriginalWidth(16);
 		callButtonIcon.setOriginalHeight(16);
@@ -156,10 +156,10 @@ public class CallButtonModule extends PluginModuleContract
 
 	private void removeCallButton()
 	{
-		if (minimapOrbsWidget != null)
+		if (minimapContainerWidget != null)
 		{
-			minimapOrbsWidget.deleteAllChildren();
-			minimapOrbsWidget = null;
+			minimapContainerWidget.deleteAllChildren();
+			minimapContainerWidget = null;
 		}
 
 	}

@@ -111,6 +111,18 @@ public interface StarCallingAssistConfig extends Config
 	String generalSection = "General Settings";
 
 	@ConfigItem(
+		keyName = "tierDepletionEstimation",
+		name = "Show tier depletion estimation",
+		description = "Whether or not to display an estimation of the time until the star's tier is depleted.",
+		position = 9,
+		section = generalSection
+	)
+	default boolean tierDepletionEstimation()
+	{
+		return false;
+	}
+
+	@ConfigItem(
 		keyName = "starOnWorldMap",
 		name = "Show active star on world map",
 		description = "Whether or not to display any active star on the world map.",
@@ -506,10 +518,22 @@ public interface StarCallingAssistConfig extends Config
 	}
 
 	@ConfigItem(
+		keyName = RegionKeyName.KEY_VARLAMORE,
+		name = "Varlamore",
+		description = "Show or hide this region.",
+		position = 42,
+		section = regionFilterSection
+	)
+	default boolean varlamore()
+	{
+		return true;
+	}
+
+	@ConfigItem(
 		keyName = RegionKeyName.KEY_WILDERNESS,
 		name = "Wilderness",
 		description = "Show or hide this region.",
-		position = 42,
+		position = 43,
 		section = regionFilterSection
 	)
 	default boolean wilderness()
@@ -521,7 +545,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_UNKNOWN,
 		name = "Unknown / Unconfirmed",
 		description = "Show or hide stars that haven't been confirmed / mapped to a region yet.",
-		position = 43,
+		position = 44,
 		section = regionFilterSection
 	)
 	default boolean unknown()

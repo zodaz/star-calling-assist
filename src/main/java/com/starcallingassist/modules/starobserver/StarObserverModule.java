@@ -19,6 +19,8 @@ import javax.annotation.Nonnull;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
+import net.runelite.api.NPC;
+import net.runelite.api.NullNpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
@@ -26,16 +28,23 @@ import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.GameObjectDespawned;
 import net.runelite.api.events.GameObjectSpawned;
 import net.runelite.api.events.GameTick;
+import net.runelite.api.events.NpcDespawned;
+import net.runelite.api.events.NpcSpawned;
 import net.runelite.api.events.WorldChanged;
+import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
 
 public class StarObserverModule extends PluginModuleContract
 {
+	private static final int STAR_NPC_ID = NullNpcID.NULL_10629;
 	@Inject
 	private StarCallingAssistConfig config;
 
 	@Inject
 	private Client client;
+
+	@Inject
+	private ClientThread clientThread;
 
 	private static final int[] STAR_TIER_IDS = new int[]{
 		ObjectID.CRASHED_STAR_41229,
@@ -51,18 +60,21 @@ public class StarObserverModule extends PluginModuleContract
 
 	public final ConcurrentHashMap<Integer, Star> currentStars = new ConcurrentHashMap<>();
 
-	private boolean isNearStar = false;
+	private boolean isNearStarLocation = false;
+
+	private NPC currentStarNpc = null;
 
 	@Override
 	public void startUp()
 	{
-		dispatch(new WorldStarUpdated(currentStars.get(client.getWorld())));
+		detectExistingStarNpc();
+		clientThread.invokeLater(() -> dispatch(new WorldStarUpdated(currentStars.get(client.getWorld()))));
 	}
 
 	@Override
 	public void shutDown()
 	{
-		isNearStar = false;
+		isNearStarLocation = false;
 	}
 
 	@Subscribe
@@ -116,7 +128,7 @@ public class StarObserverModule extends PluginModuleContract
 
 		// When the player leaves the area, the star object will automatically despawn.
 		// We will ignore these objects, since we can't rely on them being accurate.
-		if (!isStarWithinRenderDistance(lastKnownStar))
+		if (!isStarLocationWithinRenderDistance(lastKnownStar))
 		{
 			return;
 		}
@@ -131,7 +143,7 @@ public class StarObserverModule extends PluginModuleContract
 		currentStars.remove(lastKnownStar.getWorld());
 		dispatch(new StarDepleted(despawnedStar));
 		dispatch(new WorldStarUpdated(null));
-		isNearStar = false;
+		isNearStarLocation = false;
 	}
 
 	@Subscribe
@@ -150,7 +162,7 @@ public class StarObserverModule extends PluginModuleContract
 
 		// Since for this 'despawn event' we won't have a game-object to check against, we'll want to
 		// make sure we're close to the area that the current world's star was indicated to be.
-		if (!isStarWithinRenderDistance(lastKnownStar))
+		if (!isStarLocationWithinRenderDistance(lastKnownStar))
 		{
 			return;
 		}
@@ -169,7 +181,7 @@ public class StarObserverModule extends PluginModuleContract
 
 		dispatch(new StarDepleted(despawnedStar));
 		dispatch(new WorldStarUpdated(null));
-		isNearStar = false;
+		isNearStarLocation = false;
 	}
 
 	@Subscribe
@@ -233,20 +245,22 @@ public class StarObserverModule extends PluginModuleContract
 			return;
 		}
 
-		if (isStarWithinRenderDistance(star))
+		star.setNpc(currentStarNpc);
+
+		if (isStarLocationWithinRenderDistance(star))
 		{
-			if (!isNearStar)
+			if (!isNearStarLocation)
 			{
-				isNearStar = true;
+				isNearStarLocation = true;
 				dispatch(new StarApproached(star));
 			}
 
 			return;
 		}
 
-		if (isNearStar)
+		if (isNearStarLocation)
 		{
-			isNearStar = false;
+			isNearStarLocation = false;
 			dispatch(new StarAbandoned(star));
 		}
 	}
@@ -254,7 +268,7 @@ public class StarObserverModule extends PluginModuleContract
 	@Subscribe
 	public void onWorldChanged(WorldChanged event)
 	{
-		isNearStar = false;
+		isNearStarLocation = false;
 		dispatch(new WorldStarUpdated(currentStars.get(client.getWorld())));
 	}
 
@@ -324,12 +338,41 @@ public class StarObserverModule extends PluginModuleContract
 		return null;
 	}
 
+	private void detectExistingStarNpc()
+	{
+		client.getNpcs().forEach(npc ->
+		{
+			if (npc.getId() == STAR_NPC_ID)
+			{
+				currentStarNpc = npc;
+			}
+		});
+	}
+
+	@Subscribe
+	public void onNpcSpawned(NpcSpawned event)
+	{
+		if (event.getNpc().getId() == STAR_NPC_ID)
+		{
+			this.currentStarNpc = event.getNpc();
+		}
+	}
+
+	@Subscribe
+	public void onNpcDespawned(NpcDespawned event)
+	{
+		if (event.getNpc().getId() == STAR_NPC_ID)
+		{
+			this.currentStarNpc = null;
+		}
+	}
+
 	protected Boolean isValidStarObject(GameObject object)
 	{
 		return this.calculateStarTier(object) != null;
 	}
 
-	private boolean isStarWithinRenderDistance(@Nonnull Star star)
+	private boolean isStarLocationWithinRenderDistance(@Nonnull Star star)
 	{
 		WorldArea worldArea = star.getLocation().getWorldArea();
 

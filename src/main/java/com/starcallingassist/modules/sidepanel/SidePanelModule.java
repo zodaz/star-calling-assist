@@ -70,6 +70,12 @@ public class SidePanelModule extends PluginModuleContract
 				{
 					return currentPlayerRegions;
 				}
+
+				@Override
+				public void onSidePanelVisibilityChanged(boolean isVisible)
+				{
+					dispatch(new NavButtonClicked(isVisible));
+				}
 			});
 			sidePanel.setInjector(injector);
 			injector.injectMembers(sidePanel);
@@ -84,7 +90,6 @@ public class SidePanelModule extends PluginModuleContract
 			.build();
 
 		clientToolbar.addNavigation(navButton);
-		navButton.setOnClick(() -> dispatch(new NavButtonClicked(navButton)));
 
 		fetchWorldData();
 		sidePanel.setCurrentWorld(client.getWorld());

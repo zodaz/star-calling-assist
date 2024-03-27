@@ -5,18 +5,19 @@ import com.starcallingassist.constants.RegionKeyName;
 public enum Region
 {
 	ASGARNIA(RegionKeyName.KEY_ASGARNIA),
-	KARAMJA(RegionKeyName.KEY_KARAMJA),
+	DESERT(RegionKeyName.KEY_DESERT),
 	FELDIP(RegionKeyName.KEY_FELDIP),
 	FOSSIL(RegionKeyName.KEY_FOSSIL),
 	FREMMENIK(RegionKeyName.KEY_FREMMENIK),
-	KOUREND(RegionKeyName.KEY_KOUREND),
+	GNOME(RegionKeyName.KEY_GNOME),
 	KANDARIN(RegionKeyName.KEY_KANDARIN),
+	KARAMJA(RegionKeyName.KEY_KARAMJA),
 	KEBOS(RegionKeyName.KEY_KEBOS),
-	DESERT(RegionKeyName.KEY_DESERT),
+	KOUREND(RegionKeyName.KEY_KOUREND),
 	MISTHALIN(RegionKeyName.KEY_MISTHALIN),
 	MORYTANIA(RegionKeyName.KEY_MORYTANIA),
-	GNOME(RegionKeyName.KEY_GNOME),
 	TIRANNWN(RegionKeyName.KEY_TIRANNWN),
+	VARLAMORE(RegionKeyName.KEY_VARLAMORE),
 	WILDERNESS(RegionKeyName.KEY_WILDERNESS),
 	UNKNOWN(RegionKeyName.KEY_UNKNOWN);
 

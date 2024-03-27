@@ -9,4 +9,6 @@ public interface MasterPanelDecorator
 	void onWorldHopRequest(WorldHopRequest worldHopRequest);
 
 	List<StarLocation> getCurrentPlayerRegions();
+
+	void onSidePanelVisibilityChanged(boolean isVisible);
 }

@@ -113,6 +113,10 @@ public class StarLocation
 			put(new Point(3049, 3940), new StarLocationDetails("Pirates' Hideout (lvl 53 Wildy)", Region.WILDERNESS));
 			put(new Point(3091, 3962), new StarLocationDetails("Mage Arena bank (lvl 56 Wildy)", Region.WILDERNESS));
 			put(new Point(3188, 3932), new StarLocationDetails("Wilderness Resource Area", Region.WILDERNESS));
+
+			put(new Point(1742, 2954), new StarLocationDetails("Varlamore South East mine", Region.VARLAMORE));
+			put(new Point(1771, 3102), new StarLocationDetails("Varlamore colosseum entrance bank", Region.VARLAMORE));
+			put(new Point(1486, 3089), new StarLocationDetails("Mine north-west of hunter guild", Region.VARLAMORE));
 		}
 	};
 
