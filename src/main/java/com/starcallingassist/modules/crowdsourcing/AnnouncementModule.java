@@ -249,13 +249,8 @@ public class AnnouncementModule extends PluginModuleContract
 					outdatedWorlds.forEach(world -> {
 						AnnouncedStar outdated = stars.remove(world);
 						AnnouncedStar deadStarAnnouncement = new AnnouncedStar(
-							new Star(
-								outdated.getStar().getWorld(),
-								outdated.getStar().getLocation(),
-								null
-							),
-							System.currentTimeMillis() / 1000L,
-							outdated.getPlayerName()
+							Star.fromExistingWithTierChange(outdated.getStar(), null),
+							System.currentTimeMillis() / 1000L
 						);
 
 						dispatch(new AnnouncementReceived(deadStarAnnouncement));

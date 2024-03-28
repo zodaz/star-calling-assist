@@ -71,9 +71,9 @@ public class StarListPanel extends JPanel
 		add(starPanelContainer, BorderLayout.CENTER);
 	}
 
-	public void onStarUpdate(@Nonnull Star star, @Nonnull World world, long updatedAt, @Nonnull String playerName)
+	public void onStarUpdate(@Nonnull Star star, @Nonnull World world, long updatedAt)
 	{
-		announcementAttributes.put(world.getId(), new StarListEntryAttributes(star, world, updatedAt, playerName, decorator));
+		announcementAttributes.put(world.getId(), new StarListEntryAttributes(star, world, updatedAt, decorator));
 
 		SwingUtilities.invokeLater(this::rebuild);
 	}

@@ -16,9 +16,6 @@ public class AnnouncedStar
 	@Getter
 	private final long updatedAt;
 
-	@Getter
-	private final String playerName;
-
 	public static AnnouncedStar fromJsonObject(JsonObject entry)
 	{
 		if (entry == null ||
@@ -37,10 +34,10 @@ public class AnnouncedStar
 			new Star(
 				entry.get("world").getAsInt(),
 				new StarLocation(entry.get("calledLocation").getAsString()),
-				entry.get("tier").getAsInt()
+				entry.get("tier").getAsInt(),
+				entry.get("calledBy").getAsString()
 			),
-			entry.get("calledAt").getAsLong(),
-			entry.get("calledBy").getAsString()
+			entry.get("calledAt").getAsLong()
 		);
 	}
 

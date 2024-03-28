@@ -209,9 +209,9 @@ public class SidePanel extends PluginPanel implements Activatable
 		//
 	}
 
-	public void onStarUpdate(@Nonnull Star star, @Nonnull World world, long updatedAt, @Nonnull String playerName)
+	public void onStarUpdate(@Nonnull Star star, @Nonnull World world, long updatedAt)
 	{
-		starListPanel.onStarUpdate(star, world, updatedAt, playerName);
+		starListPanel.onStarUpdate(star, world, updatedAt);
 	}
 
 	public void setErrorMessage(String errorMessage)

@@ -111,15 +111,15 @@ public interface StarCallingAssistConfig extends Config
 	String generalSection = "General Settings";
 
 	@ConfigItem(
-		keyName = "tierDepletionEstimation",
-		name = "Show tier depletion estimation",
-		description = "Whether or not to display an estimation of the time until the star's tier is depleted.",
+		keyName = "starDetailsOverlay",
+		name = "Show details overlay",
+		description = "Whether or not to display information about a nearby star.",
 		position = 9,
 		section = generalSection
 	)
-	default boolean tierDepletionEstimation()
+	default boolean starDetailsOverlay()
 	{
-		return false;
+		return true;
 	}
 
 	@ConfigItem(

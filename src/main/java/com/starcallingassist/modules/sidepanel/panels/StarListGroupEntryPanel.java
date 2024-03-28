@@ -212,7 +212,7 @@ public class StarListGroupEntryPanel extends JPanel
 	private JLabel createFoundByColumn(int textPosition)
 	{
 		return createColumnLabel(
-			"Found by " + attributes.getPlayerName(),
+			"Found by " + Optional.ofNullable(attributes.getFoundBy()).orElse("you"),
 			textPosition
 		);
 	}

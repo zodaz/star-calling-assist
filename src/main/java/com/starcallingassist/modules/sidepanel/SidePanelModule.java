@@ -158,8 +158,7 @@ public class SidePanelModule extends PluginModuleContract
 		sidePanel.onStarUpdate(
 			announcement.getStar(),
 			worldObject,
-			announcement.getUpdatedAt(),
-			announcement.getPlayerName()
+			announcement.getUpdatedAt()
 		);
 	}
 
@@ -250,8 +249,7 @@ public class SidePanelModule extends PluginModuleContract
 		sidePanel.onStarUpdate(
 			star,
 			worldObject,
-			(System.currentTimeMillis() / 1000L) - 5, // Always make sure it's slightly outdated.
-			"you"
+			(System.currentTimeMillis() / 1000L) - 5 // Always make sure it's slightly outdated
 		);
 	}
 }

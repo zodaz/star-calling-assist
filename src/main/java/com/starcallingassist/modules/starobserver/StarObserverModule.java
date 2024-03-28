@@ -99,9 +99,11 @@ public class StarObserverModule extends PluginModuleContract
 
 		if (!Objects.equals(observedStar.getTier(), lastKnownStar.getTier()))
 		{
-			currentStars.put(observedStar.getWorld(), observedStar);
-			dispatch(new WorldStarUpdated(observedStar));
-			dispatch(new StarTierChanged(observedStar));
+			Star updatedStar = Star.fromExistingWithTierChange(lastKnownStar, observedStar.getTier());
+
+			currentStars.put(updatedStar.getWorld(), updatedStar);
+			dispatch(new WorldStarUpdated(updatedStar));
+			dispatch(new StarTierChanged(updatedStar));
 		}
 	}
 
@@ -120,8 +122,8 @@ public class StarObserverModule extends PluginModuleContract
 			return;
 		}
 
-		Star despawnedStar = new Star(client.getWorld(), despawnedGameObject.getWorldLocation(), null);
-		if (!despawnedStar.isSameAs(lastKnownStar))
+		Star observedStar = new Star(client.getWorld(), despawnedGameObject.getWorldLocation(), null);
+		if (!observedStar.isSameAs(lastKnownStar))
 		{
 			return;
 		}
@@ -140,7 +142,9 @@ public class StarObserverModule extends PluginModuleContract
 			return;
 		}
 
-		currentStars.remove(lastKnownStar.getWorld());
+		Star despawnedStar = Star.fromExistingWithTierChange(lastKnownStar, null);
+
+		currentStars.remove(despawnedStar.getWorld());
 		dispatch(new StarDepleted(despawnedStar));
 		dispatch(new WorldStarUpdated(null));
 		isNearStarLocation = false;
@@ -176,7 +180,7 @@ public class StarObserverModule extends PluginModuleContract
 			return;
 		}
 
-		Star despawnedStar = new Star(lastKnownStar.getWorld(), lastKnownStar.getLocation(), null);
+		Star despawnedStar = Star.fromExistingWithTierChange(lastKnownStar, null);
 		currentStars.remove(despawnedStar.getWorld());
 
 		dispatch(new StarDepleted(despawnedStar));
@@ -232,7 +236,7 @@ public class StarObserverModule extends PluginModuleContract
 			}
 		}
 
-		dispatch(new StarMissing(new Star(star.getWorld(), star.getLocation().getWorldPoint(), null)));
+		dispatch(new StarMissing(Star.fromExistingWithTierChange(star, null)));
 		currentStars.remove(star.getWorld());
 	}
 
