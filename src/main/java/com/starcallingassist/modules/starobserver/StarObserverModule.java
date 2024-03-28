@@ -19,6 +19,7 @@ import javax.annotation.Nonnull;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.GameObject;
+import net.runelite.api.GameState;
 import net.runelite.api.NPC;
 import net.runelite.api.NullNpcID;
 import net.runelite.api.ObjectID;
@@ -27,6 +28,7 @@ import net.runelite.api.coords.WorldArea;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.GameObjectDespawned;
 import net.runelite.api.events.GameObjectSpawned;
+import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.NpcDespawned;
 import net.runelite.api.events.NpcSpawned;
@@ -148,6 +150,15 @@ public class StarObserverModule extends PluginModuleContract
 		dispatch(new StarDepleted(despawnedStar));
 		dispatch(new WorldStarUpdated(null));
 		isNearStarLocation = false;
+	}
+
+	@Subscribe
+	public void onGameStateChanged(GameStateChanged state)
+	{
+		if (state.getGameState() == GameState.HOPPING || state.getGameState() == GameState.LOGIN_SCREEN)
+		{
+			currentStarNpc = null;
+		}
 	}
 
 	@Subscribe
