@@ -1,12 +1,11 @@
 package com.starcallingassist.events;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import net.runelite.client.ui.NavigationButton;
+import lombok.Data;
 
 @AllArgsConstructor
+@Data
 public class NavButtonClicked
 {
-	@Getter
-	private NavigationButton button;
+	private final boolean isVisible;
 }

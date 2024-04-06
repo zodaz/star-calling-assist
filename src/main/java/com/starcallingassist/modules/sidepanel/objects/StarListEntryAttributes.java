@@ -25,7 +25,7 @@ public class StarListEntryAttributes
 	private final long updatedAt;
 
 	@Getter
-	private final String playerName;
+	private final String foundBy;
 
 	private final StarListGroupEntryDecorator decorator;
 
@@ -43,12 +43,12 @@ public class StarListEntryAttributes
 		9 * 7 * 60 * 1000    // 63 minutes
 	};
 
-	public StarListEntryAttributes(@Nonnull Star star, @Nonnull World world, long updatedAt, @Nonnull String playerName, StarListGroupEntryDecorator decorator)
+	public StarListEntryAttributes(@Nonnull Star star, @Nonnull World world, long updatedAt, StarListGroupEntryDecorator decorator)
 	{
 		this.star = star;
 		this.world = world;
 		this.updatedAt = updatedAt;
-		this.playerName = playerName;
+		this.foundBy = star.getFoundBy();
 		this.decorator = decorator;
 	}
 

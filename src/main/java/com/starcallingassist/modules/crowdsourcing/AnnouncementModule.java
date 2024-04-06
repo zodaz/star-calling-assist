@@ -71,7 +71,7 @@ public class AnnouncementModule extends PluginModuleContract
 
 	private long lastInteractionTimestamp = System.currentTimeMillis();
 
-	private boolean sidePanelOpened = false;
+	private boolean sidePanelShowing = false;
 
 	@Override
 	public void startUp()
@@ -124,9 +124,9 @@ public class AnnouncementModule extends PluginModuleContract
 	@Subscribe
 	public void onNavButtonClicked(NavButtonClicked event)
 	{
-		sidePanelOpened = event.getButton().isSelected();
+		sidePanelShowing = event.isVisible();
 
-		if (sidePanelOpened)
+		if (sidePanelShowing)
 		{
 			SwingUtilities.invokeLater(this::refreshAnnouncements);
 		}
@@ -136,14 +136,14 @@ public class AnnouncementModule extends PluginModuleContract
 	{
 		// We'll want to refresh the star list every three minutes when the side panel is closed.
 		// This allows us to auto-call "outdated" or unconfirmed stars when not participating.
-		if (!sidePanelOpened && config.autoCall() && seconds % (60 * 3) == 0)
+		if (!sidePanelShowing && config.autoCall() && seconds % (60 * 3) == 0)
 		{
 			refreshAnnouncements();
 			return;
 		}
 
 		// When the side-panel is open, we'll want to refresh every thirty seconds.
-		if (sidePanelOpened && seconds % 30 == 0)
+		if (sidePanelShowing && seconds % 30 == 0)
 		{
 			refreshAnnouncements();
 			return;
@@ -249,13 +249,8 @@ public class AnnouncementModule extends PluginModuleContract
 					outdatedWorlds.forEach(world -> {
 						AnnouncedStar outdated = stars.remove(world);
 						AnnouncedStar deadStarAnnouncement = new AnnouncedStar(
-							new Star(
-								outdated.getStar().getWorld(),
-								outdated.getStar().getLocation(),
-								null
-							),
-							System.currentTimeMillis() / 1000L,
-							outdated.getPlayerName()
+							Star.fromExistingWithTierChange(outdated.getStar(), null),
+							System.currentTimeMillis() / 1000L
 						);
 
 						dispatch(new AnnouncementReceived(deadStarAnnouncement));
