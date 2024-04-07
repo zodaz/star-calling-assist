@@ -249,7 +249,7 @@ public class BroadcastModule extends PluginModuleContract
 						return;
 					}
 
-					lastCalledStar = new Star(Integer.valueOf(payload.getWorld()), new StarLocation(payload.getLocation()), Integer.valueOf(payload.getTier()), client.getLocalPlayer().getName());
+					lastCalledStar = payload.toStar();
 					dispatch(new BroadcastSuccessful(lastCalledStar, payload));
 					clientThread.invokeLater(() -> dispatch(new LogMessage("Star successfully called: *" + payload.toCallout() + "*", ChatLogLevel.CALLS)));
 					res.close();
