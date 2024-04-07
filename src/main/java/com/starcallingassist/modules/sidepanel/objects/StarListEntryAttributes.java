@@ -263,6 +263,10 @@ public class StarListEntryAttributes
 		{
 			return PluginColors.FRESH_START_WORLD;
 		}
+		else if (types.contains(WorldType.PVP) || types.contains(WorldType.HIGH_RISK))
+		{
+			return PluginColors.PVP_WORLD;
+		}
 
 		return null;
 	}
