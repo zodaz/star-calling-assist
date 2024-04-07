@@ -243,7 +243,7 @@ public class StarListEntryAttributes
 	{
 		EnumSet<WorldType> types = world.getTypes();
 
-		if (world.getTypes().contains(WorldType.SKILL_TOTAL))
+		if (types.contains(WorldType.SKILL_TOTAL))
 		{
 			return PluginColors.TOTAL_LEVEL_RESTRICTED_WORLD;
 		}
