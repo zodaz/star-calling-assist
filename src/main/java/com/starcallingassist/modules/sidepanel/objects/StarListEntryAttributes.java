@@ -211,6 +211,11 @@ public class StarListEntryAttributes
 			return world.getActivity().substring(0, 4) + " Total";
 		}
 
+		if (world.getTypes().contains(WorldType.PVP) && world.getTypes().contains(WorldType.HIGH_RISK))
+		{
+			return "High-risk PvP";
+		}
+
 		if (world.getTypes().contains(WorldType.PVP))
 		{
 			return "PvP World";
