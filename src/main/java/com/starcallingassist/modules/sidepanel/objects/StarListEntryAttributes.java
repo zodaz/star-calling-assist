@@ -171,7 +171,7 @@ public class StarListEntryAttributes
 
 		EnumSet<WorldType> types = world.getTypes();
 
-		if (types.contains(WorldType.PVP) || types.contains(WorldType.HIGH_RISK) || types.contains(WorldType.DEADMAN))
+		if (types.contains(WorldType.PVP) || types.contains(WorldType.DEADMAN))
 		{
 			return PluginColors.DANGEROUS_AREA;
 		}
