@@ -218,7 +218,7 @@ public class StarListEntryAttributes
 
 		if (world.getTypes().contains(WorldType.HIGH_RISK))
 		{
-			return "High-risk PvP";
+			return "High-risk";
 		}
 
 		if (world.getTypes().contains(WorldType.BETA_WORLD))
