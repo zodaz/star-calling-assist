@@ -12,7 +12,6 @@ import com.starcallingassist.modules.scout.ScoutModule;
 import com.starcallingassist.modules.sidepanel.SidePanelModule;
 import com.starcallingassist.modules.starobserver.StarObserverModule;
 import com.starcallingassist.modules.worldhop.WorldHopModule;
-import com.starcallingassist.modules.worldmap.WorldMapModule;
 import java.lang.reflect.InvocationTargetException;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -55,8 +54,7 @@ public class StarCallingAssistPlugin extends Plugin
 		ScoutModule.class,
 		SidePanelModule.class,
 		StarObserverModule.class,
-		WorldHopModule.class,
-		WorldMapModule.class
+		WorldHopModule.class
 	));
 
 	@Inject
