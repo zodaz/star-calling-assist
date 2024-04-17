@@ -1,6 +1,7 @@
 package com.starcallingassist.modules.crowdsourcing.objects;
 
 import com.starcallingassist.objects.Star;
+import com.starcallingassist.objects.StarLocation;
 import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nonnull;
@@ -26,6 +27,11 @@ public class CallStarPayload
 			location,
 			Optional.ofNullable(star.getCurrentMiners()).orElse(-1)
 		);
+	}
+
+	public Star toStar()
+	{
+		return new Star(Integer.valueOf(world), new StarLocation(location), Integer.valueOf(tier), sender);
 	}
 
 	public String toCallout()

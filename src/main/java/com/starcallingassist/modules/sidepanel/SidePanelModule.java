@@ -7,6 +7,7 @@ import com.starcallingassist.events.AnnouncementRefreshFailed;
 import com.starcallingassist.events.AnnouncementsRefreshed;
 import com.starcallingassist.events.NavButtonClicked;
 import com.starcallingassist.events.PluginConfigChanged;
+import com.starcallingassist.events.ShowWorldPointOnWorldMapRequested;
 import com.starcallingassist.events.StarDepleted;
 import com.starcallingassist.events.StarLocationRegionEntered;
 import com.starcallingassist.events.StarLocationRegionExited;
@@ -63,6 +64,12 @@ public class SidePanelModule extends PluginModuleContract
 				public void onWorldHopRequest(WorldHopRequest worldHopRequest)
 				{
 					dispatch(worldHopRequest);
+				}
+
+				@Override
+				public void onShowWorldPointOnWorldMapRequested(ShowWorldPointOnWorldMapRequested showWorldPointOnWorldMapRequested)
+				{
+					dispatch(showWorldPointOnWorldMapRequested);
 				}
 
 				@Override
