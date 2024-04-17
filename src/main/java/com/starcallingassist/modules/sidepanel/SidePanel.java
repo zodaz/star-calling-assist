@@ -5,7 +5,6 @@ import com.google.inject.Injector;
 import com.starcallingassist.StarCallingAssistConfig;
 import com.starcallingassist.constants.PluginColors;
 import com.starcallingassist.enums.Region;
-import com.starcallingassist.events.ShowWorldPointOnWorldMapRequested;
 import com.starcallingassist.events.WorldHopRequest;
 import com.starcallingassist.modules.sidepanel.decorators.HeaderPanelDecorator;
 import com.starcallingassist.modules.sidepanel.decorators.MasterPanelDecorator;
@@ -165,12 +164,6 @@ public class SidePanel extends PluginPanel implements Activatable
 			public void onWorldHopRequest(WorldHopRequest request)
 			{
 				decorator.onWorldHopRequest(request);
-			}
-
-			@Override
-			public void onShowWorldPointOnWorldMapRequested(ShowWorldPointOnWorldMapRequested showWorldPointOnWorldMapRequested)
-			{
-				decorator.onShowWorldPointOnWorldMapRequested(showWorldPointOnWorldMapRequested);
 			}
 		});
 

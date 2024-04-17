@@ -1,7 +1,6 @@
 package com.starcallingassist.modules.sidepanel.decorators;
 
 import com.starcallingassist.enums.Region;
-import com.starcallingassist.events.ShowWorldPointOnWorldMapRequested;
 import com.starcallingassist.events.WorldHopRequest;
 import com.starcallingassist.modules.sidepanel.enums.TotalLevelType;
 import com.starcallingassist.objects.StarLocation;
@@ -44,6 +43,4 @@ public interface StarListGroupEntryDecorator
 	int getCurrentWorldId();
 
 	void onWorldHopRequest(WorldHopRequest request);
-
-	void onShowWorldPointOnWorldMapRequested(ShowWorldPointOnWorldMapRequested showWorldPointOnWorldMapRequested);
 }

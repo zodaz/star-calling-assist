@@ -1,22 +1,17 @@
 package com.starcallingassist.modules.sidepanel.panels;
 
 import com.starcallingassist.constants.PluginColors;
-import com.starcallingassist.events.ShowWorldPointOnWorldMapRequested;
 import com.starcallingassist.events.WorldHopRequest;
 import com.starcallingassist.modules.sidepanel.decorators.StarListGroupDecorator;
 import com.starcallingassist.modules.sidepanel.decorators.StarListGroupEntryDecorator;
 import com.starcallingassist.modules.sidepanel.objects.StarListEntryAttributes;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Optional;
 import javax.swing.JLabel;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import lombok.Getter;
@@ -65,10 +60,6 @@ public class StarListGroupEntryPanel extends JPanel
 				if (mouseEvent.getButton() == MouseEvent.BUTTON1 && mouseEvent.getClickCount() == 2)
 				{
 					entry.onWorldHopRequest(new WorldHopRequest(attributes.getWorld()));
-				}
-				else if (mouseEvent.getButton() == MouseEvent.BUTTON3)
-				{
-					showContextMenu(mouseEvent.getX(), mouseEvent.getY());
 				}
 			}
 
@@ -283,37 +274,5 @@ public class StarListGroupEntryPanel extends JPanel
 	public String getGroupingTitle()
 	{
 		return attributes.getStar().getLocation().getName();
-	}
-
-	private void showContextMenu(int x, int y)
-	{
-		JPopupMenu popupMenu = new JPopupMenu();
-		JMenuItem hopToWorld = new JMenuItem("Hop to world " + attributes.getWorld().getId());
-		JMenuItem showOnWorldMap = new JMenuItem("Show on world map");
-
-		hopToWorld.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				entry.onWorldHopRequest(new WorldHopRequest(attributes.getWorld()));
-			}
-		});
-
-		showOnWorldMap.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				entry.onShowWorldPointOnWorldMapRequested(new ShowWorldPointOnWorldMapRequested(attributes.getStar().getLocation().getWorldPoint()));
-			}
-		});
-
-		popupMenu.add(hopToWorld);
-
-		if (attributes.getStar().getLocation().getWorldPoint() != null)
-		{
-			popupMenu.add(showOnWorldMap);
-		}
-
-		popupMenu.show(this, x, y);
 	}
 }

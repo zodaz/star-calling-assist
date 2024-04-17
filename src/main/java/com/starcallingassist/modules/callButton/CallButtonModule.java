@@ -138,9 +138,9 @@ public class CallButtonModule extends PluginModuleContract
 		callButtonBackground.setOriginalWidth(26);
 		callButtonBackground.setOriginalHeight(26);
 		setWidgetLocation(callButtonBackground, 4, 4);
-		callButtonBackground.setAction(CallType.STAR.getOp() - 1, "Call star");
-		callButtonBackground.setAction(CallType.DEAD.getOp() - 1, "Call dead");
-		callButtonBackground.setAction(CallType.DEAD_PRIVATE.getOp() - 1, "Call private");
+		callButtonBackground.setAction(CallType.STAR.getOp(), "Call star");
+		callButtonBackground.setAction(CallType.DEAD.getOp(), "Call dead");
+		callButtonBackground.setAction(CallType.DEAD_PRIVATE.getOp(), "Call private");
 		callButtonBackground.setHasListener(true);
 		callButtonBackground.setNoClickThrough(true);
 		callButtonBackground.setOnOpListener((JavaScriptCallback) this::callButtonClicked);

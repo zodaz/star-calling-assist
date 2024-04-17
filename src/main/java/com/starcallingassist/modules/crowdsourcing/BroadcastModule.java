@@ -17,7 +17,6 @@ import com.starcallingassist.events.StarScouted;
 import com.starcallingassist.events.StarTierChanged;
 import com.starcallingassist.modules.crowdsourcing.objects.CallStarPayload;
 import com.starcallingassist.objects.Star;
-import com.starcallingassist.objects.StarLocation;
 import com.starcallingassist.services.HttpService;
 import java.io.IOException;
 import java.util.Objects;
@@ -169,11 +168,15 @@ public class BroadcastModule extends PluginModuleContract
 	@Subscribe
 	public void onManualStarAbsenceBroadcastRequested(ManualStarAbsenceBroadcastRequested event)
 	{
-		attemptBroadcast(new CallStarPayload(client.getLocalPlayer().getName(),
-			client.getWorld(),
-			0,
-			(event.getIsPublicCall() ? "dead" : "pdead"),
-			-1));
+		if (currentStar == null)
+		{
+			return;
+		}
+
+		attemptBroadcast(
+			Star.fromExistingWithTierChange(currentStar, null),
+			event.getIsPublicCall() ? "dead" : "pdead"
+		);
 	}
 
 	@Subscribe
@@ -223,11 +226,10 @@ public class BroadcastModule extends PluginModuleContract
 
 	private void attemptBroadcast(@Nonnull Star star, String locationName)
 	{
-		attemptBroadcast(new CallStarPayload(client.getLocalPlayer().getName(), star, locationName));
-	}
+		String playerName = config.includeIgn() ? client.getLocalPlayer().getName() : null;
 
-	private void attemptBroadcast(@Nonnull CallStarPayload payload)
-	{
+		CallStarPayload payload = new CallStarPayload(playerName, star, locationName);
+
 		try
 		{
 			httpService.post(payload, new Callback()
@@ -235,7 +237,7 @@ public class BroadcastModule extends PluginModuleContract
 				@Override
 				public void onFailure(Call call, IOException e)
 				{
-					clientThread.invokeLater(() -> dispatch(new LogMessage("Unable to post call to " + config.getEndpoint() + ".", ChatLogLevel.CALLS)));
+					clientThread.invokeLater(() -> dispatch(new LogMessage("Unable to post call to " + config.getEndpoint() + ".", ChatLogLevel.DEBUG)));
 					call.cancel();
 				}
 
@@ -244,21 +246,21 @@ public class BroadcastModule extends PluginModuleContract
 				{
 					if (!res.isSuccessful())
 					{
-						clientThread.invokeLater(() -> dispatch(new LogMessage("Issue posting call to " + config.getEndpoint() + ": *" + res.message() + "*", ChatLogLevel.CALLS)));
+						clientThread.invokeLater(() -> dispatch(new LogMessage("Issue posting call to " + config.getEndpoint() + ": *" + res.message() + "*", ChatLogLevel.DEBUG)));
 						res.close();
 						return;
 					}
 
-					lastCalledStar = payload.toStar();
-					dispatch(new BroadcastSuccessful(lastCalledStar, payload));
+					lastCalledStar = star;
 					clientThread.invokeLater(() -> dispatch(new LogMessage("Star successfully called: *" + payload.toCallout() + "*", ChatLogLevel.CALLS)));
+					dispatch(new BroadcastSuccessful(star, payload));
 					res.close();
 				}
 			});
 		}
 		catch (IllegalArgumentException e)
 		{
-			clientThread.invokeLater(() -> dispatch(new LogMessage("Issue posting call to " + config.getEndpoint() + ": *Invalid endpoint*", ChatLogLevel.CALLS)));
+			clientThread.invokeLater(() -> dispatch(new LogMessage("Issue posting call to " + config.getEndpoint() + ": *Invalid endpoint*", ChatLogLevel.DEBUG)));
 		}
 	}
 }
