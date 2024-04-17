@@ -171,7 +171,7 @@ public class StarListEntryAttributes
 
 		EnumSet<WorldType> types = world.getTypes();
 
-		if (types.contains(WorldType.PVP) || types.contains(WorldType.HIGH_RISK) || types.contains(WorldType.DEADMAN))
+		if (types.contains(WorldType.PVP) || types.contains(WorldType.DEADMAN))
 		{
 			return PluginColors.DANGEROUS_AREA;
 		}
@@ -211,6 +211,11 @@ public class StarListEntryAttributes
 			return world.getActivity().substring(0, 4) + " Total";
 		}
 
+		if (world.getTypes().contains(WorldType.PVP) && world.getTypes().contains(WorldType.HIGH_RISK))
+		{
+			return "High-risk PvP";
+		}
+
 		if (world.getTypes().contains(WorldType.PVP))
 		{
 			return "PvP World";
@@ -218,7 +223,7 @@ public class StarListEntryAttributes
 
 		if (world.getTypes().contains(WorldType.HIGH_RISK))
 		{
-			return "High-risk PvP";
+			return "High-risk";
 		}
 
 		if (world.getTypes().contains(WorldType.BETA_WORLD))
@@ -243,7 +248,7 @@ public class StarListEntryAttributes
 	{
 		EnumSet<WorldType> types = world.getTypes();
 
-		if (world.getTypes().contains(WorldType.SKILL_TOTAL))
+		if (types.contains(WorldType.SKILL_TOTAL))
 		{
 			return PluginColors.TOTAL_LEVEL_RESTRICTED_WORLD;
 		}
@@ -262,6 +267,14 @@ public class StarListEntryAttributes
 		else if (types.contains(WorldType.FRESH_START_WORLD))
 		{
 			return PluginColors.FRESH_START_WORLD;
+		}
+		else if (types.contains(WorldType.PVP))
+		{
+			return PluginColors.PVP_WORLD;
+		}
+		else if (types.contains(WorldType.HIGH_RISK))
+		{
+			return PluginColors.STAR_LIST_GROUP_LABEL;
 		}
 
 		return null;

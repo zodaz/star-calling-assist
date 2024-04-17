@@ -43,4 +43,5 @@ public class PluginColors
 	public static final Color SPEEDRUNNING_WORLD = new Color(94, 213, 201);
 	public static final Color FRESH_START_WORLD = new Color(255, 211, 83);
 	public static final Color MEMBERS_WORLD = new Color(210, 193, 53);
+	public static final Color PVP_WORLD = new Color(220, 38, 38);
 }
