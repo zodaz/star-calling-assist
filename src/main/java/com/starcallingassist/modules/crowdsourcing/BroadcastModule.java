@@ -4,11 +4,12 @@ import com.google.inject.Inject;
 import com.starcallingassist.PluginModuleContract;
 import com.starcallingassist.StarCallingAssistConfig;
 import com.starcallingassist.enums.ChatLogLevel;
+import com.starcallingassist.enums.SignalEventType;
 import com.starcallingassist.events.BroadcastSuccessful;
 import com.starcallingassist.events.LogMessage;
 import com.starcallingassist.events.ManualStarAbsenceBroadcastRequested;
-import com.starcallingassist.events.ManualStarPresenceBroadcastRequested;
 import com.starcallingassist.events.PluginConfigChanged;
+import com.starcallingassist.events.SignalEvent;
 import com.starcallingassist.events.StarAbandoned;
 import com.starcallingassist.events.StarApproached;
 import com.starcallingassist.events.StarDepleted;
@@ -17,7 +18,6 @@ import com.starcallingassist.events.StarScouted;
 import com.starcallingassist.events.StarTierChanged;
 import com.starcallingassist.modules.crowdsourcing.objects.CallStarPayload;
 import com.starcallingassist.objects.Star;
-import com.starcallingassist.objects.StarLocation;
 import com.starcallingassist.services.HttpService;
 import java.io.IOException;
 import java.util.Objects;
@@ -146,8 +146,13 @@ public class BroadcastModule extends PluginModuleContract
 	}
 
 	@Subscribe
-	public void onManualStarPresenceBroadcastRequested(ManualStarPresenceBroadcastRequested event)
+	public void onSignalEvent(SignalEvent signalEvent)
 	{
+		if (signalEvent.getSignal() != SignalEventType.MANUAL_STAR_PRECENCE_BROADCAST_REQUESTED)
+		{
+			return;
+		}
+
 		if (currentStar == null)
 		{
 			dispatch(new LogMessage("Unable to find star.", ChatLogLevel.NORMAL));

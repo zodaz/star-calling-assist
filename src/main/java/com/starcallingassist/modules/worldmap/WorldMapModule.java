@@ -1,11 +1,15 @@
 package com.starcallingassist.modules.worldmap;
 
+import com.starcallingassist.constants.ScriptConstants;
 import com.google.inject.Inject;
+import javax.annotation.Nullable;
 import com.starcallingassist.PluginModuleContract;
 import com.starcallingassist.constants.InterfaceConstants;
 import com.starcallingassist.enums.GameClientLayout;
-import com.starcallingassist.events.ShowWorldPointOnWorldMapRequested;
-import javax.annotation.Nullable;
+import com.starcallingassist.events.ShowStarDetailsOnWorldMapRequested;
+import com.starcallingassist.events.ShowStarOnWorldMapRequested;
+import com.starcallingassist.modules.sidepanel.objects.StarListEntryAttributes;
+import com.starcallingassist.modules.worldmapoverlay.worldmapstardetails.WorldMapStarDetailsOverlay;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.WidgetNode;
@@ -13,12 +17,15 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.MenuOptionClicked;
-import net.runelite.api.widgets.InterfaceID;
+import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetModalMode;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
 
+/**
+ * Module for handling opening and closing the world map programmatically.
+ */
 public class WorldMapModule extends PluginModuleContract
 {
 	@Inject
@@ -37,7 +44,7 @@ public class WorldMapModule extends PluginModuleContract
 	}
 
 	@Subscribe
-	public void onMenuOptionClicked(MenuOptionClicked menuOptionClicked)
+	private void onMenuOptionClicked(MenuOptionClicked menuOptionClicked)
 	{
 		if (worldMap == null)
 		{
@@ -59,7 +66,7 @@ public class WorldMapModule extends PluginModuleContract
 	}
 
 	@Subscribe
-	public void onGameTick(GameTick gametick)
+	private void onGameTick(GameTick gametick)
 	{
 		if(client.getGameState() == GameState.LOGGED_IN && worldMap != null)
 		{
@@ -68,7 +75,7 @@ public class WorldMapModule extends PluginModuleContract
 	}
 
 	@Subscribe
-	public void onGameStateChanged(GameStateChanged gameStateChanged)
+	private void onGameStateChanged(GameStateChanged gameStateChanged)
 	{
 		if(gameStateChanged.getGameState() != GameState.LOGGED_IN && worldMap != null)
 		{
@@ -77,12 +84,17 @@ public class WorldMapModule extends PluginModuleContract
 	}
 
 	@Subscribe
-	public void onShowWorldPointOnWorldMapRequested(ShowWorldPointOnWorldMapRequested showWorldPointOnWorldMapRequested)
+	private void onShowStarOnWorldMapRequested(ShowStarOnWorldMapRequested showStarOnWorldMapRequested)
 	{
-		showWorldPointOnWorldMap(showWorldPointOnWorldMapRequested.getWorldPoint());
+		showStarOnWorldMap(showStarOnWorldMapRequested.getStarListEntryAttributes());
 	}
 
-	public void openWorldMap()
+	private void ShowStarDetails(StarListEntryAttributes starListEntryAttributes)
+	{
+		dispatch(new ShowStarDetailsOnWorldMapRequested(starListEntryAttributes.getStar().getLocation().getName()));
+	}
+
+	private void openWorldMap()
 	{
 		if (!client.isClientThread())
 		{
@@ -95,20 +107,19 @@ public class WorldMapModule extends PluginModuleContract
 			return;
 		}
 
-		worldMap = client.openInterface(getWorldMapParentComponentId(), InterfaceID.WORLD_MAP, WidgetModalMode.NON_MODAL);
+		worldMap = client.openInterface(getWorldMapParentComponentId(), InterfaceID.WORLDMAP, WidgetModalMode.NON_MODAL);
 	}
 
 	/**
-	 * Pans the world map to the specified {@link WorldPoint}. Opens the world
+	 * Pans the world map to the specified star. Opens the world
 	 * map if it is not already open.
-	 * @param worldPoint {@link WorldPoint} to pan to in the world map
-	 * @return World map coordinate as integer
+	 * @param starListEntryAttributes {@link StarListEntryAttributes }
 	 */
-	public void showWorldPointOnWorldMap(WorldPoint worldPoint)
+	private void showStarOnWorldMap(StarListEntryAttributes starListEntryAttributes)
 	{
 		if (!client.isClientThread())
 		{
-			clientThread.invokeLater(() -> showWorldPointOnWorldMap(worldPoint));
+			clientThread.invokeLater(() -> showStarOnWorldMap(starListEntryAttributes));
 			return;
 		}
 
@@ -117,15 +128,20 @@ public class WorldMapModule extends PluginModuleContract
 			openWorldMap();
 		}
 
-		panWorldMapToPosition(toWorldMapPosition(worldPoint));
+		panWorldMapToPosition(toWorldMapPosition(starListEntryAttributes.getStar().getLocation().getWorldPoint()));
+		ShowStarDetails(starListEntryAttributes);
 	}
 
-	public void setWorldMapPlayerPosition(WorldPoint point)
+	/**
+	 * Updates the yellow "player position" marker on the world map.
+	 * @param point {@link WorldPoint} at which to put the "player position" widget.
+	 */
+	private void setWorldMapPlayerPosition(WorldPoint point)
 	{
-		client.runScript(InterfaceConstants.WORLD_MAP_UPDATE_PLAYER_POSITION_SCRIPT_ID, toWorldMapPosition(point), -1, -1);
+		client.runScript(ScriptConstants.WORLD_MAP_UPDATE_PLAYER_POSITION_SCRIPT_ID, toWorldMapPosition(point), -1, -1);
 	}
 
-	public void closeWorldMap()
+	private void closeWorldMap()
 	{
 		if (!client.isClientThread())
 		{
@@ -161,12 +177,12 @@ public class WorldMapModule extends PluginModuleContract
 
 	private void panWorldMapToPosition(int position)
 	{
-		client.runScript(InterfaceConstants.WORLD_MAP_PAN_TO_POSITION_SCRIPT_ID, 1, position, 1);
+		client.runScript(ScriptConstants.WORLD_MAP_PAN_TO_POSITION_SCRIPT_ID, 1, position, 1);
 	}
 
 	private boolean isWorldMapOpen()
 	{
-		return client.getWidget(InterfaceID.WORLD_MAP, 0) != null;
+		return client.getWidget(InterfaceID.WORLDMAP, 0) != null;
 	}
 
 	private int getWorldMapParentComponentId()

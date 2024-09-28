@@ -2,12 +2,13 @@ package com.starcallingassist.modules.sidepanel;
 
 import com.google.inject.Inject;
 import com.starcallingassist.PluginModuleContract;
+import com.starcallingassist.events.AnnouncementAttributesUpdated;
 import com.starcallingassist.events.AnnouncementReceived;
 import com.starcallingassist.events.AnnouncementRefreshFailed;
 import com.starcallingassist.events.AnnouncementsRefreshed;
 import com.starcallingassist.events.NavButtonClicked;
 import com.starcallingassist.events.PluginConfigChanged;
-import com.starcallingassist.events.ShowWorldPointOnWorldMapRequested;
+import com.starcallingassist.events.ShowStarOnWorldMapRequested;
 import com.starcallingassist.events.StarDepleted;
 import com.starcallingassist.events.StarLocationRegionEntered;
 import com.starcallingassist.events.StarLocationRegionExited;
@@ -18,8 +19,9 @@ import com.starcallingassist.events.WorldHopRequest;
 import com.starcallingassist.events.RouteViaShortestPathRequested;
 import com.starcallingassist.modules.crowdsourcing.objects.AnnouncedStar;
 import com.starcallingassist.modules.sidepanel.decorators.MasterPanelDecorator;
+import com.starcallingassist.modules.sidepanel.objects.StarListEntryAttributes;
 import com.starcallingassist.objects.Star;
-import com.starcallingassist.objects.StarLocation;
+import com.starcallingassist.enums.StarLocationDetails;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.SwingUtilities;
@@ -52,7 +54,7 @@ public class SidePanelModule extends PluginModuleContract
 
 	private List<World> worldList = new ArrayList<>();
 
-	private final List<StarLocation> currentPlayerRegions = new ArrayList<>();
+	private final List<StarLocationDetails> currentPlayerRegions = new ArrayList<>();
 
 	@Override
 	public void startUp()
@@ -68,9 +70,9 @@ public class SidePanelModule extends PluginModuleContract
 				}
 
 				@Override
-				public void onShowWorldPointOnWorldMapRequested(ShowWorldPointOnWorldMapRequested showWorldPointOnWorldMapRequested)
+				public void onShowWorldPointOnWorldMapRequested(ShowStarOnWorldMapRequested showStarOnWorldMapRequested)
 				{
-					dispatch(showWorldPointOnWorldMapRequested);
+					dispatch(showStarOnWorldMapRequested);
 				}
 
 				@Override
@@ -80,7 +82,7 @@ public class SidePanelModule extends PluginModuleContract
 				}
 
 				@Override
-				public List<StarLocation> getCurrentPlayerRegions()
+				public List<StarLocationDetails> getCurrentPlayerRegions()
 				{
 					return currentPlayerRegions;
 				}
@@ -169,11 +171,18 @@ public class SidePanelModule extends PluginModuleContract
 			return;
 		}
 
-		sidePanel.onStarUpdate(
-			announcement.getStar(),
-			worldObject,
-			announcement.getUpdatedAt()
+		sidePanel.getStarListPanel().getAnnouncementAttributes().put(
+			world,
+			new StarListEntryAttributes(
+				announcement.getStar(),
+				worldObject,
+				announcement.getUpdatedAt(),
+				sidePanel.getStarListPanel().getDecorator()
+			)
 		);
+
+		sidePanel.getStarListPanel().rebuild();
+		dispatch(new AnnouncementAttributesUpdated(sidePanel.getStarListPanel().getAnnouncementAttributes()));
 	}
 
 	@Subscribe
@@ -260,10 +269,17 @@ public class SidePanelModule extends PluginModuleContract
 			return;
 		}
 
-		sidePanel.onStarUpdate(
-			star,
-			worldObject,
-			(System.currentTimeMillis() / 1000L) - 5 // Always make sure it's slightly outdated
+		sidePanel.getStarListPanel().getAnnouncementAttributes().put(
+			worldObject.getId(),
+			new StarListEntryAttributes(
+				star,
+				worldObject,
+				(System.currentTimeMillis() / 1000L) - 5,
+				sidePanel.getStarListPanel().getDecorator()
+			)
 		);
+
+		sidePanel.getStarListPanel().rebuild();
+		dispatch(new AnnouncementAttributesUpdated(sidePanel.getStarListPanel().getAnnouncementAttributes()));
 	}
 }
