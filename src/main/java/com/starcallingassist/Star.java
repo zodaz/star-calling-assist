@@ -185,6 +185,8 @@ public class Star
 	    put(new Point(1742, 2954), "Varlamore South East mine");
 	    put(new Point(1771, 3102), "Varlamore colosseum entrance bank");
 	    put(new Point(1486, 3089), "Mine north-west of hunter guild");
+	    put(new Point(1625, 3275), "Salvager Overlook in Varlamore");
+	    put(new Point(1421, 2873), "Aldarin mine in Varlamore");
 	}
     };
 }
