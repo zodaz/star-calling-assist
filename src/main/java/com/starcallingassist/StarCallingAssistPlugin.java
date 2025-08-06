@@ -96,12 +96,7 @@ public class StarCallingAssistPlugin extends Plugin
 	sidePanel = injector.getInstance(SidePanel.class);
 	sidePanel.init();
 
-	navButton = NavigationButton.builder()
-		.tooltip("Star Miners")
-		.icon(ImageUtil.loadImageResource(getClass(), "/sminers.png"))
-		.panel(sidePanel)
-		.build();
-	clientToolbar.addNavigation(navButton);
+	updateNavigationButton();
     }
 
     @Override protected void shutDown() throws Exception
@@ -222,6 +217,11 @@ public class StarCallingAssistPlugin extends Plugin
 	    sidePanel.rebuildTableRows();
 	    return;
 	}
+	else if (event.getKey().equals("navigationButtonPriority"))
+	{
+		updateNavigationButton();
+		return;
+	}
 
 	sidePanel.updateTableRows();
     }
@@ -282,6 +282,23 @@ public class StarCallingAssistPlugin extends Plugin
 	    clientThread.invokeLater(() -> logHighlightedToChat("Attempting to quick-hop to world ", hopTarget + ""));
 	}
     }
+
+	private void updateNavigationButton()
+	{
+		if (navButton != null)
+		{
+			clientToolbar.removeNavigation(navButton);
+		}
+
+		navButton = NavigationButton.builder()
+				.tooltip("Star Miners")
+				.icon(ImageUtil.loadImageResource(getClass(), "/sminers.png"))
+				.priority(starConfig.navigationButtonPriority())
+				.panel(sidePanel)
+				.build();
+
+		clientToolbar.addNavigation(navButton);
+	}
 
     private void performHop()
     {

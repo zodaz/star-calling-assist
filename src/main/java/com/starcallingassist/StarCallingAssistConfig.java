@@ -188,6 +188,15 @@ public interface StarCallingAssistConfig extends Config
     )
     default TotalLevelType totalLevelType() { return TotalLevelType.TOTAL_2200; }
 
+	@ConfigItem(
+	    keyName = "navigationButtonPriority",
+	    name = "Side Panel Priority",
+	    description = "Adjust the position of Star Miners in the side panel by making this number higher or lower.",
+	    position = 18,
+	    section = panelSection
+	)
+	default int navigationButtonPriority() { return 5; }
+
     @ConfigSection(
 	    name = "Region Toggles",
 	    description = "Toggle regions to be displayed in the side-panel",
