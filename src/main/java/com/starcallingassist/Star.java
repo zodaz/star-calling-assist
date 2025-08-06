@@ -187,6 +187,7 @@ public class Star
 	    put(new Point(1486, 3089), "Mine north-west of hunter guild");
 	    put(new Point(1625, 3275), "Salvager Overlook in Varlamore");
 	    put(new Point(1421, 2873), "Aldarin mine in Varlamore");
+	    put(new Point(1288, 3412), "Custodia Mountains mine");
 	}
     };
 }
