@@ -138,6 +138,11 @@ public class StarListEntryAttributes
 			return false;
 		}
 
+        if (types.contains(WorldType.SEASONAL) && !decorator.showSeasonalWorlds())
+        {
+            return false;
+        }
+
 		if (types.contains(WorldType.HIGH_RISK) && !decorator.showHighRiskWorlds())
 		{
 			return false;

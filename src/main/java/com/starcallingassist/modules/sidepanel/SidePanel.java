@@ -87,6 +87,12 @@ public class SidePanel extends PluginPanel implements Activatable
 				return config.showPvp();
 			}
 
+            @Override
+            public boolean showSeasonalWorlds()
+            {
+                return config.showSeasonal();
+            }
+
 			@Override
 			public boolean showHighRiskWorlds()
 			{

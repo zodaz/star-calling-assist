@@ -329,11 +329,23 @@ public interface StarCallingAssistConfig extends Config
 		return false;
 	}
 
+    @ConfigItem(
+            keyName = "showSeasonal",
+            name = "Show Seasonal",
+            description = "Show or hide Seasonal worlds.",
+            position = 26,
+            section = worldFilterSection
+    )
+    default boolean showSeasonal()
+    {
+        return false;
+    }
+
 	@ConfigItem(
 		keyName = "showHighRisk",
 		name = "Show High-Risk PvP",
 		description = "Show or hide high-risk PvP worlds.",
-		position = 26,
+		position = 27,
 		section = worldFilterSection
 	)
 	default boolean showHighRisk()
@@ -345,7 +357,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = "totalLevelType",
 		name = "Max Total World",
 		description = "Hides worlds with a total level requirement higher than this.",
-		position = 27,
+		position = 28,
 		section = worldFilterSection
 	)
 	default TotalLevelType totalLevelType()
@@ -356,7 +368,7 @@ public interface StarCallingAssistConfig extends Config
 	@ConfigSection(
 		name = "Region Filters",
 		description = "Settings to filter out stars in certain regions from the side-panel.",
-		position = 28,
+		position = 29,
 		closedByDefault = true
 	)
 	String regionFilterSection = "Region Filters";
@@ -365,7 +377,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_ASGARNIA,
 		name = "Asgarnia",
 		description = "Show or hide this region.",
-		position = 29,
+		position = 30,
 		section = regionFilterSection
 	)
 	default boolean asgarnia()
@@ -377,7 +389,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_KARAMJA,
 		name = "Crandor/Karamja",
 		description = "Show or hide this region.",
-		position = 30,
+		position = 31,
 		section = regionFilterSection
 	)
 	default boolean karamja()
@@ -389,7 +401,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_FELDIP,
 		name = "Feldip Hills/Isle Of Souls",
 		description = "Show or hide this region.",
-		position = 31,
+		position = 32,
 		section = regionFilterSection
 	)
 	default boolean feldip()
@@ -401,7 +413,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_FOSSIL,
 		name = "Fossil Island/Mos Le Harmless",
 		description = "Show or hide this region.",
-		position = 32,
+		position = 33,
 		section = regionFilterSection
 	)
 	default boolean fossil()
@@ -413,7 +425,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_FREMMENIK,
 		name = "Fremmenik/Lunar Isle",
 		description = "Show or hide this region.",
-		position = 33,
+		position = 34,
 		section = regionFilterSection
 	)
 	default boolean fremmenik()
@@ -425,7 +437,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_KOUREND,
 		name = "Kourend",
 		description = "Show or hide this region.",
-		position = 34,
+		position = 35,
 		section = regionFilterSection
 	)
 	default boolean kourend()
@@ -437,7 +449,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_KANDARIN,
 		name = "Kandarin",
 		description = "Show or hide this region.",
-		position = 35,
+		position = 36,
 		section = regionFilterSection
 	)
 	default boolean kandarin()
@@ -449,7 +461,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_KEBOS,
 		name = "Kebos Lowlands",
 		description = "Show or hide this region.",
-		position = 36,
+		position = 37,
 		section = regionFilterSection
 	)
 	default boolean kebos()
@@ -461,7 +473,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_DESERT,
 		name = "Desert",
 		description = "Show or hide this region.",
-		position = 37,
+		position = 38,
 		section = regionFilterSection
 	)
 	default boolean desert()
@@ -473,7 +485,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_MISTHALIN,
 		name = "Misthalin",
 		description = "Show or hide this region.",
-		position = 38,
+		position = 39,
 		section = regionFilterSection
 	)
 	default boolean misthalin()
@@ -485,7 +497,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_MORYTANIA,
 		name = "Morytania",
 		description = "Show or hide this region.",
-		position = 39,
+		position = 40,
 		section = regionFilterSection
 	)
 	default boolean morytania()
@@ -497,7 +509,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_GNOME,
 		name = "Piscatoris/Gnome Stronghold",
 		description = "Show or hide this region.",
-		position = 40,
+		position = 41,
 		section = regionFilterSection
 	)
 	default boolean gnome()
@@ -509,7 +521,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_TIRANNWN,
 		name = "Tirannwn",
 		description = "Show or hide this region.",
-		position = 41,
+		position = 42,
 		section = regionFilterSection
 	)
 	default boolean tirannwn()
@@ -521,7 +533,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_VARLAMORE,
 		name = "Varlamore",
 		description = "Show or hide this region.",
-		position = 42,
+		position = 43,
 		section = regionFilterSection
 	)
 	default boolean varlamore()
@@ -533,7 +545,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_WILDERNESS,
 		name = "Wilderness",
 		description = "Show or hide this region.",
-		position = 43,
+		position = 44,
 		section = regionFilterSection
 	)
 	default boolean wilderness()
@@ -545,7 +557,7 @@ public interface StarCallingAssistConfig extends Config
 		keyName = RegionKeyName.KEY_UNKNOWN,
 		name = "Unknown / Unconfirmed",
 		description = "Show or hide stars that haven't been confirmed / mapped to a region yet.",
-		position = 44,
+		position = 45,
 		section = regionFilterSection
 	)
 	default boolean unknown()
