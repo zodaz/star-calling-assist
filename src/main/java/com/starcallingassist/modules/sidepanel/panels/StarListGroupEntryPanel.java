@@ -322,7 +322,11 @@ public class StarListGroupEntryPanel extends JPanel
 		if (attributes.getStar().getLocation().getWorldPoint() != null)
 		{
 			popupMenu.add(showOnWorldMap);
-			popupMenu.add(routeViaShortestPath);
+
+			if (entry.isShortestPathPluginAvailable())
+			{
+				popupMenu.add(routeViaShortestPath);
+			}
 		}
 
 		popupMenu.show(this, x, y);

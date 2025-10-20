@@ -40,6 +40,8 @@ public interface StarListGroupEntryDecorator
 
 	Boolean showFoundByColumn();
 
+	boolean isShortestPathPluginAvailable();
+
 	List<StarLocation> getCurrentPlayerLocations();
 
 	int getCurrentWorldId();

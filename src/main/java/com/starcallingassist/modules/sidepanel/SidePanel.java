@@ -24,6 +24,8 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import lombok.Setter;
 import net.runelite.client.config.ConfigManager;
+import net.runelite.client.plugins.Plugin;
+import net.runelite.client.plugins.PluginManager;
 import net.runelite.client.ui.Activatable;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.http.api.worlds.World;
@@ -38,6 +40,9 @@ public class SidePanel extends PluginPanel implements Activatable
 
 	@Inject
 	private ConfigManager configManager;
+
+	@Inject
+	private PluginManager pluginManager;
 
 	private final MasterPanelDecorator decorator;
 
@@ -148,6 +153,19 @@ public class SidePanel extends PluginPanel implements Activatable
 			public Boolean showFoundByColumn()
 			{
 				return config.showFoundBy();
+			}
+
+			@Override
+			public boolean isShortestPathPluginAvailable()
+			{
+				for (Plugin plugin : pluginManager.getPlugins())
+				{
+					if (plugin.getName().equals("Shortest Path"))
+					{
+						return pluginManager.isPluginActive(plugin);
+					}
+				}
+				return false;
 			}
 
 			@Override
