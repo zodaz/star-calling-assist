@@ -15,6 +15,7 @@ import com.starcallingassist.events.StarMissing;
 import com.starcallingassist.events.StarScouted;
 import com.starcallingassist.events.StarTierChanged;
 import com.starcallingassist.events.WorldHopRequest;
+import com.starcallingassist.events.RouteViaShortestPathRequested;
 import com.starcallingassist.modules.crowdsourcing.objects.AnnouncedStar;
 import com.starcallingassist.modules.sidepanel.decorators.MasterPanelDecorator;
 import com.starcallingassist.objects.Star;
@@ -70,6 +71,12 @@ public class SidePanelModule extends PluginModuleContract
 				public void onShowWorldPointOnWorldMapRequested(ShowWorldPointOnWorldMapRequested showWorldPointOnWorldMapRequested)
 				{
 					dispatch(showWorldPointOnWorldMapRequested);
+				}
+
+				@Override
+				public void onRouteViaShortestPathRequested(RouteViaShortestPathRequested routeViaShortestPathRequested)
+				{
+					dispatch(routeViaShortestPathRequested);
 				}
 
 				@Override

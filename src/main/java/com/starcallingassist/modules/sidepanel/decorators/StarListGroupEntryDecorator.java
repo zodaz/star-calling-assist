@@ -1,6 +1,7 @@
 package com.starcallingassist.modules.sidepanel.decorators;
 
 import com.starcallingassist.enums.Region;
+import com.starcallingassist.events.RouteViaShortestPathRequested;
 import com.starcallingassist.events.ShowWorldPointOnWorldMapRequested;
 import com.starcallingassist.events.WorldHopRequest;
 import com.starcallingassist.modules.sidepanel.enums.TotalLevelType;
@@ -39,6 +40,8 @@ public interface StarListGroupEntryDecorator
 
 	Boolean showFoundByColumn();
 
+	boolean isShortestPathPluginAvailable();
+
 	List<StarLocation> getCurrentPlayerLocations();
 
 	int getCurrentWorldId();
@@ -46,4 +49,6 @@ public interface StarListGroupEntryDecorator
 	void onWorldHopRequest(WorldHopRequest request);
 
 	void onShowWorldPointOnWorldMapRequested(ShowWorldPointOnWorldMapRequested showWorldPointOnWorldMapRequested);
+
+	void onRouteViaShortestPathRequested(RouteViaShortestPathRequested routeViaShortestPathRequested);
 }

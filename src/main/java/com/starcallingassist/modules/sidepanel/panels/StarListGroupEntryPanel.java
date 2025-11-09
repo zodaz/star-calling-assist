@@ -1,6 +1,7 @@
 package com.starcallingassist.modules.sidepanel.panels;
 
 import com.starcallingassist.constants.PluginColors;
+import com.starcallingassist.events.RouteViaShortestPathRequested;
 import com.starcallingassist.events.ShowWorldPointOnWorldMapRequested;
 import com.starcallingassist.events.WorldHopRequest;
 import com.starcallingassist.modules.sidepanel.decorators.StarListGroupDecorator;
@@ -290,6 +291,7 @@ public class StarListGroupEntryPanel extends JPanel
 		JPopupMenu popupMenu = new JPopupMenu();
 		JMenuItem hopToWorld = new JMenuItem("Hop to world " + attributes.getWorld().getId());
 		JMenuItem showOnWorldMap = new JMenuItem("Show on world map");
+		JMenuItem routeViaShortestPath = new JMenuItem("Route via shortest path");
 
 		hopToWorld.addActionListener(new ActionListener()
 		{
@@ -307,11 +309,24 @@ public class StarListGroupEntryPanel extends JPanel
 			}
 		});
 
+		routeViaShortestPath.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				entry.onRouteViaShortestPathRequested(new RouteViaShortestPathRequested(attributes.getStar().getLocation().getWorldPoint()));
+			}
+		});
+
 		popupMenu.add(hopToWorld);
 
 		if (attributes.getStar().getLocation().getWorldPoint() != null)
 		{
 			popupMenu.add(showOnWorldMap);
+
+			if (entry.isShortestPathPluginAvailable())
+			{
+				popupMenu.add(routeViaShortestPath);
+			}
 		}
 
 		popupMenu.show(this, x, y);

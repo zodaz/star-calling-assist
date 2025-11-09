@@ -5,6 +5,7 @@ import com.google.inject.Injector;
 import com.starcallingassist.StarCallingAssistConfig;
 import com.starcallingassist.constants.PluginColors;
 import com.starcallingassist.enums.Region;
+import com.starcallingassist.events.RouteViaShortestPathRequested;
 import com.starcallingassist.events.ShowWorldPointOnWorldMapRequested;
 import com.starcallingassist.events.WorldHopRequest;
 import com.starcallingassist.modules.sidepanel.decorators.HeaderPanelDecorator;
@@ -23,6 +24,8 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import lombok.Setter;
 import net.runelite.client.config.ConfigManager;
+import net.runelite.client.plugins.Plugin;
+import net.runelite.client.plugins.PluginManager;
 import net.runelite.client.ui.Activatable;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.http.api.worlds.World;
@@ -37,6 +40,9 @@ public class SidePanel extends PluginPanel implements Activatable
 
 	@Inject
 	private ConfigManager configManager;
+
+	@Inject
+	private PluginManager pluginManager;
 
 	private final MasterPanelDecorator decorator;
 
@@ -150,6 +156,19 @@ public class SidePanel extends PluginPanel implements Activatable
 			}
 
 			@Override
+			public boolean isShortestPathPluginAvailable()
+			{
+				for (Plugin plugin : pluginManager.getPlugins())
+				{
+					if (plugin.getName().equals("Shortest Path"))
+					{
+						return pluginManager.isPluginActive(plugin);
+					}
+				}
+				return false;
+			}
+
+			@Override
 			public List<StarLocation> getCurrentPlayerLocations()
 			{
 				return decorator.getCurrentPlayerRegions();
@@ -171,6 +190,12 @@ public class SidePanel extends PluginPanel implements Activatable
 			public void onShowWorldPointOnWorldMapRequested(ShowWorldPointOnWorldMapRequested showWorldPointOnWorldMapRequested)
 			{
 				decorator.onShowWorldPointOnWorldMapRequested(showWorldPointOnWorldMapRequested);
+			}
+
+			@Override
+			public void onRouteViaShortestPathRequested(RouteViaShortestPathRequested routeViaShortestPathRequested)
+			{
+				decorator.onRouteViaShortestPathRequested(routeViaShortestPathRequested);
 			}
 		});
 

@@ -9,6 +9,7 @@ import com.starcallingassist.modules.crowdsourcing.BroadcastModule;
 import com.starcallingassist.modules.logging.ChatLoggerModule;
 import com.starcallingassist.modules.overlay.OverlayModule;
 import com.starcallingassist.modules.scout.ScoutModule;
+import com.starcallingassist.modules.shortestpath.ShortestPathModule;
 import com.starcallingassist.modules.sidepanel.SidePanelModule;
 import com.starcallingassist.modules.starobserver.StarObserverModule;
 import com.starcallingassist.modules.worldhop.WorldHopModule;
@@ -56,7 +57,8 @@ public class StarCallingAssistPlugin extends Plugin
 		SidePanelModule.class,
 		StarObserverModule.class,
 		WorldHopModule.class,
-		WorldMapModule.class
+		WorldMapModule.class,
+		ShortestPathModule.class
 	));
 
 	@Inject
