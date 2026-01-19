@@ -11,7 +11,8 @@ public enum TotalLevelType
 	TOTAL_1500("1500"),
 	TOTAL_1750("1750"),
 	TOTAL_2000("2000"),
-	TOTAL_2200("2200");
+	TOTAL_2200("2200"),
+	TOTAL_2350("2350");
 
 	@Getter
 	private final String name;
