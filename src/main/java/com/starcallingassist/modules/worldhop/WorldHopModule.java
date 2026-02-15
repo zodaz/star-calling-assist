@@ -9,7 +9,7 @@ import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.World;
 import net.runelite.api.events.GameTick;
-import net.runelite.api.widgets.ComponentID;
+import net.runelite.api.gameval.InterfaceID;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.util.WorldUtil;
@@ -78,7 +78,7 @@ public class WorldHopModule extends PluginModuleContract
 			return;
 		}
 
-		if (client.getWidget(ComponentID.WORLD_SWITCHER_WORLD_LIST) == null)
+		if (client.getWidget(InterfaceID.Worldswitcher.LIST) == null)
 		{
 			client.openWorldHopper();
 

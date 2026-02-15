@@ -20,11 +20,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import javax.swing.SwingUtilities;
-import net.runelite.api.AnimationID;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.events.AnimationChanged;
 import net.runelite.api.events.GameStateChanged;
+import net.runelite.api.gameval.AnimationID;
 import net.runelite.client.eventbus.Subscribe;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -46,21 +46,21 @@ public class AnnouncementModule extends PluginModuleContract
 	private HttpService httpService;
 
 	private static final int[] starMiningAnimationIDs = {
-		AnimationID.MINING_CRASHEDSTAR_BRONZE,
-		AnimationID.MINING_CRASHEDSTAR_IRON,
-		AnimationID.MINING_CRASHEDSTAR_STEEL,
-		AnimationID.MINING_CRASHEDSTAR_BLACK,
-		AnimationID.MINING_CRASHEDSTAR_MITHRIL,
-		AnimationID.MINING_CRASHEDSTAR_ADAMANT,
-		AnimationID.MINING_CRASHEDSTAR_RUNE,
-		AnimationID.MINING_CRASHEDSTAR_GILDED,
-		AnimationID.MINING_CRASHEDSTAR_DRAGON,
-		AnimationID.MINING_CRASHEDSTAR_DRAGON_UPGRADED,
-		AnimationID.MINING_CRASHEDSTAR_DRAGON_OR,
-		AnimationID.MINING_CRASHEDSTAR_DRAGON_OR_TRAILBLAZER,
-		AnimationID.MINING_CRASHEDSTAR_INFERNAL,
-		AnimationID.MINING_CRASHEDSTAR_3A,
-		AnimationID.MINING_CRASHEDSTAR_CRYSTAL
+            AnimationID.HUMAN_MINING_BRONZE_PICKAXE_NOREACHFORWARD,
+            AnimationID.HUMAN_MINING_IRON_PICKAXE_NOREACHFORWARD,
+            AnimationID.HUMAN_MINING_STEEL_PICKAXE_NOREACHFORWARD,
+            AnimationID.HUMAN_MINING_BLACK_PICKAXE_NOREACHFORWARD,
+            AnimationID.HUMAN_MINING_MITHRIL_PICKAXE_NOREACHFORWARD,
+            AnimationID.HUMAN_MINING_ADAMANT_PICKAXE_NOREACHFORWARD,
+            AnimationID.HUMAN_MINING_RUNE_PICKAXE_NOREACHFORWARD,
+            AnimationID.HUMAN_MINING_GILDED_PICKAXE_NOREACHFORWARD,
+            AnimationID.HUMAN_MINING_DRAGON_PICKAXE_NOREACHFORWARD,
+            AnimationID.HUMAN_MINING_DRAGON_PICKAXE_PRETTY_NOREACHFORWARD,
+            AnimationID.HUMAN_MINING_ZALCANO_PICKAXE_NOREACHFORWARD,
+            AnimationID.HUMAN_MINING_TRAILBLAZER_PICKAXE_NO_INFERNAL_NOREACHFORWARD,
+            AnimationID.HUMAN_MINING_INFERNAL_PICKAXE_NOREACHFORWARD,
+            AnimationID.HUMAN_MINING_3A_PICKAXE_NOREACHFORWARD,
+            AnimationID.HUMAN_MINING_CRYSTAL_PICKAXE_NOREACHFORWARD
 	};
 
 	private final HashMap<Integer, AnnouncedStar> stars = new HashMap<>();

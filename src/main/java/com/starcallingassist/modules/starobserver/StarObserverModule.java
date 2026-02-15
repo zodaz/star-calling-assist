@@ -21,8 +21,6 @@ import net.runelite.api.Client;
 import net.runelite.api.GameObject;
 import net.runelite.api.GameState;
 import net.runelite.api.NPC;
-import net.runelite.api.NullNpcID;
-import net.runelite.api.ObjectID;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.events.ChatMessage;
@@ -33,12 +31,14 @@ import net.runelite.api.events.GameTick;
 import net.runelite.api.events.NpcDespawned;
 import net.runelite.api.events.NpcSpawned;
 import net.runelite.api.events.WorldChanged;
+import net.runelite.api.gameval.NpcID;
+import net.runelite.api.gameval.ObjectID;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
 
 public class StarObserverModule extends PluginModuleContract
 {
-	private static final int STAR_NPC_ID = NullNpcID.NULL_10629;
+	private static final int STAR_NPC_ID = NpcID.STAR_HEADBAR_NPC;
 	@Inject
 	private StarCallingAssistConfig config;
 
@@ -49,15 +49,15 @@ public class StarObserverModule extends PluginModuleContract
 	private ClientThread clientThread;
 
 	private static final int[] STAR_TIER_IDS = new int[]{
-		ObjectID.CRASHED_STAR_41229,
-		ObjectID.CRASHED_STAR_41228,
-		ObjectID.CRASHED_STAR_41227,
-		ObjectID.CRASHED_STAR_41226,
-		ObjectID.CRASHED_STAR_41225,
-		ObjectID.CRASHED_STAR_41224,
-		ObjectID.CRASHED_STAR_41223,
-		ObjectID.CRASHED_STAR_41021,
-		ObjectID.CRASHED_STAR,
+            ObjectID.STAR_SIZE_ONE_STAR,
+            ObjectID.STAR_SIZE_TWO_STAR,
+            ObjectID.STAR_SIZE_THREE_STAR,
+            ObjectID.STAR_SIZE_FOUR_STAR,
+            ObjectID.STAR_SIZE_FIVE_STAR,
+            ObjectID.STAR_SIZE_SIX_STAR,
+            ObjectID.STAR_SIZE_SEVEN_STAR,
+            ObjectID.STAR_SIZE_EIGHT_STAR,
+            ObjectID.STAR_SIZE_NINE_STAR,
 	};
 
 	public final ConcurrentHashMap<Integer, Star> currentStars = new ConcurrentHashMap<>();

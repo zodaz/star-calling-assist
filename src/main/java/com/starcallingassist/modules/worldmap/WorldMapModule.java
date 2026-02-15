@@ -13,7 +13,7 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.MenuOptionClicked;
-import net.runelite.api.widgets.InterfaceID;
+import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetModalMode;
 import net.runelite.client.callback.ClientThread;
@@ -95,7 +95,7 @@ public class WorldMapModule extends PluginModuleContract
 			return;
 		}
 
-		worldMap = client.openInterface(getWorldMapParentComponentId(), InterfaceID.WORLD_MAP, WidgetModalMode.NON_MODAL);
+		worldMap = client.openInterface(getWorldMapParentComponentId(), InterfaceID.WORLDMAP, WidgetModalMode.NON_MODAL);
 	}
 
 	/**
@@ -166,7 +166,7 @@ public class WorldMapModule extends PluginModuleContract
 
 	private boolean isWorldMapOpen()
 	{
-		return client.getWidget(InterfaceID.WORLD_MAP, 0) != null;
+		return client.getWidget(InterfaceID.WORLDMAP, 0) != null;
 	}
 
 	private int getWorldMapParentComponentId()

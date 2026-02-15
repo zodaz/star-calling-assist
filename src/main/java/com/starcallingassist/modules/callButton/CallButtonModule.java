@@ -10,13 +10,12 @@ import com.starcallingassist.modules.callButton.enums.CallType;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.ScriptEvent;
-import net.runelite.api.SpriteID;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.ResizeableChanged;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.events.WidgetLoaded;
-import net.runelite.api.widgets.ComponentID;
-import net.runelite.api.widgets.InterfaceID;
+import net.runelite.api.gameval.InterfaceID;
+import net.runelite.api.gameval.SpriteID;
 import net.runelite.api.widgets.JavaScriptCallback;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetType;
@@ -39,7 +38,7 @@ public class CallButtonModule extends PluginModuleContract
 	@Override
 	public void startUp()
 	{
-		minimapContainerWidget = client.getWidget(ComponentID.MINIMAP_CONTAINER);
+		minimapContainerWidget = client.getWidget(InterfaceID.Orbs.UNIVERSE);
 		clientThread.invokeLater(this::createCallButton);
 	}
 
@@ -76,7 +75,7 @@ public class CallButtonModule extends PluginModuleContract
 	@Subscribe
 	public void onWidgetLoaded(WidgetLoaded event)
 	{
-		if (event.getGroupId() == InterfaceID.MINIMAP && minimapContainerWidget == null)
+		if (event.getGroupId() == InterfaceID.ORBS && minimapContainerWidget == null)
 		{
 			redrawCallButton();
 		}
@@ -91,7 +90,7 @@ public class CallButtonModule extends PluginModuleContract
 	private void redrawCallButton()
 	{
 		removeCallButton();
-		minimapContainerWidget = client.getWidget(ComponentID.MINIMAP_CONTAINER);
+		minimapContainerWidget = client.getWidget(InterfaceID.Orbs.UNIVERSE);
 		clientThread.invokeLater(this::createCallButton);
 	}
 
@@ -147,7 +146,7 @@ public class CallButtonModule extends PluginModuleContract
 		callButtonBackground.revalidate();
 
 		Widget callButtonIcon = minimapContainerWidget.createChild(WidgetType.GRAPHIC);
-		callButtonIcon.setSpriteId(SpriteID.BARBARIAN_ASSAULT_HORN_FOR_ATTACKER_ICON);
+		callButtonIcon.setSpriteId(SpriteID.BarbassaultIcons.HORN_FOR_ATTACKER);
 		callButtonIcon.setOriginalWidth(16);
 		callButtonIcon.setOriginalHeight(16);
 		setWidgetLocation(callButtonIcon, 9, 9);
