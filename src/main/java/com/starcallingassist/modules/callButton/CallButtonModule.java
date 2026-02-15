@@ -8,14 +8,12 @@ import com.starcallingassist.events.ManualStarPresenceBroadcastRequested;
 import com.starcallingassist.events.PluginConfigChanged;
 import com.starcallingassist.modules.callButton.enums.CallType;
 import net.runelite.api.Client;
-import net.runelite.api.GameState;
 import net.runelite.api.ScriptEvent;
-import net.runelite.api.events.GameStateChanged;
-import net.runelite.api.events.ResizeableChanged;
-import net.runelite.api.events.VarbitChanged;
-import net.runelite.api.events.WidgetLoaded;
-import net.runelite.api.gameval.InterfaceID;
+import net.runelite.api.ScriptID;
 import net.runelite.api.gameval.SpriteID;
+import net.runelite.api.gameval.InterfaceID;
+import net.runelite.api.events.ScriptPostFired;
+import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.widgets.JavaScriptCallback;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetType;
@@ -33,27 +31,39 @@ public class CallButtonModule extends PluginModuleContract
 	@Inject
 	private StarCallingAssistConfig config;
 
-	private Widget minimapContainerWidget = null;
+	private Widget callIcon;
+	private Widget callBackground;
+	private Widget callContainer;
 
 	@Override
 	public void startUp()
 	{
-		minimapContainerWidget = client.getWidget(InterfaceID.Orbs.UNIVERSE);
 		clientThread.invokeLater(this::createCallButton);
 	}
 
 	@Override
 	public void shutDown()
 	{
-		removeCallButton();
+		clientThread.invokeLater(this::removeCallButton);
 	}
 
 	@Subscribe
-	public void onGameStateChanged(GameStateChanged state)
+	public void onWidgetLoaded(WidgetLoaded event)
 	{
-		if (state.getGameState() == GameState.HOPPING || state.getGameState() == GameState.LOGGING_IN)
+		// consider adding callbutton support for InterfaceID.ORBS_NOMAP interface
+		if (event.getGroupId() == InterfaceID.ORBS)
 		{
-			removeCallButton();
+			createCallButton();
+		}
+	}
+
+	@Subscribe
+	public void onScriptPostFired(ScriptPostFired event)
+	{
+		// use wiki orb as trigger for drawing call button, this seems more reliable than prayer scripts
+		if (event.getScriptId() == ScriptID.WIKI_ICON_UPDATE)
+		{
+			createCallButton();
 		}
 	}
 
@@ -61,37 +71,15 @@ public class CallButtonModule extends PluginModuleContract
 	public void onPluginConfigChanged(PluginConfigChanged event)
 	{
 		if (event.getKey().equals("callHorn"))
-		{
-			redrawCallButton();
+			{
+			clientThread.invokeLater(() -> {
+				removeCallButton();
+				if (config.callHorn())
+				{
+					createCallButton();
+				}
+			});
 		}
-	}
-
-	@Subscribe
-	public void onVarbitChanged(VarbitChanged event)
-	{
-		redrawCallButton();
-	}
-
-	@Subscribe
-	public void onWidgetLoaded(WidgetLoaded event)
-	{
-		if (event.getGroupId() == InterfaceID.ORBS && minimapContainerWidget == null)
-		{
-			redrawCallButton();
-		}
-	}
-
-	@Subscribe
-	public void onResizeableChanged(ResizeableChanged event)
-	{
-		redrawCallButton();
-	}
-
-	private void redrawCallButton()
-	{
-		removeCallButton();
-		minimapContainerWidget = client.getWidget(InterfaceID.Orbs.UNIVERSE);
-		clientThread.invokeLater(this::createCallButton);
 	}
 
 	private void setWidgetLocation(Widget widget, int offsetX, int offsetY)
@@ -117,50 +105,69 @@ public class CallButtonModule extends PluginModuleContract
 
 	private void createCallButton()
 	{
-		if (minimapContainerWidget == null || !config.callHorn())
+		if (!config.callHorn())
 		{
 			return;
 		}
 
-		Widget callButtonContainer = minimapContainerWidget.createChild(-1, WidgetType.GRAPHIC);
-		callButtonContainer.setSpriteId(2138);
-		callButtonContainer.setOriginalWidth(34);
-		callButtonContainer.setOriginalHeight(34);
-		callButtonContainer.setHasListener(true);
-		callButtonContainer.setOnMouseOverListener((JavaScriptCallback) ev -> callButtonContainer.setSpriteId(3517));
-		callButtonContainer.setOnMouseLeaveListener((JavaScriptCallback) ev -> callButtonContainer.setSpriteId(2138));
-		setWidgetLocation(callButtonContainer, 0, 0);
-		callButtonContainer.revalidate();
-
-		Widget callButtonBackground = minimapContainerWidget.createChild(-1, WidgetType.GRAPHIC);
-		callButtonBackground.setSpriteId(1061);
-		callButtonBackground.setOriginalWidth(26);
-		callButtonBackground.setOriginalHeight(26);
-		setWidgetLocation(callButtonBackground, 4, 4);
-		callButtonBackground.setAction(CallType.STAR.getOp() - 1, "Call star");
-		callButtonBackground.setAction(CallType.DEAD.getOp() - 1, "Call dead");
-		callButtonBackground.setAction(CallType.DEAD_PRIVATE.getOp() - 1, "Call private");
-		callButtonBackground.setHasListener(true);
-		callButtonBackground.setNoClickThrough(true);
-		callButtonBackground.setOnOpListener((JavaScriptCallback) this::callButtonClicked);
-		callButtonBackground.revalidate();
-
-		Widget callButtonIcon = minimapContainerWidget.createChild(WidgetType.GRAPHIC);
-		callButtonIcon.setSpriteId(SpriteID.BarbassaultIcons.HORN_FOR_ATTACKER);
-		callButtonIcon.setOriginalWidth(16);
-		callButtonIcon.setOriginalHeight(16);
-		setWidgetLocation(callButtonIcon, 9, 9);
-		callButtonIcon.revalidate();
-	}
-
-	private void removeCallButton()
-	{
-		if (minimapContainerWidget != null)
+		// consider adding callbutton support OrbsNomap interface
+		Widget orbsContainer = client.getWidget(InterfaceID.Orbs.UNIVERSE);
+		if (orbsContainer == null)
 		{
-			minimapContainerWidget.deleteAllChildren();
-			minimapContainerWidget = null;
+			return;
 		}
 
+		removeCallButton();
+
+		callContainer = orbsContainer.createChild(-1, WidgetType.GRAPHIC);
+		callContainer.setSpriteId(SpriteID.Ring34._0);
+		callContainer.setOriginalWidth(34);
+		callContainer.setOriginalHeight(34);
+		setWidgetLocation(callContainer, 0, 0);
+		callContainer.setHasListener(true);
+		callContainer.setOnMouseOverListener((JavaScriptCallback) ev -> callContainer.setSpriteId(SpriteID.Ring34._1));
+		callContainer.setOnMouseLeaveListener((JavaScriptCallback) ev -> callContainer.setSpriteId(SpriteID.Ring34._0));
+		callContainer.revalidate();
+
+		callBackground = orbsContainer.createChild(-1, WidgetType.GRAPHIC);
+		callBackground.setSpriteId(SpriteID.OrbFiller.HITPOINTS_POISON);
+		callBackground.setOriginalWidth(26);
+		callBackground.setOriginalHeight(26);
+		setWidgetLocation(callBackground, 4, 4);
+		callBackground.setAction(CallType.STAR.getOp() - 1, "Call star");
+		callBackground.setAction(CallType.DEAD.getOp() - 1, "Call dead");
+		callBackground.setAction(CallType.DEAD_PRIVATE.getOp() - 1, "Call private");
+		callBackground.setHasListener(true);
+		callBackground.setNoClickThrough(true);
+		callBackground.setOnOpListener((JavaScriptCallback) this::callButtonClicked);
+		callBackground.revalidate();
+
+		callIcon = orbsContainer.createChild(-1, WidgetType.GRAPHIC);
+		callIcon.setSpriteId(SpriteID.BarbassaultIcons.HORN_FOR_ATTACKER);
+		callIcon.setOriginalWidth(16);
+		callIcon.setOriginalHeight(16);
+		setWidgetLocation(callIcon, 9, 9);
+		callIcon.revalidate();
+	}
+
+	// note: this is a misnomer as the widget still exists, it is just hidden.
+	private void removeCallButton()
+	{
+		if (callContainer != null)
+		{
+			callContainer.setHidden(true);
+			callContainer = null;
+		}
+		if (callBackground != null)
+		{
+			callBackground.setHidden(true);
+			callBackground = null;
+		}
+		if (callIcon != null)
+		{
+			callIcon.setHidden(true);
+			callIcon = null;
+		}
 	}
 
 	private void callButtonClicked(ScriptEvent event)
