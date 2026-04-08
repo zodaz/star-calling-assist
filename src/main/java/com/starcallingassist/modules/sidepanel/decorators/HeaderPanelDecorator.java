@@ -9,4 +9,8 @@ public interface HeaderPanelDecorator
 	OrderBy getOrderBy();
 
 	void onSortingChanged(OrderBy orderBy);
+
+	String getLocationFilter();
+
+	void onLocationFilterChanged(String filterText);
 }

@@ -49,6 +49,8 @@ public class SidePanel extends PluginPanel implements Activatable
 	@Setter
 	private int currentWorld = 0;
 
+	private String locationFilter = "";
+
 	private final HeaderPanel headerPanel;
 
 	private final StarListPanel starListPanel;
@@ -156,6 +158,12 @@ public class SidePanel extends PluginPanel implements Activatable
 			}
 
 			@Override
+			public String getLocationFilter()
+			{
+				return locationFilter;
+			}
+
+			@Override
 			public boolean isShortestPathPluginAvailable()
 			{
 				for (Plugin plugin : pluginManager.getPlugins())
@@ -217,6 +225,19 @@ public class SidePanel extends PluginPanel implements Activatable
 			public void onSortingChanged(OrderBy orderBy)
 			{
 				starListPanel.setOrderByColumn(orderBy);
+				starListPanel.rebuild();
+			}
+
+			@Override
+			public String getLocationFilter()
+			{
+				return locationFilter;
+			}
+
+			@Override
+			public void onLocationFilterChanged(String filterText)
+			{
+				locationFilter = filterText;
 				starListPanel.rebuild();
 			}
 		});
