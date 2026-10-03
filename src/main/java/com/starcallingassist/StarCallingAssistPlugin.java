@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provides;
 import com.starcallingassist.events.PluginConfigChanged;
 import com.starcallingassist.modules.callButton.CallButtonModule;
+import com.starcallingassist.modules.chatcommands.ChatCommandModule;
 import com.starcallingassist.modules.crowdsourcing.AnnouncementModule;
 import com.starcallingassist.modules.crowdsourcing.BroadcastModule;
 import com.starcallingassist.modules.logging.ChatLoggerModule;
@@ -49,6 +50,7 @@ public class StarCallingAssistPlugin extends Plugin
 
 	private final ArrayList<Class<? extends PluginModuleContract>> modules = new ArrayList<>(Arrays.asList(
 		CallButtonModule.class,
+		ChatCommandModule.class,
 		BroadcastModule.class,
 		AnnouncementModule.class,
 		OverlayModule.class,
