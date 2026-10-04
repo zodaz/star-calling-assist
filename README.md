@@ -18,3 +18,13 @@ Posts are made in the following format to the endpoint specified in the plugin s
 ```
 
 Authorization header is set to what is specified in the plugin settings.
+
+## Shortest Path integration
+
+When the [Shortest Path](https://github.com/Skretzo/shortest-path) plugin is installed and enabled, this plugin can:
+
+- Show the route to a star, using the "Route via shortest path" option when right-clicking a star in the side-panel.
+- Automatically show the route to a star when you hop to its world from the side-panel.
+- Clear the route when you arrive at the star, or when the star is depleted or missing.
+
+All of the above can be configured in the "Shortest Path" section of the plugin settings.
