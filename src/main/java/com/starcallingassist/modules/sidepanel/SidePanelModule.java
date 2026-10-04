@@ -14,6 +14,7 @@ import com.starcallingassist.events.StarLocationRegionExited;
 import com.starcallingassist.events.StarMissing;
 import com.starcallingassist.events.StarScouted;
 import com.starcallingassist.events.StarTierChanged;
+import com.starcallingassist.events.TravelDistancesUpdated;
 import com.starcallingassist.events.WorldHopRequest;
 import com.starcallingassist.events.RouteViaShortestPathRequested;
 import com.starcallingassist.modules.crowdsourcing.objects.AnnouncedStar;
@@ -21,10 +22,13 @@ import com.starcallingassist.modules.sidepanel.decorators.MasterPanelDecorator;
 import com.starcallingassist.objects.Star;
 import com.starcallingassist.objects.StarLocation;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.swing.SwingUtilities;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.WorldChanged;
 import net.runelite.client.eventbus.Subscribe;
@@ -53,6 +57,8 @@ public class SidePanelModule extends PluginModuleContract
 	private List<World> worldList = new ArrayList<>();
 
 	private final List<StarLocation> currentPlayerRegions = new ArrayList<>();
+
+	private volatile Map<WorldPoint, Integer> travelDistances = new HashMap<>();
 
 	@Override
 	public void startUp()
@@ -86,6 +92,12 @@ public class SidePanelModule extends PluginModuleContract
 				}
 
 				@Override
+				public Map<WorldPoint, Integer> getTravelDistances()
+				{
+					return travelDistances;
+				}
+
+				@Override
 				public void onSidePanelVisibilityChanged(boolean isVisible)
 				{
 					dispatch(new NavButtonClicked(isVisible));
@@ -114,6 +126,7 @@ public class SidePanelModule extends PluginModuleContract
 	{
 		sidePanel.shutDown();
 		currentPlayerRegions.clear();
+		travelDistances = new HashMap<>();
 		clientToolbar.removeNavigation(navButton);
 	}
 
@@ -214,6 +227,13 @@ public class SidePanelModule extends PluginModuleContract
 	public void onStarLocationRegionExited(StarLocationRegionExited event)
 	{
 		currentPlayerRegions.remove(event.getLocation());
+		SwingUtilities.invokeLater(sidePanel::rebuild);
+	}
+
+	@Subscribe
+	public void onTravelDistancesUpdated(TravelDistancesUpdated event)
+	{
+		travelDistances = event.getDistances();
 		SwingUtilities.invokeLater(sidePanel::rebuild);
 	}
 

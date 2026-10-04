@@ -313,7 +313,7 @@ public class StarListGroupEntryPanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				entry.onRouteViaShortestPathRequested(new RouteViaShortestPathRequested(attributes.getStar().getLocation().getWorldPoint()));
+				entry.onRouteViaShortestPathRequested(new RouteViaShortestPathRequested(attributes.getStar()));
 			}
 		});
 

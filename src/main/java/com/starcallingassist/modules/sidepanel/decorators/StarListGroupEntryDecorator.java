@@ -42,6 +42,8 @@ public interface StarListGroupEntryDecorator
 
 	boolean isShortestPathPluginAvailable();
 
+	Integer getTravelDistance(StarLocation location);
+
 	List<StarLocation> getCurrentPlayerLocations();
 
 	int getCurrentWorldId();

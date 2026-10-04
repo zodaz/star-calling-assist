@@ -6,6 +6,7 @@ import com.starcallingassist.modules.sidepanel.enums.OrderBy;
 import com.starcallingassist.modules.sidepanel.objects.StarListEntryAttributes;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.BoxLayout;
@@ -19,6 +20,7 @@ import net.runelite.client.ui.FontManager;
 public class StarListGroupPanel extends JPanel
 {
 	private final JLabel titleLabel = new JLabel();
+	private final JLabel distanceLabel = new JLabel();
 	private final JPanel innerPanel;
 
 	@Getter
@@ -44,7 +46,17 @@ public class StarListGroupPanel extends JPanel
 		titleLabel.setFont(FontManager.getRunescapeSmallFont());
 		titleLabel.setForeground(PluginColors.STAR_LIST_GROUP_LABEL);
 		titleLabel.setText(title);
-		add(titleLabel, BorderLayout.NORTH);
+
+		distanceLabel.setOpaque(true);
+		distanceLabel.setFont(FontManager.getRunescapeSmallFont());
+		distanceLabel.setForeground(PluginColors.STAR_LIST_GROUP_LABEL);
+		distanceLabel.setToolTipText("Estimated travel distance in tiles, according to the Shortest Path plugin");
+
+		JPanel titlePanel = new JPanel(new BorderLayout());
+		titlePanel.setOpaque(false);
+		titlePanel.add(titleLabel, BorderLayout.CENTER);
+		titlePanel.add(distanceLabel, BorderLayout.EAST);
+		add(titlePanel, BorderLayout.NORTH);
 
 		innerPanel = new JPanel();
 		innerPanel.setLayout(new BoxLayout(innerPanel, BoxLayout.Y_AXIS));
@@ -65,6 +77,8 @@ public class StarListGroupPanel extends JPanel
 		setBorder(new MatteBorder(2, 2, 2, 2, color));
 		titleLabel.setBackground(color);
 		titleLabel.setBorder(new MatteBorder(0, 1, 0, 0, color));
+		distanceLabel.setBackground(color);
+		distanceLabel.setBorder(new MatteBorder(0, 4, 0, 1, color));
 	}
 
 	private void setPanelHoverColor()
@@ -167,6 +181,17 @@ public class StarListGroupPanel extends JPanel
 		{
 			isDangerousArea = entry.getAttributes().isDangerousArea();
 		}
+
+		Integer travelDistance = entry.getAttributes().getTravelDistance();
+		if (travelDistance != null)
+		{
+			distanceLabel.setText("~" + travelDistance);
+
+			// The title gives way to the distance, rather than making the group wider than the side-panel.
+			titleLabel.setPreferredSize(null);
+			titleLabel.setPreferredSize(new Dimension(0, titleLabel.getPreferredSize().height));
+			titleLabel.setToolTipText(title);
+		}
 	}
 
 	public void commit()
@@ -187,7 +212,7 @@ public class StarListGroupPanel extends JPanel
 
 		// We only want to re-sort the location order within the location group, because
 		// the entries are already added in a pre-sorted order by the StarListPanel.
-		if (orderByColumn == OrderBy.LOCATION)
+		if (orderByColumn == OrderBy.LOCATION || orderByColumn == OrderBy.DISTANCE)
 		{
 			int deadTime1 = a1.getDeadTime();
 			int deadTime2 = a2.getDeadTime();

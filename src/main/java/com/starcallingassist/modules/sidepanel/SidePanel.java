@@ -169,6 +169,17 @@ public class SidePanel extends PluginPanel implements Activatable
 			}
 
 			@Override
+			public Integer getTravelDistance(StarLocation location)
+			{
+				if (!config.showTravelDistance() || location.getWorldPoint() == null)
+				{
+					return null;
+				}
+
+				return decorator.getTravelDistances().get(location.getWorldPoint());
+			}
+
+			@Override
 			public List<StarLocation> getCurrentPlayerLocations()
 			{
 				return decorator.getCurrentPlayerRegions();

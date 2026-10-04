@@ -30,3 +30,12 @@ tasks.withType(JavaCompile) {
 	options.encoding = 'UTF-8'
 	options.release.set(11)
 }
+
+tasks.register('runClient', JavaExec) {
+	group = 'application'
+	description = 'Runs RuneLite in developer mode with this plugin loaded'
+	classpath = sourceSets.test.runtimeClasspath
+	mainClass = 'com.starcallingassist.StarCallingAssistPluginTest'
+	jvmArgs '-ea'
+	args '--developer-mode', '--debug'
+}

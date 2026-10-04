@@ -7,7 +7,8 @@ public enum OrderBy
 	WORLD("World"),
 	TIER("Tier"),
 	LOCATION("Location"),
-	DEAD_TIME("Dead Time");
+	DEAD_TIME("Dead Time"),
+	DISTANCE("Distance");
 
 	@Getter
 	private final String name;

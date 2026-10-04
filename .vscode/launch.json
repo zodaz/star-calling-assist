@@ -1,0 +1,13 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "RuneLite + Star Calling Assist",
+            "request": "launch",
+            "mainClass": "com.starcallingassist.StarCallingAssistPluginTest",
+            "vmArgs": "-ea",
+            "args": "--developer-mode --debug"
+        }
+    ]
+}
