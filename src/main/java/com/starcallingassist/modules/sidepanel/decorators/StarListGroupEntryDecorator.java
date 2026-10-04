@@ -6,6 +6,7 @@ import com.starcallingassist.events.ShowStarOnWorldMapRequested;
 import com.starcallingassist.events.WorldHopRequest;
 import com.starcallingassist.modules.sidepanel.enums.TotalLevelType;
 import com.starcallingassist.enums.StarLocationDetails;
+
 import java.util.List;
 
 public interface StarListGroupEntryDecorator

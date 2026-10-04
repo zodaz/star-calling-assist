@@ -65,7 +65,7 @@ public class StarListGroupEntryPanel extends JPanel
 			{
 				if (mouseEvent.getButton() == MouseEvent.BUTTON1 && mouseEvent.getClickCount() == 2)
 				{
-					entry.onWorldHopRequest(new WorldHopRequest(attributes.getWorld()));
+					entry.onWorldHopRequest(new WorldHopRequest(attributes.getWorld(), attributes.getStar()));
 				}
 				else if (mouseEvent.getButton() == MouseEvent.BUTTON3)
 				{
@@ -297,7 +297,7 @@ public class StarListGroupEntryPanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				entry.onWorldHopRequest(new WorldHopRequest(attributes.getWorld()));
+				entry.onWorldHopRequest(new WorldHopRequest(attributes.getWorld(), attributes.getStar()));
 			}
 		});
 
@@ -313,7 +313,7 @@ public class StarListGroupEntryPanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				entry.onRouteViaShortestPathRequested(new RouteViaShortestPathRequested(attributes.getStar().getLocation().getWorldPoint()));
+				entry.onRouteViaShortestPathRequested(new RouteViaShortestPathRequested(attributes.getStar()));
 			}
 		});
 

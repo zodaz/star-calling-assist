@@ -752,7 +752,7 @@ public class WorldMapStarDetailsOverlay extends Overlay
 			return;
 		}
 
-		eventBus.post(new WorldHopRequest(world));
+		eventBus.post(new WorldHopRequest(world, null));
 	}
 
 	/**
