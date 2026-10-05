@@ -3,7 +3,7 @@ package com.starcallingassist.modules.sidepanel;
 import com.google.inject.Inject;
 import com.starcallingassist.PluginModuleContract;
 import com.starcallingassist.events.AnnouncementAttributesUpdated;
-import com.starcallingassist.events.AnnouncementReceived;
+import com.starcallingassist.events.AnnouncementsReceived;
 import com.starcallingassist.events.AnnouncementRefreshFailed;
 import com.starcallingassist.events.AnnouncementsRefreshed;
 import com.starcallingassist.events.NavButtonClicked;
@@ -160,26 +160,29 @@ public class SidePanelModule extends PluginModuleContract
 	}
 
 	@Subscribe
-	public void onAnnouncementReceived(AnnouncementReceived event)
+	public void onAnnouncementsReceived(AnnouncementsReceived event)
 	{
-		AnnouncedStar announcement = event.getAnnouncement();
-		Integer world = announcement.getStar().getWorld();
 
-		World worldObject = getWorldObject(world);
-		if (worldObject == null)
+		for (AnnouncedStar announcement : event.getAnnouncements())
 		{
-			return;
-		}
+			Integer world = announcement.getStar().getWorld();
 
-		sidePanel.getStarListPanel().getAnnouncementAttributes().put(
-			world,
-			new StarListEntryAttributes(
-				announcement.getStar(),
-				worldObject,
-				announcement.getUpdatedAt(),
-				sidePanel.getStarListPanel().getDecorator()
-			)
-		);
+			World worldObject = getWorldObject(world);
+			if (worldObject == null)
+			{
+				return;
+			}
+
+			sidePanel.getStarListPanel().getAnnouncementAttributes().put(
+				world,
+				new StarListEntryAttributes(
+					announcement.getStar(),
+					worldObject,
+					announcement.getUpdatedAt(),
+					sidePanel.getStarListPanel().getDecorator()
+				)
+			);
+		}
 
 		sidePanel.getStarListPanel().rebuild();
 		dispatch(new AnnouncementAttributesUpdated(sidePanel.getStarListPanel().getAnnouncementAttributes()));

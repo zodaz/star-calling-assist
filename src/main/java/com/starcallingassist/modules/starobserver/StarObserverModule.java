@@ -3,7 +3,7 @@ package com.starcallingassist.modules.starobserver;
 import com.google.inject.Inject;
 import com.starcallingassist.PluginModuleContract;
 import com.starcallingassist.StarCallingAssistConfig;
-import com.starcallingassist.events.AnnouncementReceived;
+import com.starcallingassist.events.AnnouncementsReceived;
 import com.starcallingassist.events.StarAbandoned;
 import com.starcallingassist.events.StarApproached;
 import com.starcallingassist.events.StarDepleted;
@@ -12,6 +12,7 @@ import com.starcallingassist.events.StarMissing;
 import com.starcallingassist.events.StarScouted;
 import com.starcallingassist.events.StarTierChanged;
 import com.starcallingassist.events.CurrentWorldStarUpdated;
+import com.starcallingassist.modules.crowdsourcing.objects.AnnouncedStar;
 import com.starcallingassist.objects.Star;
 import com.starcallingassist.enums.StarLocationDetails;
 import java.util.Objects;
@@ -200,16 +201,18 @@ public class StarObserverModule extends PluginModuleContract
 	}
 
 	@Subscribe
-	public void onAnnouncementReceived(AnnouncementReceived event)
+	public void onAnnouncementsReceived(AnnouncementsReceived event)
 	{
-		Star updatedStar = event.getAnnouncement().getStar();
-		if (client.getWorld() == updatedStar.getWorld())
+		for (AnnouncedStar announcement : event.getAnnouncements())
 		{
-			updateCurrentStarForCurrentWorld(updatedStar);
-		}
-		else
-		{
-			updateCurrentStarForOtherWorlds(updatedStar);
+			if (client.getWorld() == announcement.getStar().getWorld())
+			{
+				updateCurrentStarForCurrentWorld(announcement.getStar());
+			}
+			else
+			{
+				updateCurrentStarForOtherWorlds(announcement.getStar());
+			}
 		}
 	}
 
