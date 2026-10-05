@@ -584,17 +584,4 @@ public interface StarCallingAssistConfig extends Config
 	{
 		return true;
 	}
-
-	@ConfigItem(
-		keyName = "showTravelDistance",
-		name = "Show travel distance",
-		description = "Displays the estimated travel distance to each star location in the list, and allows sorting by it.<br>" +
-			"Requires a version of the Shortest Path plugin that supports path queries.",
-		position = 48,
-		section = shortestPathSection
-	)
-	default boolean showTravelDistance()
-	{
-		return true;
-	}
 }

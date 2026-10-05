@@ -10,7 +10,6 @@ import java.awt.CardLayout;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nonnull;
 import javax.swing.Box;
@@ -213,23 +212,6 @@ public class StarListPanel extends JPanel
 			return !isSortAscending
 				? Integer.compare(deadTime2, deadTime1)
 				: Integer.compare(deadTime1, deadTime2);
-		}
-
-		if (orderByColumn == OrderBy.DISTANCE)
-		{
-			// Stars without a known travel distance are always listed last, and entries
-			// for the same location need to stay next to each other to end up in one group.
-			int distance1 = Optional.ofNullable(a1.getTravelDistance()).orElse(Integer.MAX_VALUE);
-			int distance2 = Optional.ofNullable(a2.getTravelDistance()).orElse(Integer.MAX_VALUE);
-
-			if (distance1 == distance2)
-			{
-				return panelA.getGroupingTitle().compareTo(panelB.getGroupingTitle());
-			}
-
-			return isSortAscending && distance1 != Integer.MAX_VALUE && distance2 != Integer.MAX_VALUE
-				? Integer.compare(distance2, distance1)
-				: Integer.compare(distance1, distance2);
 		}
 
 		return 0;

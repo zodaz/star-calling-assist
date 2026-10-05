@@ -85,11 +85,6 @@ public class StarListEntryAttributes
 		return (int) ((deadAt - System.currentTimeMillis()) / (60 * 1000));
 	}
 
-	public Integer getTravelDistance()
-	{
-		return decorator.getTravelDistance(star.getLocation());
-	}
-
 	public TotalLevelType getTotalLevelType()
 	{
 		if (!world.getTypes().contains(WorldType.SKILL_TOTAL))

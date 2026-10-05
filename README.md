@@ -26,7 +26,5 @@ When the [Shortest Path](https://github.com/Skretzo/shortest-path) plugin is ins
 - Show the route to a star, using the "Route via shortest path" option when right-clicking a star in the side-panel.
 - Automatically show the route to a star when you hop to its world from the side-panel.
 - Clear the route when you arrive at the star, or when the star is depleted or missing.
-- Display the estimated travel distance to each star location in the side-panel, and sort the stars by it.
-  This requires a version of Shortest Path that answers `query` plugin messages.
 
 All of the above can be configured in the "Shortest Path" section of the plugin settings.
