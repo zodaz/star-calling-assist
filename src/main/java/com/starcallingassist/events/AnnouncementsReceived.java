@@ -4,9 +4,11 @@ import com.starcallingassist.modules.crowdsourcing.objects.AnnouncedStar;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.List;
+
 @AllArgsConstructor
-public class AnnouncementReceived
+public class AnnouncementsReceived
 {
 	@Getter
-	private final AnnouncedStar announcement;
+	private final List<AnnouncedStar> announcements;
 }

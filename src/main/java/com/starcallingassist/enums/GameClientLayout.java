@@ -4,6 +4,9 @@ import com.starcallingassist.constants.InterfaceConstants;
 
 import net.runelite.api.Client;
 
+/**
+ * Enum representing the different game client layouts.
+ */
 public enum GameClientLayout
 {
 	FIXED,
@@ -11,6 +14,12 @@ public enum GameClientLayout
 	RESIZABLE_MODERN,
 	UNKNOWN;
 
+	/**
+	 * Get the current game client layout.
+	 *
+	 * @param client The runelite client instance.
+	 * @return       The current client layout.
+	 */
 	public static GameClientLayout currentGameClientLayout(Client client)
 	{
 		if (!client.isResized())

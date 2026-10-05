@@ -2,7 +2,7 @@ package com.starcallingassist.modules.sidepanel.panels;
 
 import com.starcallingassist.constants.PluginColors;
 import com.starcallingassist.events.RouteViaShortestPathRequested;
-import com.starcallingassist.events.ShowWorldPointOnWorldMapRequested;
+import com.starcallingassist.events.ShowStarOnWorldMapRequested;
 import com.starcallingassist.events.WorldHopRequest;
 import com.starcallingassist.modules.sidepanel.decorators.StarListGroupDecorator;
 import com.starcallingassist.modules.sidepanel.decorators.StarListGroupEntryDecorator;
@@ -305,7 +305,7 @@ public class StarListGroupEntryPanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				entry.onShowWorldPointOnWorldMapRequested(new ShowWorldPointOnWorldMapRequested(attributes.getStar().getLocation().getWorldPoint()));
+				entry.onShowWorldPointOnWorldMapRequested(new ShowStarOnWorldMapRequested(attributes));
 			}
 		});
 

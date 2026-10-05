@@ -7,19 +7,22 @@ import com.starcallingassist.modules.callButton.CallButtonModule;
 import com.starcallingassist.modules.crowdsourcing.AnnouncementModule;
 import com.starcallingassist.modules.crowdsourcing.BroadcastModule;
 import com.starcallingassist.modules.logging.ChatLoggerModule;
-import com.starcallingassist.modules.overlay.OverlayModule;
+import com.starcallingassist.modules.overlaypanel.OverlayPanelModule;
 import com.starcallingassist.modules.scout.ScoutModule;
 import com.starcallingassist.modules.shortestpath.ShortestPathModule;
 import com.starcallingassist.modules.sidepanel.SidePanelModule;
+import com.starcallingassist.modules.spriteutil.SpriteUtilModule;
 import com.starcallingassist.modules.starobserver.StarObserverModule;
 import com.starcallingassist.modules.worldhop.WorldHopModule;
 import com.starcallingassist.modules.worldmap.WorldMapModule;
+import com.starcallingassist.modules.worldmapoverlay.WorldMapOverlayModule;
 import java.lang.reflect.InvocationTargetException;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.EventBus;
@@ -34,9 +37,25 @@ import net.runelite.client.task.Schedule;
 	description = "Displays a list of active stars and crowdsources data about stars you find and mine",
 	tags = {"star", "shooting", "shootingstar", "meteor", "crowdsource", "crowdsourcing"}
 )
-
+@Slf4j
 public class StarCallingAssistPlugin extends Plugin
 {
+	private static final ArrayList<Class<? extends PluginModuleContract>> MODULES = new ArrayList<>(Arrays.asList(
+		AnnouncementModule.class,
+		BroadcastModule.class,
+		CallButtonModule.class,
+		ChatLoggerModule.class,
+		OverlayPanelModule.class,
+		ScoutModule.class,
+		SidePanelModule.class,
+		SpriteUtilModule.class,
+		StarObserverModule.class,
+		WorldHopModule.class,
+		WorldMapModule.class,
+		WorldMapOverlayModule.class,
+		ShortestPathModule.class
+	));
+
 	@Getter
 	@Inject
 	private StarCallingAssistConfig config;
@@ -46,20 +65,6 @@ public class StarCallingAssistPlugin extends Plugin
 	{
 		return configManager.getConfig(StarCallingAssistConfig.class);
 	}
-
-	private final ArrayList<Class<? extends PluginModuleContract>> modules = new ArrayList<>(Arrays.asList(
-		CallButtonModule.class,
-		BroadcastModule.class,
-		AnnouncementModule.class,
-		OverlayModule.class,
-		ChatLoggerModule.class,
-		ScoutModule.class,
-		SidePanelModule.class,
-		StarObserverModule.class,
-		WorldHopModule.class,
-		WorldMapModule.class,
-		ShortestPathModule.class
-	));
 
 	@Inject
 	private EventBus eventBus;
@@ -75,7 +80,7 @@ public class StarCallingAssistPlugin extends Plugin
 			return;
 		}
 
-		T module;
+		final T module;
 
 		try
 		{
@@ -83,7 +88,7 @@ public class StarCallingAssistPlugin extends Plugin
 		}
 		catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e)
 		{
-			e.printStackTrace();
+			log.error("Error registering module: ", e);
 			return;
 		}
 
@@ -96,12 +101,12 @@ public class StarCallingAssistPlugin extends Plugin
 	@Override
 	protected void startUp()
 	{
-		for (Class<? extends PluginModuleContract> module : modules)
+		for (final Class<? extends PluginModuleContract> module : MODULES)
 		{
 			this.registerModule(module);
 		}
 
-		for (PluginModuleContract module : this.registeredModules.values())
+		for (final PluginModuleContract module : this.registeredModules.values())
 		{
 			eventBus.register(module);
 			module.startUp();
@@ -111,7 +116,7 @@ public class StarCallingAssistPlugin extends Plugin
 	@Override
 	protected void shutDown()
 	{
-		for (PluginModuleContract module : this.registeredModules.values())
+		for (final PluginModuleContract module : this.registeredModules.values())
 		{
 			eventBus.unregister(module);
 			module.shutDown();
@@ -123,10 +128,7 @@ public class StarCallingAssistPlugin extends Plugin
 	@Subscribe
 	public void onConfigChanged(ConfigChanged event)
 	{
-		Class<?> inter = config.getClass().getInterfaces()[0];
-		ConfigGroup group = inter.getAnnotation(ConfigGroup.class);
-
-		if (group != null && event.getGroup().equals(group.value()))
+		if (event.getGroup().equals(StarCallingAssistConfig.CONFIG_GROUP))
 		{
 			eventBus.post(PluginConfigChanged.fromRuneLiteEvent(event));
 		}
@@ -138,7 +140,7 @@ public class StarCallingAssistPlugin extends Plugin
 	)
 	public void everySecondTick()
 	{
-		for (PluginModuleContract module : this.registeredModules.values())
+		for (final PluginModuleContract module : this.registeredModules.values())
 		{
 			module.onSecondElapsed(secondsElapsed);
 		}

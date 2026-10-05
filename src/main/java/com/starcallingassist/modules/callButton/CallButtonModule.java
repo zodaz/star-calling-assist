@@ -3,9 +3,10 @@ package com.starcallingassist.modules.callButton;
 import com.google.inject.Inject;
 import com.starcallingassist.PluginModuleContract;
 import com.starcallingassist.StarCallingAssistConfig;
+import com.starcallingassist.enums.SignalEventType;
 import com.starcallingassist.events.ManualStarAbsenceBroadcastRequested;
-import com.starcallingassist.events.ManualStarPresenceBroadcastRequested;
 import com.starcallingassist.events.PluginConfigChanged;
+import com.starcallingassist.events.SignalEvent;
 import com.starcallingassist.modules.callButton.enums.CallType;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
@@ -168,7 +169,7 @@ public class CallButtonModule extends PluginModuleContract
 	{
 		if (event.getOp() == CallType.STAR.getOp())
 		{
-			dispatch(new ManualStarPresenceBroadcastRequested());
+			dispatch(new SignalEvent(SignalEventType.MANUAL_STAR_PRECENCE_BROADCAST_REQUESTED));
 		}
 
 		if (event.getOp() == CallType.DEAD.getOp())

@@ -1,5 +1,8 @@
 package com.starcallingassist.constants;
 
+/**
+ * Contains all region toggle config key definitions.
+ */
 public class RegionKeyName
 {
 	public static final String KEY_ASGARNIA = "asgarnia";

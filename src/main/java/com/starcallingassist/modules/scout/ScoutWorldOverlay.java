@@ -4,7 +4,7 @@ import java.awt.BasicStroke;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.geom.GeneralPath;
-import javax.inject.Inject;
+import com.google.inject.Inject;
 import net.runelite.api.Client;
 import net.runelite.api.Perspective;
 import static net.runelite.api.Perspective.LOCAL_TILE_SIZE;
@@ -38,8 +38,8 @@ public class ScoutWorldOverlay extends Overlay
 	{
 		WorldPoint playerLocation = client.getLocalPlayer().getWorldLocation();
 
-		module.getLocations().forEach((location, state) -> {
-			if (location.getWorldPoint().distanceTo(playerLocation) >= Perspective.SCENE_SIZE)
+		module.getLocations().forEach((starLocationDetails, state) -> {
+			if (starLocationDetails.getWorldPoint().distanceTo(playerLocation) >= Perspective.SCENE_SIZE)
 			{
 				return;
 			}
@@ -47,7 +47,7 @@ public class ScoutWorldOverlay extends Overlay
 			graphics.setStroke(new BasicStroke(2));
 			graphics.setColor(state.getColor());
 
-			renderScoutableBounds(graphics, location.getScoutableBounds());
+			renderScoutableBounds(graphics, starLocationDetails.getScoutableBounds());
 		});
 
 		return null;

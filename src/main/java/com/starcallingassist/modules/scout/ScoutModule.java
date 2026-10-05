@@ -6,11 +6,11 @@ import com.starcallingassist.events.PluginConfigChanged;
 import com.starcallingassist.events.StarLocationRegionEntered;
 import com.starcallingassist.events.StarLocationRegionExited;
 import com.starcallingassist.events.StarLocationScouted;
-import com.starcallingassist.objects.StarLocation;
+import com.starcallingassist.enums.StarLocationDetails;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.HashMap;
-import javax.inject.Inject;
+import com.google.inject.Inject;
 import lombok.Getter;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
@@ -40,13 +40,16 @@ public class ScoutModule extends PluginModuleContract
 	private WorldMapBoundsOverlay scoutWorldMapBoundsOverlay;
 
 	@Getter
-	private final HashMap<StarLocation, StarLocationState> locations = new HashMap<>();
+	private final HashMap<StarLocationDetails, StarLocationState> locations = new HashMap<>();
 
 	private boolean overlayVisible = false;
 
 	public ScoutModule()
 	{
-		StarLocation.LOCATIONS.keySet().forEach(point -> locations.put(new StarLocation(point), new StarLocationState()));
+		for (StarLocationDetails starLocationDetails : StarLocationDetails.values())
+		{
+			locations.put(starLocationDetails, new StarLocationState());
+		}
 	}
 
 	@Override
@@ -117,10 +120,12 @@ public class ScoutModule extends PluginModuleContract
 			return;
 		}
 
-		locations.forEach((location, state) -> {
-			boolean isPlayerWithinBounds = location.getScoutableBounds().contains(playerLocation);
-			boolean isRegionLoaded = Arrays.stream(client.getMapRegions()).anyMatch(region -> region == location.getWorldPoint().getRegionID());
-			boolean isWorldPointLoaded = location.getWorldPoint().isInScene(client);
+		locations.forEach((starLocationDetails, state) -> {
+			boolean isPlayerWithinBounds = starLocationDetails.getScoutableBounds().contains(playerLocation);
+
+			// TODO: Depreceated
+			boolean isRegionLoaded = Arrays.stream(client.getMapRegions()).anyMatch(region -> region == starLocationDetails.getWorldPoint().getRegionID());
+			boolean isWorldPointLoaded = starLocationDetails.getWorldPoint().isInScene(client);
 
 			boolean wasPlayerWithinBounds = state.isPlayerWithinBounds();
 			boolean wasRegionLoaded = state.isRegionLoaded();
@@ -129,13 +134,13 @@ public class ScoutModule extends PluginModuleContract
 			if (wasPlayerWithinBounds && !isPlayerWithinBounds)
 			{
 				state.setPlayerWithinBounds(false);
-				dispatch(new StarLocationRegionExited(location));
+				dispatch(new StarLocationRegionExited(starLocationDetails));
 			}
 
 			if (!wasPlayerWithinBounds && isPlayerWithinBounds)
 			{
 				state.setPlayerWithinBounds(true);
-				dispatch(new StarLocationRegionEntered(location));
+				dispatch(new StarLocationRegionEntered(starLocationDetails));
 			}
 
 			if ((isPlayerWithinBounds && isRegionLoaded && isWorldPointLoaded) &&
@@ -144,7 +149,7 @@ public class ScoutModule extends PluginModuleContract
 				state.setRegionLoaded(true);
 				state.setWorldPointLoaded(true);
 				state.setPlayerWithinBounds(true);
-				dispatch(new StarLocationScouted(location));
+				dispatch(new StarLocationScouted(starLocationDetails));
 			}
 
 			if (wasWorldPointLoaded && !isWorldPointLoaded)

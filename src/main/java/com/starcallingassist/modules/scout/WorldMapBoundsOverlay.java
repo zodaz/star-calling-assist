@@ -5,7 +5,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import javax.inject.Inject;
+import com.google.inject.Inject;
 import net.runelite.api.Client;
 import net.runelite.api.Point;
 import net.runelite.api.coords.WorldArea;
@@ -55,12 +55,8 @@ class WorldMapBoundsOverlay extends Overlay
 		Rectangle worldMapRect = map.getBounds();
 		graphics.setClip(worldMapRect);
 
-		module.getLocations().forEach((location, state) -> {
-			WorldArea bounds = location.getScoutableBounds();
-			if (bounds == null)
-			{
-				return;
-			}
+		module.getLocations().forEach((starLocationDetails, state) -> {
+			final WorldArea bounds = starLocationDetails.getScoutableBounds();
 
 			Point topLeft = mapWorldPointToGraphicsPoint(new WorldPoint(bounds.getX(), bounds.getY(), 0));
 			Point topRight = mapWorldPointToGraphicsPoint(new WorldPoint(bounds.getX() + bounds.getWidth(), bounds.getY(), 0));

@@ -6,7 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.inject.Inject;
 import com.starcallingassist.PluginModuleContract;
 import com.starcallingassist.StarCallingAssistConfig;
-import com.starcallingassist.events.AnnouncementReceived;
+import com.starcallingassist.events.AnnouncementsReceived;
 import com.starcallingassist.events.AnnouncementRefreshFailed;
 import com.starcallingassist.events.AnnouncementsRefreshed;
 import com.starcallingassist.events.NavButtonClicked;
@@ -205,6 +205,7 @@ public class AnnouncementModule extends PluginModuleContract
 					}
 
 					List<Integer> outdatedWorlds = new ArrayList<>(stars.keySet());
+					List<AnnouncedStar> newAnnouncements = new ArrayList<>();
 
 					try
 					{
@@ -235,7 +236,7 @@ public class AnnouncementModule extends PluginModuleContract
 							}
 
 							stars.put(world, announcedStar);
-							dispatch(new AnnouncementReceived(announcedStar));
+							newAnnouncements.add(announcedStar);
 						}
 					}
 					catch (Exception e)
@@ -253,8 +254,10 @@ public class AnnouncementModule extends PluginModuleContract
 							System.currentTimeMillis() / 1000L
 						);
 
-						dispatch(new AnnouncementReceived(deadStarAnnouncement));
+						newAnnouncements.add(deadStarAnnouncement);
 					});
+
+					dispatch(new AnnouncementsReceived(newAnnouncements));
 
 					announcementsLastRefreshedAt = System.currentTimeMillis();
 					dispatch(new AnnouncementsRefreshed(new ArrayList<>(stars.values())));

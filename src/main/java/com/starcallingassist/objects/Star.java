@@ -8,6 +8,9 @@ import lombok.Setter;
 import net.runelite.api.NPC;
 import net.runelite.api.coords.WorldPoint;
 
+/**
+ * Contains all dynamic data about a star.
+ */
 @Getter
 public class Star
 {
@@ -38,6 +41,12 @@ public class Star
 		this(world, new StarLocation(location), tier, null);
 	}
 
+	/**
+	 * Create a new star with a different tier from an existing star.
+	 * @param star The {@link Star} to base the new star on.
+	 * @param tier The tier of the new star.
+	 * @return The new {@link Star} object.
+	 */
 	public static Star fromExistingWithTierChange(Star star, Integer tier)
 	{
 		return new Star(

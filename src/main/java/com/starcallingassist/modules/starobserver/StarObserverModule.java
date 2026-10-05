@@ -3,7 +3,7 @@ package com.starcallingassist.modules.starobserver;
 import com.google.inject.Inject;
 import com.starcallingassist.PluginModuleContract;
 import com.starcallingassist.StarCallingAssistConfig;
-import com.starcallingassist.events.AnnouncementReceived;
+import com.starcallingassist.events.AnnouncementsReceived;
 import com.starcallingassist.events.StarAbandoned;
 import com.starcallingassist.events.StarApproached;
 import com.starcallingassist.events.StarDepleted;
@@ -11,8 +11,10 @@ import com.starcallingassist.events.StarLocationScouted;
 import com.starcallingassist.events.StarMissing;
 import com.starcallingassist.events.StarScouted;
 import com.starcallingassist.events.StarTierChanged;
-import com.starcallingassist.events.WorldStarUpdated;
+import com.starcallingassist.events.CurrentWorldStarUpdated;
+import com.starcallingassist.modules.crowdsourcing.objects.AnnouncedStar;
 import com.starcallingassist.objects.Star;
+import com.starcallingassist.enums.StarLocationDetails;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nonnull;
@@ -24,7 +26,6 @@ import net.runelite.api.NPC;
 import net.runelite.api.NullNpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.LocalPoint;
-import net.runelite.api.coords.WorldArea;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.GameObjectDespawned;
 import net.runelite.api.events.GameObjectSpawned;
@@ -70,7 +71,7 @@ public class StarObserverModule extends PluginModuleContract
 	public void startUp()
 	{
 		detectExistingStarNpc();
-		clientThread.invokeLater(() -> dispatch(new WorldStarUpdated(currentStars.get(client.getWorld()))));
+		clientThread.invokeLater(() -> dispatch(new CurrentWorldStarUpdated(currentStars.get(client.getWorld()))));
 	}
 
 	@Override
@@ -94,7 +95,7 @@ public class StarObserverModule extends PluginModuleContract
 		if (lastKnownStar == null || !observedStar.isSameAs(lastKnownStar))
 		{
 			currentStars.put(observedStar.getWorld(), observedStar);
-			dispatch(new WorldStarUpdated(observedStar));
+			dispatch(new CurrentWorldStarUpdated(observedStar));
 			dispatch(new StarScouted(observedStar));
 			return;
 		}
@@ -104,7 +105,7 @@ public class StarObserverModule extends PluginModuleContract
 			Star updatedStar = Star.fromExistingWithTierChange(lastKnownStar, observedStar.getTier());
 
 			currentStars.put(updatedStar.getWorld(), updatedStar);
-			dispatch(new WorldStarUpdated(updatedStar));
+			dispatch(new CurrentWorldStarUpdated(updatedStar));
 			dispatch(new StarTierChanged(updatedStar));
 		}
 	}
@@ -148,7 +149,7 @@ public class StarObserverModule extends PluginModuleContract
 
 		currentStars.remove(despawnedStar.getWorld());
 		dispatch(new StarDepleted(despawnedStar));
-		dispatch(new WorldStarUpdated(null));
+		dispatch(new CurrentWorldStarUpdated(null));
 		isNearStarLocation = false;
 	}
 
@@ -195,21 +196,23 @@ public class StarObserverModule extends PluginModuleContract
 		currentStars.remove(despawnedStar.getWorld());
 
 		dispatch(new StarDepleted(despawnedStar));
-		dispatch(new WorldStarUpdated(null));
+		dispatch(new CurrentWorldStarUpdated(null));
 		isNearStarLocation = false;
 	}
 
 	@Subscribe
-	public void onAnnouncementReceived(AnnouncementReceived event)
+	public void onAnnouncementsReceived(AnnouncementsReceived event)
 	{
-		Star updatedStar = event.getAnnouncement().getStar();
-		if (client.getWorld() == updatedStar.getWorld())
+		for (AnnouncedStar announcement : event.getAnnouncements())
 		{
-			updateCurrentStarForCurrentWorld(updatedStar);
-		}
-		else
-		{
-			updateCurrentStarForOtherWorlds(updatedStar);
+			if (client.getWorld() == announcement.getStar().getWorld())
+			{
+				updateCurrentStarForCurrentWorld(announcement.getStar());
+			}
+			else
+			{
+				updateCurrentStarForOtherWorlds(announcement.getStar());
+			}
 		}
 	}
 
@@ -284,9 +287,13 @@ public class StarObserverModule extends PluginModuleContract
 	public void onWorldChanged(WorldChanged event)
 	{
 		isNearStarLocation = false;
-		dispatch(new WorldStarUpdated(currentStars.get(client.getWorld())));
+		dispatch(new CurrentWorldStarUpdated(currentStars.get(client.getWorld())));
 	}
 
+	/**
+	 * Update the currently active star in worlds other than the player's current world.
+	 * @param updatedStar The new updated {@link Star}.
+	 */
 	private void updateCurrentStarForOtherWorlds(Star updatedStar)
 	{
 		if (updatedStar.getTier() == null)
@@ -299,6 +306,10 @@ public class StarObserverModule extends PluginModuleContract
 		}
 	}
 
+	/**
+	 * Update the currently active star in the player's current world.
+	 * @param updatedStar The new updated {@link Star} on the player's current world.
+	 */
 	private void updateCurrentStarForCurrentWorld(Star updatedStar)
 	{
 		Star existingStar = currentStars.get(client.getWorld());
@@ -307,34 +318,32 @@ public class StarObserverModule extends PluginModuleContract
 			return;
 		}
 
-		if (existingStar == null)
+		if (existingStar == null || !existingStar.isSameAs(updatedStar))
 		{
 			currentStars.put(updatedStar.getWorld(), updatedStar);
-			dispatch(new WorldStarUpdated(updatedStar));
-			return;
-		}
-
-		if (!existingStar.isSameAs(updatedStar))
-		{
-			currentStars.put(updatedStar.getWorld(), updatedStar);
-			dispatch(new WorldStarUpdated(updatedStar));
+			dispatch(new CurrentWorldStarUpdated(updatedStar));
 			return;
 		}
 
 		if (updatedStar.getTier() == null)
 		{
 			currentStars.remove(updatedStar.getWorld());
-			dispatch(new WorldStarUpdated(null));
+			dispatch(new CurrentWorldStarUpdated(null));
 			return;
 		}
 
 		if (existingStar.getTier() > updatedStar.getTier())
 		{
 			currentStars.put(updatedStar.getWorld(), updatedStar);
-			dispatch(new WorldStarUpdated(updatedStar));
+			dispatch(new CurrentWorldStarUpdated(updatedStar));
 		}
 	}
 
+	/**
+	 * Get the tier (<code>1-9</code>) of a crashed star {@link GameObject}.
+	 * @param object The {@link GameObject} which presumably is a crashed star.
+	 * @return The tier of the star. <code>null</code> if not a valid star.
+	 */
 	protected Integer calculateStarTier(GameObject object)
 	{
 		if (object == null)
@@ -353,6 +362,9 @@ public class StarObserverModule extends PluginModuleContract
 		return null;
 	}
 
+	/**
+	 * Try finding the existing star NPC and update {@link #currentStarNpc}.
+	 */
 	private void detectExistingStarNpc()
 	{
 		client.getNpcs().forEach(npc ->
@@ -382,20 +394,20 @@ public class StarObserverModule extends PluginModuleContract
 		}
 	}
 
-	protected Boolean isValidStarObject(GameObject object)
+	private boolean isValidStarObject(GameObject object)
 	{
 		return this.calculateStarTier(object) != null;
 	}
 
 	private boolean isStarLocationWithinRenderDistance(@Nonnull Star star)
 	{
-		WorldArea worldArea = star.getLocation().getWorldArea();
+		final StarLocationDetails starLocationDetails = star.getLocation().getStarLocationDetails();
 
-		if (worldArea == null)
+		if (starLocationDetails == null)
 		{
 			return false;
 		}
 
-		return worldArea.distanceTo(client.getLocalPlayer().getWorldLocation()) <= 13;
+		return starLocationDetails.getWorldArea().distanceTo(client.getLocalPlayer().getWorldLocation()) <= 13;
 	}
 }

@@ -4,7 +4,8 @@ import com.google.inject.Inject;
 import com.starcallingassist.PluginModuleContract;
 import com.starcallingassist.StarCallingAssistConfig;
 import com.starcallingassist.enums.ChatLogLevel;
-import com.starcallingassist.events.AnnouncementReceived;
+import com.starcallingassist.enums.StarLocationDetails;
+import com.starcallingassist.events.AnnouncementsReceived;
 import com.starcallingassist.events.LogMessage;
 import com.starcallingassist.events.RouteViaShortestPathRequested;
 import com.starcallingassist.events.StarDepleted;
@@ -12,6 +13,7 @@ import com.starcallingassist.events.StarMissing;
 import com.starcallingassist.events.StarScouted;
 import com.starcallingassist.events.StarTierChanged;
 import com.starcallingassist.events.WorldHopRequest;
+import com.starcallingassist.modules.crowdsourcing.objects.AnnouncedStar;
 import com.starcallingassist.objects.Star;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,6 +21,7 @@ import net.runelite.api.Client;
 import net.runelite.api.Player;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameTick;
+import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.PluginMessage;
 
@@ -33,6 +36,9 @@ public class ShortestPathModule extends PluginModuleContract
 
 	@Inject
 	private Client client;
+
+	@Inject
+	private ClientThread clientThread;
 
 	@Inject
 	private StarCallingAssistConfig config;
@@ -65,6 +71,7 @@ public class ShortestPathModule extends PluginModuleContract
 		}
 
 		// The route can only be set once we're logged in to the star's world, so it is picked up on a later game tick.
+		// Hops that aren't for a specific star (e.g. from the world map) carry no star, which drops any pending route.
 		pendingRouteStar = event.getStar();
 		pendingRouteSecondsLeft = PENDING_ROUTE_TIMEOUT_SECONDS;
 	}
@@ -86,9 +93,13 @@ public class ShortestPathModule extends PluginModuleContract
 		}
 
 		Star routed = routedStar;
-		if (routed != null
-			&& routed.getWorld() == client.getWorld()
-			&& routed.getLocation().getWorldArea().distanceTo(player.getWorldLocation()) <= ARRIVAL_DISTANCE)
+		if (routed == null || routed.getWorld() != client.getWorld())
+		{
+			return;
+		}
+
+		StarLocationDetails details = routed.getLocation().getStarLocationDetails();
+		if (details != null && details.getWorldArea().distanceTo(player.getWorldLocation()) <= ARRIVAL_DISTANCE)
 		{
 			clearRoute();
 		}
@@ -104,17 +115,20 @@ public class ShortestPathModule extends PluginModuleContract
 	}
 
 	@Subscribe
-	public void onAnnouncementReceived(AnnouncementReceived event)
+	public void onAnnouncementsReceived(AnnouncementsReceived event)
 	{
-		Star routed = routedStar;
-
-		if (clearRouteIfGone(event.getAnnouncement().getStar()) && routed != null && config.clearRouteWhenDone())
+		for (AnnouncedStar announcement : event.getAnnouncements())
 		{
-			dispatch(new LogMessage(String.format(
-				"The star near *%s* on world *%d* is gone, so the route to it has been cleared.",
-				routed.getLocation().getName(),
-				routed.getWorld()
-			), ChatLogLevel.NORMAL));
+			Star routed = routedStar;
+
+			if (clearRouteIfGone(announcement.getStar()) && routed != null && config.clearRouteWhenDone())
+			{
+				dispatch(new LogMessage(String.format(
+					"The star near *%s* on world *%d* is gone, so the route to it has been cleared.",
+					routed.getLocation().getName(),
+					routed.getWorld()
+				), ChatLogLevel.NORMAL));
+			}
 		}
 	}
 
@@ -175,7 +189,7 @@ public class ShortestPathModule extends PluginModuleContract
 
 		Map<String, Object> data = new HashMap<>();
 		data.put("target", target);
-		dispatch(new PluginMessage(NAMESPACE, "path", data));
+		clientThread.invokeLater(() -> dispatch(new PluginMessage(NAMESPACE, "path", data)));
 
 		routedStar = star;
 	}
@@ -186,7 +200,7 @@ public class ShortestPathModule extends PluginModuleContract
 
 		if (config.clearRouteWhenDone())
 		{
-			dispatch(new PluginMessage(NAMESPACE, "clear"));
+			clientThread.invokeLater(() -> dispatch(new PluginMessage(NAMESPACE, "clear")));
 		}
 	}
 }

@@ -14,6 +14,9 @@ import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.util.WorldUtil;
 
+/**
+ * Module handling world hop requests.
+ */
 public class WorldHopModule extends PluginModuleContract
 {
 	@Inject
@@ -32,7 +35,7 @@ public class WorldHopModule extends PluginModuleContract
 	@Override
 	public void startUp()
 	{
-		resetQuickHopper();
+		resetWorldHopper();
 	}
 
 	@Subscribe
@@ -50,6 +53,10 @@ public class WorldHopModule extends PluginModuleContract
 		}
 	}
 
+	/**
+	 * Change the currently selected world on the login screen.
+	 * @param world The {@link net.runelite.http.api.worlds.World} to select.
+	 */
 	private void changeWorldLoginScreen(net.runelite.http.api.worlds.World world)
 	{
 		final World rsWorld = client.createWorld();
@@ -63,11 +70,15 @@ public class WorldHopModule extends PluginModuleContract
 		client.changeWorld(rsWorld);
 	}
 
+	/**
+	 * Initiate the world hop process while being logged in.
+	 * @param world The {@link net.runelite.http.api.worlds.World} to hop to.
+	 */
 	private void changeWorldLoggedIn(net.runelite.http.api.worlds.World world)
 	{
 		displaySwitcherAttempts = 0;
 		hopTarget = world.getId();
-		dispatch(new LogMessage("Attempting to quick-hop to world *" + hopTarget + "*", ChatLogLevel.NORMAL));
+		dispatch(new LogMessage("Attempting to hop to world *" + hopTarget + "*", ChatLogLevel.NORMAL));
 	}
 
 	@Subscribe
@@ -84,7 +95,7 @@ public class WorldHopModule extends PluginModuleContract
 
 			if (++displaySwitcherAttempts >= DISPLAY_SWITCHER_MAX_ATTEMPTS)
 			{
-				resetQuickHopper();
+				resetWorldHopper();
 				dispatch(new LogMessage("Failed to open world switcher after *" + displaySwitcherAttempts + "* attempts", ChatLogLevel.NORMAL));
 			}
 
@@ -93,8 +104,8 @@ public class WorldHopModule extends PluginModuleContract
 
 		if (++hopAttempts >= 5)
 		{
-			resetQuickHopper();
-			dispatch(new LogMessage("Unable to quick-hop to world *" + hopTarget + "*", ChatLogLevel.NORMAL));
+			resetWorldHopper();
+			dispatch(new LogMessage("Unable to hop to world *" + hopTarget + "*", ChatLogLevel.NORMAL));
 			return;
 		}
 
@@ -109,13 +120,13 @@ public class WorldHopModule extends PluginModuleContract
 			if (world.getId() == hopTarget)
 			{
 				client.hopToWorld(world);
-				resetQuickHopper();
+				resetWorldHopper();
 				break;
 			}
 		}
 	}
 
-	private void resetQuickHopper()
+	private void resetWorldHopper()
 	{
 		hopTarget = null;
 		hopAttempts = 0;

@@ -2,6 +2,9 @@ package com.starcallingassist.constants;
 
 import java.awt.Color;
 
+/**
+ * Contains color definitions used throughout the plugin.
+ */
 public class PluginColors
 {
 	public static final Color PRIMARY_BACKGROUND = new Color(23, 23, 23);
@@ -44,4 +47,20 @@ public class PluginColors
 	public static final Color FRESH_START_WORLD = new Color(255, 211, 83);
 	public static final Color MEMBERS_WORLD = new Color(210, 193, 53);
 	public static final Color PVP_WORLD = new Color(220, 38, 38);
+
+	/**
+	 * Get the color tied to a specific tier of star.
+	 *
+	 * @param tier The tier of the star.
+	 * @return     A color ranging from green to yellow.
+	 */
+	public static Color getTierColor(int tier)
+	{
+		tier = (tier < 0) ? 0 : Math.min(tier, 9);
+
+		// Get the red value
+		int red = (int)((1 - (tier / 9.0f)) * 255);
+
+		return new Color(red, 255, 0);
+	}
 }
