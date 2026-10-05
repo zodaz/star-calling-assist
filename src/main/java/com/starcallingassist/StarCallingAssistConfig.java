@@ -590,4 +590,38 @@ public interface StarCallingAssistConfig extends Config
 		return false;
 	}
 	//#endregion
+
+	//#region Shortest Path
+	@ConfigSection(
+		name = "Shortest Path",
+		description = "Settings to configure the integration with the Shortest Path plugin, if you have it installed.",
+		position = 9,
+		closedByDefault = true
+	)
+	String shortestPathSection = "Shortest Path";
+
+	@ConfigItem(
+		keyName = "routeOnHop",
+		name = "Route when hopping",
+		description = "Automatically shows the route to a star when you hop to its world from the side-panel.",
+		position = 0,
+		section = shortestPathSection
+	)
+	default boolean routeOnHop()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "clearRouteWhenDone",
+		name = "Clear finished routes",
+		description = "Clears the route to a star when you arrive at it, or when the star is depleted or missing.",
+		position = 1,
+		section = shortestPathSection
+	)
+	default boolean clearRouteWhenDone()
+	{
+		return true;
+	}
+	//#endregion
 }

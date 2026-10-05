@@ -1,12 +1,12 @@
 package com.starcallingassist.events;
 
+import com.starcallingassist.objects.Star;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.runelite.api.coords.WorldPoint;
 
 @AllArgsConstructor
 public class RouteViaShortestPathRequested
 {
 	@Getter
-	private final WorldPoint target;
+	private final Star star;
 }
