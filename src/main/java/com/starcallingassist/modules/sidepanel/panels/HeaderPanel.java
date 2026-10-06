@@ -5,12 +5,17 @@ import com.starcallingassist.modules.sidepanel.decorators.HeaderPanelDecorator;
 import com.starcallingassist.modules.sidepanel.elements.Link;
 import com.starcallingassist.modules.sidepanel.enums.OrderBy;
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ItemEvent;
+import javax.swing.Box;
 import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import net.runelite.client.ui.components.TitleCaseListCellRenderer;
 
 public class HeaderPanel extends JPanel
@@ -21,6 +26,7 @@ public class HeaderPanel extends JPanel
 
 	private final JPanel sortingPanel = new JPanel(new BorderLayout());
 	private final JComboBox<String> dropdown;
+	private final JTextField locationFilterField;
 
 	public HeaderPanel(HeaderPanelDecorator decorator)
 	{
@@ -34,9 +40,12 @@ public class HeaderPanel extends JPanel
 		));
 
 		dropdown = createSortingDropdown();
+		locationFilterField = createLocationFilterField();
 
 		sortingPanel.setOpaque(false);
-		sortingPanel.add(dropdown, BorderLayout.CENTER);
+		sortingPanel.add(dropdown, BorderLayout.NORTH);
+		sortingPanel.add(Box.createVerticalStrut(4), BorderLayout.CENTER);
+		sortingPanel.add(locationFilterField, BorderLayout.SOUTH);
 		sortingPanel.setBorder(new EmptyBorder(0, 0, 3, 0));
 	}
 
@@ -64,9 +73,39 @@ public class HeaderPanel extends JPanel
 		return dropdown;
 	}
 
+	private JTextField createLocationFilterField()
+	{
+		JTextField textField = new JTextField();
+		textField.setToolTipText("Filter stars by location, world, or tier");
+		textField.setPreferredSize(new Dimension(0, 24));
+		textField.getDocument().addDocumentListener(new DocumentListener()
+		{
+			@Override
+			public void insertUpdate(DocumentEvent event)
+			{
+				decorator.onLocationFilterChanged(textField.getText());
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent event)
+			{
+				decorator.onLocationFilterChanged(textField.getText());
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent event)
+			{
+				decorator.onLocationFilterChanged(textField.getText());
+			}
+		});
+
+		return textField;
+	}
+
 	public void startUp()
 	{
 		dropdown.setSelectedItem(decorator.getOrderBy().getName());
+		locationFilterField.setText(decorator.getLocationFilter());
 
 		rebuild();
 	}
