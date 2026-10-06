@@ -1,7 +1,14 @@
 package com.starcallingassist.enums;
 
 import com.starcallingassist.constants.RegionKeyName;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
+/**
+ * Enum representing each region and the corresponding config key of its toggle.
+ */
+@Getter
+@AllArgsConstructor
 public enum Region
 {
 	ASGARNIA(RegionKeyName.KEY_ASGARNIA),
@@ -21,15 +28,8 @@ public enum Region
 	WILDERNESS(RegionKeyName.KEY_WILDERNESS),
 	UNKNOWN(RegionKeyName.KEY_UNKNOWN);
 
+	/**
+	 * The config key name of the toggle for this region.
+	 */
 	public final String keyName;
-
-	Region(String keyName)
-	{
-		this.keyName = keyName;
-	}
-
-	public String getKeyName()
-	{
-		return keyName;
-	}
 }

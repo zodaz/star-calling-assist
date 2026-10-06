@@ -5,8 +5,8 @@ import com.google.inject.Injector;
 import com.starcallingassist.StarCallingAssistConfig;
 import com.starcallingassist.constants.PluginColors;
 import com.starcallingassist.enums.Region;
+import com.starcallingassist.events.ShowStarOnWorldMapRequested;
 import com.starcallingassist.events.RouteViaShortestPathRequested;
-import com.starcallingassist.events.ShowWorldPointOnWorldMapRequested;
 import com.starcallingassist.events.WorldHopRequest;
 import com.starcallingassist.modules.sidepanel.decorators.HeaderPanelDecorator;
 import com.starcallingassist.modules.sidepanel.decorators.MasterPanelDecorator;
@@ -15,20 +15,18 @@ import com.starcallingassist.modules.sidepanel.enums.OrderBy;
 import com.starcallingassist.modules.sidepanel.enums.TotalLevelType;
 import com.starcallingassist.modules.sidepanel.panels.HeaderPanel;
 import com.starcallingassist.modules.sidepanel.panels.StarListPanel;
-import com.starcallingassist.objects.Star;
-import com.starcallingassist.objects.StarLocation;
+import com.starcallingassist.enums.StarLocationDetails;
 import java.awt.BorderLayout;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
+import lombok.Getter;
 import lombok.Setter;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginManager;
 import net.runelite.client.ui.Activatable;
 import net.runelite.client.ui.PluginPanel;
-import net.runelite.http.api.worlds.World;
 
 public class SidePanel extends PluginPanel implements Activatable
 {
@@ -51,6 +49,7 @@ public class SidePanel extends PluginPanel implements Activatable
 
 	private final HeaderPanel headerPanel;
 
+	@Getter
 	private final StarListPanel starListPanel;
 
 	public SidePanel(MasterPanelDecorator decorator)
@@ -127,7 +126,8 @@ public class SidePanel extends PluginPanel implements Activatable
 			public List<Region> visibleRegions()
 			{
 				return Arrays.stream(Region.values())
-					.filter(region -> Boolean.parseBoolean(configManager.getConfiguration("starcallingassistplugin", region.getKeyName())))
+					.filter(region -> Boolean.parseBoolean(
+						configManager.getConfiguration(StarCallingAssistConfig.CONFIG_GROUP, region.keyName)))
 					.collect(Collectors.toList());
 			}
 
@@ -158,6 +158,7 @@ public class SidePanel extends PluginPanel implements Activatable
 			@Override
 			public boolean isShortestPathPluginAvailable()
 			{
+
 				for (Plugin plugin : pluginManager.getPlugins())
 				{
 					if (plugin.getName().equals("Shortest Path"))
@@ -169,7 +170,7 @@ public class SidePanel extends PluginPanel implements Activatable
 			}
 
 			@Override
-			public List<StarLocation> getCurrentPlayerLocations()
+			public List<StarLocationDetails> getCurrentPlayerLocations()
 			{
 				return decorator.getCurrentPlayerRegions();
 			}
@@ -187,9 +188,9 @@ public class SidePanel extends PluginPanel implements Activatable
 			}
 
 			@Override
-			public void onShowWorldPointOnWorldMapRequested(ShowWorldPointOnWorldMapRequested showWorldPointOnWorldMapRequested)
+			public void onShowWorldPointOnWorldMapRequested(ShowStarOnWorldMapRequested showStarOnWorldMapRequested)
 			{
-				decorator.onShowWorldPointOnWorldMapRequested(showWorldPointOnWorldMapRequested);
+				decorator.onShowWorldPointOnWorldMapRequested(showStarOnWorldMapRequested);
 			}
 
 			@Override
@@ -239,11 +240,6 @@ public class SidePanel extends PluginPanel implements Activatable
 	public void shutDown()
 	{
 		//
-	}
-
-	public void onStarUpdate(@Nonnull Star star, @Nonnull World world, long updatedAt)
-	{
-		starListPanel.onStarUpdate(star, world, updatedAt);
 	}
 
 	public void setErrorMessage(String errorMessage)

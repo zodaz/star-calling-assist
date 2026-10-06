@@ -14,7 +14,7 @@ import com.starcallingassist.events.StarLocationScouted;
 import com.starcallingassist.events.StarMissing;
 import com.starcallingassist.events.StarScouted;
 import com.starcallingassist.events.StarTierChanged;
-import com.starcallingassist.events.WorldStarUpdated;
+import com.starcallingassist.events.CurrentWorldStarUpdated;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
@@ -98,7 +98,7 @@ public class ChatLoggerModule extends PluginModuleContract
 	}
 
 	@Subscribe
-	public void onWorldStarUpdated(WorldStarUpdated event)
+	public void onCurrentWorldStarUpdated(CurrentWorldStarUpdated event)
 	{
 		if (event.getStar() == null || client.getGameState() != GameState.LOGGED_IN)
 		{
@@ -116,7 +116,7 @@ public class ChatLoggerModule extends PluginModuleContract
 	@Subscribe
 	public void onLogMessage(LogMessage event)
 	{
-		if (config.logLevel().getValue() < event.getLogLevel().getValue())
+		if (config.logLevel().ordinal() < event.getLogLevel().ordinal())
 		{
 			return;
 		}

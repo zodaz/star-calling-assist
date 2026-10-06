@@ -2,10 +2,10 @@ package com.starcallingassist.modules.sidepanel.decorators;
 
 import com.starcallingassist.enums.Region;
 import com.starcallingassist.events.RouteViaShortestPathRequested;
-import com.starcallingassist.events.ShowWorldPointOnWorldMapRequested;
+import com.starcallingassist.events.ShowStarOnWorldMapRequested;
 import com.starcallingassist.events.WorldHopRequest;
 import com.starcallingassist.modules.sidepanel.enums.TotalLevelType;
-import com.starcallingassist.objects.StarLocation;
+import com.starcallingassist.enums.StarLocationDetails;
 import java.util.List;
 
 public interface StarListGroupEntryDecorator
@@ -42,13 +42,13 @@ public interface StarListGroupEntryDecorator
 
 	boolean isShortestPathPluginAvailable();
 
-	List<StarLocation> getCurrentPlayerLocations();
+	List<StarLocationDetails> getCurrentPlayerLocations();
 
 	int getCurrentWorldId();
 
 	void onWorldHopRequest(WorldHopRequest request);
 
-	void onShowWorldPointOnWorldMapRequested(ShowWorldPointOnWorldMapRequested showWorldPointOnWorldMapRequested);
+	void onShowWorldPointOnWorldMapRequested(ShowStarOnWorldMapRequested showStarOnWorldMapRequested);
 
 	void onRouteViaShortestPathRequested(RouteViaShortestPathRequested routeViaShortestPathRequested);
 }

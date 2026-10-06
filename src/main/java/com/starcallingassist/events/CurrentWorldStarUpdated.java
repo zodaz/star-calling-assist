@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @AllArgsConstructor
-public class WorldStarUpdated
+public class CurrentWorldStarUpdated
 {
 	@Getter
 	private final Star star;

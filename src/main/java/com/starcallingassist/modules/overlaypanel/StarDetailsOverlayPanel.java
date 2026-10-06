@@ -1,4 +1,4 @@
-package com.starcallingassist.modules.overlay;
+package com.starcallingassist.modules.overlaypanel;
 
 import com.starcallingassist.objects.Star;
 import java.awt.Color;
@@ -14,7 +14,7 @@ import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.LineComponent;
 
 @Slf4j
-public class StarDetailsOverlay extends OverlayPanel
+public class StarDetailsOverlayPanel extends OverlayPanel
 {
 	private final Client client;
 	private final Star star;
@@ -22,7 +22,7 @@ public class StarDetailsOverlay extends OverlayPanel
 	private long lastKnownStarHealthTime = System.currentTimeMillis();
 	private static final long ONE_PERCENT_TIME_ESTIMATE = 4200;
 
-	public StarDetailsOverlay(Client client, Star star)
+	public StarDetailsOverlayPanel(Client client, Star star)
 	{
 		super();
 		this.client = client;

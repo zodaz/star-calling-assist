@@ -17,12 +17,15 @@ import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import javax.swing.border.EmptyBorder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.ui.components.PluginErrorPanel;
 import net.runelite.http.api.worlds.World;
 
+@Slf4j
 public class StarListPanel extends JPanel
 {
 	@Setter
@@ -32,15 +35,18 @@ public class StarListPanel extends JPanel
 	@Setter
 	private boolean isSortAscending = false;
 
+	@Getter
+	private final StarListGroupEntryDecorator decorator;
+
+	@Getter
+	private ConcurrentHashMap<Integer, StarListEntryAttributes> announcementAttributes = new ConcurrentHashMap<>();
+
 	private static final String EMPTY_PANEL = "EMPTY_PANEL";
 	private static final String STAR_PANEL = "STAR_PANEL";
 	public final CardLayout cardLayout = new CardLayout();
 	private final PluginErrorPanel noStarsPanel = new PluginErrorPanel();
 	private final JPanel starPanel = new JPanel();
 	public final JPanel starPanelContainer = new JPanel(cardLayout);
-	private final StarListGroupEntryDecorator decorator;
-
-	public final ConcurrentHashMap<Integer, StarListEntryAttributes> announcementAttributes = new ConcurrentHashMap<>();
 
 	public StarListPanel(StarListGroupEntryDecorator decorator)
 	{
@@ -71,16 +77,103 @@ public class StarListPanel extends JPanel
 		add(starPanelContainer, BorderLayout.CENTER);
 	}
 
-	public void onStarUpdate(@Nonnull Star star, @Nonnull World world, long updatedAt)
-	{
-		announcementAttributes.put(world.getId(), new StarListEntryAttributes(star, world, updatedAt, decorator));
-
-		SwingUtilities.invokeLater(this::rebuild);
-	}
-
 	public void startUp()
 	{
 		rebuild();
+	}
+
+	static void printCallerMethodName() {
+		// Get the current thread's stack trace
+		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+
+		// Index 0 is getStackTrace
+		// Index 1 is printCallerMethodName (this method)
+		// Index 2 is methodB (caller of this method)
+		// Index 3 is methodA (caller of methodB), and so on...
+
+		if (stackTrace.length >= 3) {
+			String callerMethodName = stackTrace[3].getMethodName();
+			log.info("rebuild called by: {}", callerMethodName);
+		} else {
+			log.info("rebuild caller not found.");
+		}
+	}
+
+	public void rebuild1()
+	{
+		printCallerMethodName();
+		SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+			@Override
+			protected Void doInBackground() throws Exception
+			{
+				// Needed every time? Could be done once?
+				rebuildNoStarsPanel();
+
+				// Seems fine, doesn't have to be on AWT event thread though
+				List<StarListGroupEntryPanel> tableEntries = new ArrayList<>();
+				for (StarListEntryAttributes announcementAttribute : announcementAttributes.values())
+				{
+					if (!announcementAttribute.shouldBeVisible())
+					{
+						continue;
+					}
+
+					tableEntries.add(new StarListGroupEntryPanel(announcementAttribute, decorator));
+				}
+
+				if (tableEntries.isEmpty() || !decorator.hasAuthorization())
+				{
+					cardLayout.show(starPanelContainer, EMPTY_PANEL);
+					return null;
+				}
+
+				cardLayout.show(starPanelContainer, STAR_PANEL);
+				tableEntries.sort(StarListPanel.this::sorter);
+
+				starPanel.removeAll();
+				starPanel.add(Box.createVerticalStrut(4));
+
+				StarListGroupPanel group = null;
+				for (StarListGroupEntryPanel entry : tableEntries)
+				{
+					if (group != null && entry.getGroupingTitle().equals(group.getTitle()))
+					{
+						group.addEntry(entry);
+						continue;
+					}
+
+					if (group != null)
+					{
+						group.commit();
+
+						starPanel.add(group);
+						starPanel.add(Box.createVerticalStrut(4));
+					}
+
+					group = new StarListGroupPanel(entry.getGroupingTitle(), orderByColumn, isSortAscending);
+					group.addEntry(entry);
+				}
+
+				if (group != null)
+				{
+					group.commit();
+					starPanel.add(group);
+					starPanel.add(Box.createVerticalStrut(4));
+				}
+
+				return null;
+			}
+
+			@Override
+			protected void done()
+			{
+				log.info("Done building!");
+				revalidate();
+				repaint();
+			}
+		};
+
+		worker.execute();
 	}
 
 	public void rebuild()
@@ -124,6 +217,7 @@ public class StarListPanel extends JPanel
 				if (group != null)
 				{
 					group.commit();
+
 					starPanel.add(group);
 					starPanel.add(Box.createVerticalStrut(4));
 				}
