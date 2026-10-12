@@ -5,6 +5,7 @@ import com.starcallingassist.PluginModuleContract;
 import com.starcallingassist.events.AnnouncementsRefreshed;
 import com.starcallingassist.modules.crowdsourcing.objects.AnnouncedStar;
 import com.starcallingassist.objects.Star;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -13,7 +14,6 @@ import net.runelite.api.Client;
 import net.runelite.api.MessageNode;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.client.callback.ClientThread;
-import net.runelite.client.chat.ChatColorType;
 import net.runelite.client.chat.ChatCommandManager;
 import net.runelite.client.chat.ChatMessageBuilder;
 import net.runelite.client.eventbus.Subscribe;
@@ -87,14 +87,52 @@ public class ChatCommandModule extends PluginModuleContract
 			{
 				return;
 			}
-			String formattedResponse = new ChatMessageBuilder()
-				.append(ChatColorType.HIGHLIGHT)
-				.append(response)
-				.build();
+
+			String[] lines = response.split("\\n");
+			ChatMessageBuilder responseBuilder = new ChatMessageBuilder();
+			appendHeader(responseBuilder, lines[0]);
+
+			for (int index = 1; index < lines.length; index++)
+			{
+				responseBuilder.append("\n");
+				appendStarLine(responseBuilder, lines[index]);
+			}
+
+			String formattedResponse = responseBuilder.build().replace("\n", "<br>");
 			MessageNode messageNode = chatMessage.getMessageNode();
 			messageNode.setRuneLiteFormatMessage(formattedResponse);
 			client.refreshChat();
 		});
+	}
+
+	private static void appendHeader(ChatMessageBuilder builder, String header)
+	{
+		int openingBracket = header.indexOf('[');
+		int closingBracket = header.indexOf(']');
+
+		if (openingBracket == -1 || closingBracket <= openingBracket)
+		{
+			builder.append(Color.RED, header);
+			return;
+		}
+
+		builder.append(Color.RED, header.substring(0, openingBracket + 1));
+		builder.append(Color.BLACK, header.substring(openingBracket + 1, closingBracket));
+		builder.append(Color.RED, header.substring(closingBracket));
+	}
+
+	private static void appendStarLine(ChatMessageBuilder builder, String line)
+	{
+		int separator = line.indexOf(" - ");
+
+		if (separator == -1)
+		{
+			builder.append(Color.RED, line);
+			return;
+		}
+
+		builder.append(Color.BLACK, line.substring(0, separator + 3));
+		builder.append(Color.RED, line.substring(separator + 3));
 	}
 
 	static String formatStars(List<Star> stars, StarChatCommandFilter filter)
@@ -106,7 +144,7 @@ public class ChatCommandModule extends PluginModuleContract
 				: "No active stars matched " + filter.description() + ".";
 		}
 
-		StringBuilder response = new StringBuilder(filter.isAll() ? "Stars: " : "Stars (" + filter.description() + "): ");
+		StringBuilder response = new StringBuilder(filter.isAll() ? "Stars:" : "Stars [" + filter.description() + "]:");
 		int starsShown = 0;
 		for (Star star : stars)
 		{
@@ -115,24 +153,19 @@ public class ChatCommandModule extends PluginModuleContract
 				break;
 			}
 
-			String entry = "T" + star.getTier() + " W" + star.getWorld();
+			String entry = "W" + star.getWorld() + " T" + star.getTier();
 			String location = StarChatCommandFilter.cleanLocation(star);
 			if (!location.isEmpty())
 			{
-				entry += " (" + abbreviateLocation(location) + ")";
+				entry += " - " + abbreviateLocation(location);
 			}
 
-			int separatorLength = starsShown == 0 ? 0 : 3;
-			if (response.length() + separatorLength + entry.length() > MAX_RESPONSE_LENGTH)
+			if (response.length() + 1 + entry.length() > MAX_RESPONSE_LENGTH)
 			{
 				break;
 			}
 
-			if (starsShown > 0)
-			{
-				response.append(" | ");
-			}
-			response.append(entry);
+			response.append('\n').append(entry);
 			starsShown++;
 		}
 
@@ -142,7 +175,11 @@ public class ChatCommandModule extends PluginModuleContract
 		}
 		if (starsShown < stars.size())
 		{
-			response.append(" | +").append(stars.size() - starsShown).append(" more");
+			String remaining = "+" + (stars.size() - starsShown) + " more";
+			if (response.length() + 1 + remaining.length() <= MAX_RESPONSE_LENGTH)
+			{
+				response.append('\n').append(remaining);
+			}
 		}
 		return response.toString();
 	}
