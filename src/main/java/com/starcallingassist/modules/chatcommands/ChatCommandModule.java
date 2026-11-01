@@ -117,7 +117,7 @@ public class ChatCommandModule extends PluginModuleContract
 		}
 
 		builder.append(Color.RED, header.substring(0, openingBracket + 1));
-		builder.append(Color.BLACK, header.substring(openingBracket + 1, closingBracket));
+		builder.append(header.substring(openingBracket + 1, closingBracket));
 		builder.append(Color.RED, header.substring(closingBracket));
 	}
 
@@ -131,7 +131,7 @@ public class ChatCommandModule extends PluginModuleContract
 			return;
 		}
 
-		builder.append(Color.BLACK, line.substring(0, separator + 3));
+		builder.append(line.substring(0, separator + 3));
 		builder.append(Color.RED, line.substring(separator + 3));
 	}
 
