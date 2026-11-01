@@ -16,6 +16,7 @@ import com.starcallingassist.modules.starobserver.StarObserverModule;
 import com.starcallingassist.modules.worldhop.WorldHopModule;
 import com.starcallingassist.modules.worldmap.WorldMapModule;
 import com.starcallingassist.modules.worldmapoverlay.WorldMapOverlayModule;
+import com.starcallingassist.modules.worldutil.WorldUtilModule;
 import java.lang.reflect.InvocationTargetException;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -53,6 +54,7 @@ public class StarCallingAssistPlugin extends Plugin
 		WorldHopModule.class,
 		WorldMapModule.class,
 		WorldMapOverlayModule.class,
+		WorldUtilModule.class,
 		ShortestPathModule.class
 	));
 

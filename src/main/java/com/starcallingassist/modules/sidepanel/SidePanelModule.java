@@ -20,6 +20,7 @@ import com.starcallingassist.events.RouteViaShortestPathRequested;
 import com.starcallingassist.modules.crowdsourcing.objects.AnnouncedStar;
 import com.starcallingassist.modules.sidepanel.decorators.MasterPanelDecorator;
 import com.starcallingassist.modules.sidepanel.objects.StarListEntryAttributes;
+import com.starcallingassist.modules.worldutil.WorldUtilModule;
 import com.starcallingassist.objects.Star;
 import com.starcallingassist.enums.StarLocationDetails;
 import java.util.ArrayList;
@@ -30,12 +31,10 @@ import net.runelite.api.GameState;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.WorldChanged;
 import net.runelite.client.eventbus.Subscribe;
-import net.runelite.client.game.WorldService;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.util.ImageUtil;
 import net.runelite.http.api.worlds.World;
-import net.runelite.http.api.worlds.WorldResult;
 
 public class SidePanelModule extends PluginModuleContract
 {
@@ -45,14 +44,9 @@ public class SidePanelModule extends PluginModuleContract
 	@Inject
 	private ClientToolbar clientToolbar;
 
-	@Inject
-	private WorldService worldService;
-
 	private SidePanel sidePanel;
 
 	private NavigationButton navButton;
-
-	private List<World> worldList = new ArrayList<>();
 
 	private final List<StarLocationDetails> currentPlayerRegions = new ArrayList<>();
 
@@ -107,7 +101,6 @@ public class SidePanelModule extends PluginModuleContract
 
 		clientToolbar.addNavigation(navButton);
 
-		fetchWorldData();
 		sidePanel.setCurrentWorld(client.getWorld());
 	}
 
@@ -167,7 +160,7 @@ public class SidePanelModule extends PluginModuleContract
 		{
 			Integer world = announcement.getStar().getWorld();
 
-			World worldObject = getWorldObject(world);
+			World worldObject = WorldUtilModule.getWorldFromId(world);
 			if (worldObject == null)
 			{
 				return;
@@ -229,44 +222,9 @@ public class SidePanelModule extends PluginModuleContract
 		SwingUtilities.invokeLater(sidePanel::rebuild);
 	}
 
-	@Override
-	public void onSecondElapsed(int secondsSinceStartup)
-	{
-		// Every 10 minutes
-		if (secondsSinceStartup % (60 * 10) == 0)
-		{
-			fetchWorldData();
-		}
-	}
-
-	private void fetchWorldData()
-	{
-		WorldResult worldResult = worldService.getWorlds();
-		if (worldResult == null)
-		{
-			return;
-		}
-
-		List<World> worlds = worldResult.getWorlds();
-		if (worlds == null || worlds.isEmpty())
-		{
-			return;
-		}
-
-		worldList = worlds;
-	}
-
-	private World getWorldObject(int worldId)
-	{
-		return worldList.stream()
-			.filter(world -> world.getId() == worldId)
-			.findFirst()
-			.orElse(null);
-	}
-
 	private void updateStarFromLocalStateChange(Star star)
 	{
-		World worldObject = getWorldObject(star.getWorld());
+		World worldObject = WorldUtilModule.getWorldFromId(star.getWorld());
 		if (worldObject == null)
 		{
 			return;
