@@ -7,6 +7,7 @@ import com.starcallingassist.modules.sidepanel.enums.TotalLevelType;
 import com.starcallingassist.objects.Star;
 import java.awt.Color;
 import java.util.EnumSet;
+import java.util.Locale;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import lombok.Getter;
@@ -121,6 +122,12 @@ public class StarListEntryAttributes
 
 	public boolean shouldBeVisible()
 	{
+		String filter = decorator.getLocationFilter().trim().toLowerCase(Locale.ROOT);
+		if (!filter.isEmpty() && !matchesFilter(filter))
+		{
+			return false;
+		}
+
 		EnumSet<WorldType> types = world.getTypes();
 
 		if (types.contains(WorldType.MEMBERS) && !decorator.showMembersWorlds())
@@ -159,6 +166,22 @@ public class StarListEntryAttributes
 		}
 
 		return decorator.visibleRegions().contains(star.getLocation().getRegion());
+	}
+
+	private boolean matchesFilter(String filter)
+	{
+		String locationName = star.getLocation().getName().toLowerCase(Locale.ROOT);
+		if (locationName.contains(filter))
+		{
+			return true;
+		}
+
+		if (Integer.toString(world.getId()).contains(filter))
+		{
+			return true;
+		}
+
+		return Integer.toString(getTier()).equals(filter);
 	}
 
 
